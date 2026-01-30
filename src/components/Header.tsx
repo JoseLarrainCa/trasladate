@@ -33,9 +33,9 @@ const Header = () => {
               <Phone className="w-4 h-4" />
               <span>+56 9 9824 3106</span>
             </a>
-            <a href="mailto:mudanzasarias@hotmail.com" className="flex items-center gap-2 hover:text-primary transition-colors">
+            <a href="mailto:contacto@nicolaslagos.cl" className="flex items-center gap-2 hover:text-primary transition-colors">
               <Mail className="w-4 h-4" />
-              <span className="hidden sm:inline">mudanzasarias@hotmail.com</span>
+              <span className="hidden sm:inline">contacto@nicolaslagos.cl</span>
             </a>
           </div>
           <span className="text-primary-foreground/80">Presupuestos gratis a todo Chile</span>
@@ -59,10 +59,10 @@ const Header = () => {
               whileHover={{ scale: 1.02 }}
             >
               <div className="w-12 h-12 bg-cta-gradient rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-heading font-bold text-xl">MA</span>
+                <span className="text-primary-foreground font-heading font-bold text-xl">NL</span>
               </div>
               <div>
-                <h1 className="font-heading font-bold text-xl text-foreground">Mudanzas Arias</h1>
+                <h1 className="font-heading font-bold text-xl text-foreground">Mudanzas Nicolás Lagos</h1>
                 <p className="text-xs text-muted-foreground">Transportamos tu futuro</p>
               </div>
             </motion.div>
