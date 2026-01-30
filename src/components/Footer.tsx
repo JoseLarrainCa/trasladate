@@ -11,10 +11,10 @@ const Footer = () => {
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-cta-gradient rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-heading font-bold">MA</span>
+                <span className="text-primary-foreground font-heading font-bold">NL</span>
               </div>
               <div>
-                <h3 className="font-heading font-bold text-lg">Mudanzas Arias</h3>
+                <h3 className="font-heading font-bold text-lg">Mudanzas Nicolás Lagos</h3>
                 <p className="text-sm text-secondary-foreground/70">Transportamos tu futuro</p>
               </div>
             </div>
@@ -53,8 +53,8 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-2 text-secondary-foreground/70">
                 <Mail className="w-4 h-4 text-primary" />
-                <a href="mailto:mudanzasarias@hotmail.com" className="hover:text-primary transition-colors text-sm">
-                  mudanzasarias@hotmail.com
+                <a href="mailto:contacto@nicolaslagos.cl" className="hover:text-primary transition-colors text-sm">
+                  contacto@nicolaslagos.cl
                 </a>
               </li>
               <li className="flex items-center gap-2 text-secondary-foreground/70">
@@ -67,7 +67,7 @@ const Footer = () => {
 
         {/* Bottom bar */}
         <div className="border-t border-secondary-foreground/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-secondary-foreground/60">
-          <p>© {currentYear} Transportes y Mudanzas Arias. Todos los derechos reservados.</p>
+          <p>© {currentYear} Transportes y Mudanzas Nicolás Lagos. Todos los derechos reservados.</p>
           <p>
             Nuestros principios: <span className="text-primary">Soluciones, Garantías, Rapidez, Confianza</span>
           </p>

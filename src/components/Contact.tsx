@@ -13,8 +13,8 @@ const contactInfo = [
   {
     icon: Mail,
     label: 'Correos',
-    values: ['mudanzasarias@hotmail.com', 'transportesdeltajc@gmail.com'],
-    action: 'mailto:mudanzasarias@hotmail.com',
+    values: ['contacto@nicolaslagos.cl'],
+    action: 'mailto:contacto@nicolaslagos.cl',
   },
   {
     icon: Clock,
