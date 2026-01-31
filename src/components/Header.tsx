@@ -20,6 +20,7 @@ const Header = () => {
     { label: 'Servicios', href: '#servicios' },
     { label: 'Nosotros', href: '#nosotros' },
     { label: 'Flota', href: '#flota' },
+    { label: 'Cotización', href: '#cotizacion' },
     { label: 'Contacto', href: '#contacto' },
   ];
 
