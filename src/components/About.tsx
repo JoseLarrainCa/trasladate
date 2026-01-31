@@ -30,13 +30,13 @@ const About = () => {
               <div className="relative rounded-2xl overflow-hidden shadow-card">
                 <img 
                   src={moversTeam} 
-                  alt="Equipo de Mudanzas Nicolás Lagos trabajando" 
+                  alt="Equipo de Trasladarte trabajando" 
                   className="w-full h-[400px] md:h-[500px] object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-secondary/60 to-transparent" />
                 <div className="absolute bottom-6 left-6 right-6">
                   <p className="text-primary-foreground font-heading font-bold text-2xl">
-                    "Transportamos tus sueños a un futuro diferente"
+                    "La Gran Aventura de Mudarte"
                   </p>
                 </div>
               </div>

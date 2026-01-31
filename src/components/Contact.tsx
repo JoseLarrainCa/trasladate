@@ -7,14 +7,14 @@ const contactInfo = [
   {
     icon: Phone,
     label: 'Teléfonos',
-    values: ['+56 9 9824 3106', '+56 22 850 8653', '+56 22 702 9889'],
-    action: 'tel:+56998243106',
+    values: ['+56 2 2643 6664', '+56 9 9142 1929', '+56 9 9004 0399'],
+    action: 'tel:+56226436664',
   },
   {
     icon: Mail,
     label: 'Correos',
-    values: ['contacto@nicolaslagos.cl'],
-    action: 'mailto:contacto@nicolaslagos.cl',
+    values: ['contacto@trasladarte.cl'],
+    action: 'mailto:contacto@trasladarte.cl',
   },
   {
     icon: Clock,
@@ -25,7 +25,7 @@ const contactInfo = [
   {
     icon: MapPin,
     label: 'Ubicación',
-    values: ['Santiago, Chile', 'Cobertura Nacional'],
+    values: ['Santiago, Chile', 'Arica a Punta Arenas'],
     action: null,
   },
 ];
@@ -106,7 +106,7 @@ const Contact = () => {
               asChild
             >
               <motion.a
-                href="https://wa.me/56998243106"
+                href="https://wa.me/56991421929"
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.02 }}
