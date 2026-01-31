@@ -29,16 +29,16 @@ const Header = () => {
       <div className="bg-secondary text-secondary-foreground py-2 px-4">
         <div className="container mx-auto flex flex-wrap justify-between items-center text-sm gap-2">
           <div className="flex items-center gap-4 flex-wrap">
-            <a href="tel:+56998243106" className="flex items-center gap-2 hover:text-primary transition-colors">
+            <a href="tel:+56226436664" className="flex items-center gap-2 hover:text-primary transition-colors">
               <Phone className="w-4 h-4" />
-              <span>+56 9 9824 3106</span>
+              <span>+56 2 2643 6664</span>
             </a>
-            <a href="mailto:contacto@nicolaslagos.cl" className="flex items-center gap-2 hover:text-primary transition-colors">
-              <Mail className="w-4 h-4" />
-              <span className="hidden sm:inline">contacto@nicolaslagos.cl</span>
+            <a href="tel:+56991421929" className="flex items-center gap-2 hover:text-primary transition-colors">
+              <Phone className="w-4 h-4" />
+              <span className="hidden sm:inline">+56 9 9142 1929</span>
             </a>
           </div>
-          <span className="text-primary-foreground/80">Presupuestos gratis a todo Chile</span>
+          <span className="text-primary-foreground/80">La Gran Aventura de Mudarte</span>
         </div>
       </div>
 
@@ -59,11 +59,11 @@ const Header = () => {
               whileHover={{ scale: 1.02 }}
             >
               <div className="w-12 h-12 bg-cta-gradient rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-heading font-bold text-xl">NL</span>
+                <span className="text-primary-foreground font-heading font-bold text-xl">T</span>
               </div>
               <div>
-                <h1 className="font-heading font-bold text-xl text-foreground">Mudanzas Nicolás Lagos</h1>
-                <p className="text-xs text-muted-foreground">Transportamos tu futuro</p>
+                <h1 className="font-heading font-bold text-xl text-foreground">Trasladarte</h1>
+                <p className="text-xs text-muted-foreground">La Gran Aventura de Mudarte</p>
               </div>
             </motion.div>
 
@@ -88,10 +88,10 @@ const Header = () => {
                 className="bg-cta-gradient text-primary-foreground shadow-cta hover:opacity-90 transition-opacity font-semibold"
                 asChild
               >
-                <a href="https://wa.me/56998243106" target="_blank" rel="noopener noreferrer">
-                  Cotizar Ahora
-                </a>
-              </Button>
+              <a href="https://wa.me/56991421929" target="_blank" rel="noopener noreferrer">
+                Cotizar Ahora
+              </a>
+            </Button>
             </div>
 
             {/* Mobile menu button */}
@@ -129,7 +129,7 @@ const Header = () => {
                   className="bg-cta-gradient text-primary-foreground w-full mt-2"
                   asChild
                 >
-                  <a href="https://wa.me/56998243106" target="_blank" rel="noopener noreferrer">
+                  <a href="https://wa.me/56991421929" target="_blank" rel="noopener noreferrer">
                     Cotizar Ahora
                   </a>
                 </Button>

@@ -50,7 +50,7 @@ const Hero = () => {
             className="inline-flex items-center gap-2 bg-primary/20 backdrop-blur-sm border border-primary/30 rounded-full px-4 py-2 mb-6"
           >
             <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-            <span className="text-primary-foreground text-sm font-medium">Empresa Familiar desde 1995</span>
+            <span className="text-primary-foreground text-sm font-medium">La Gran Aventura de Mudarte</span>
           </motion.div>
 
           {/* Main heading */}
@@ -109,7 +109,7 @@ const Hero = () => {
               className="bg-cta-gradient text-primary-foreground shadow-cta hover:opacity-90 transition-all font-semibold text-lg px-8 group"
               asChild
             >
-              <a href="https://wa.me/56998243106" target="_blank" rel="noopener noreferrer">
+              <a href="https://wa.me/56991421929" target="_blank" rel="noopener noreferrer">
                 Cotizar por WhatsApp
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
@@ -120,7 +120,7 @@ const Hero = () => {
               className="border-2 border-primary-foreground/30 text-primary-foreground bg-transparent hover:bg-primary-foreground/10 font-semibold text-lg px-8"
               asChild
             >
-              <a href="tel:+56998243106">
+              <a href="tel:+56226436664">
                 <Phone className="mr-2 w-5 h-5" />
                 Llamar Ahora
               </a>

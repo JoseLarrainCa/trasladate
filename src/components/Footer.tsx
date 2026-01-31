@@ -11,16 +11,16 @@ const Footer = () => {
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-cta-gradient rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-heading font-bold">NL</span>
+                <span className="text-primary-foreground font-heading font-bold">T</span>
               </div>
               <div>
-                <h3 className="font-heading font-bold text-lg">Mudanzas Nicolás Lagos</h3>
-                <p className="text-sm text-secondary-foreground/70">Transportamos tu futuro</p>
+                <h3 className="font-heading font-bold text-lg">Trasladarte</h3>
+                <p className="text-sm text-secondary-foreground/70">La Gran Aventura de Mudarte</p>
               </div>
             </div>
             <p className="text-secondary-foreground/80 max-w-md">
-              Empresa familiar con más de 25 años de experiencia en mudanzas y transporte de cargas. 
-              Cobertura nacional con presupuestos gratuitos.
+              Expertos en mudanzas residenciales, de oficinas y traslados especiales. 
+              Cobertura desde Arica hasta Punta Arenas con presupuestos gratuitos.
             </p>
           </div>
 
@@ -47,14 +47,14 @@ const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-center gap-2 text-secondary-foreground/70">
                 <Phone className="w-4 h-4 text-primary" />
-                <a href="tel:+56998243106" className="hover:text-primary transition-colors">
-                  +56 9 9824 3106
+                <a href="tel:+56226436664" className="hover:text-primary transition-colors">
+                  +56 2 2643 6664
                 </a>
               </li>
               <li className="flex items-center gap-2 text-secondary-foreground/70">
                 <Mail className="w-4 h-4 text-primary" />
-                <a href="mailto:contacto@nicolaslagos.cl" className="hover:text-primary transition-colors text-sm">
-                  contacto@nicolaslagos.cl
+                <a href="mailto:contacto@trasladarte.cl" className="hover:text-primary transition-colors text-sm">
+                  contacto@trasladarte.cl
                 </a>
               </li>
               <li className="flex items-center gap-2 text-secondary-foreground/70">
@@ -67,7 +67,7 @@ const Footer = () => {
 
         {/* Bottom bar */}
         <div className="border-t border-secondary-foreground/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-secondary-foreground/60">
-          <p>© {currentYear} Transportes y Mudanzas Nicolás Lagos. Todos los derechos reservados.</p>
+          <p>© {currentYear} Trasladarte Mudanzas. Todos los derechos reservados.</p>
           <p>
             Nuestros principios: <span className="text-primary">Soluciones, Garantías, Rapidez, Confianza</span>
           </p>

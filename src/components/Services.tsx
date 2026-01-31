@@ -1,37 +1,37 @@
 import { motion } from 'framer-motion';
-import { Home, Building2, Package, Warehouse, Truck, Users } from 'lucide-react';
+import { Home, Building2, Package, Warehouse, Truck, Piano, Star } from 'lucide-react';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 const services = [
   {
     icon: Home,
-    title: 'Mudanzas Residenciales',
-    description: 'Casas, departamentos y condominios. Cuidamos cada detalle de tu hogar.',
+    title: 'Mudanza del Hogar',
+    description: 'Mediante la información brindada, le ofrecemos distintos servicios adaptados a sus necesidades.',
   },
   {
     icon: Building2,
-    title: 'Mudanzas de Oficinas',
-    description: 'Traslado empresarial eficiente, minimizando tiempos de inactividad.',
+    title: 'Mudanza de Oficina',
+    description: 'Concretamos el servicio de mudanza de oficinas en tu lugar de trabajo con eficiencia.',
   },
   {
-    icon: Package,
-    title: 'Embalaje Profesional',
-    description: 'Protección de muebles, loza, electrodomésticos y objetos delicados.',
+    icon: Star,
+    title: 'Exclusividad',
+    description: 'Lo exclusivo, requiere un servicio exclusivo. Atención personalizada para clientes exigentes.',
   },
   {
-    icon: Warehouse,
-    title: 'Bodegaje',
-    description: 'Almacenamiento seguro temporal o permanente para tus pertenencias.',
+    icon: Piano,
+    title: 'Traslados Especiales',
+    description: 'Caja fuerte, piano de cola, instrumentos musicales, obras de arte y otros objetos delicados.',
   },
   {
     icon: Truck,
-    title: 'Fletes y Cargas',
-    description: 'Transporte de carga general a nivel nacional con seguimiento.',
+    title: 'Transporte Nacional',
+    description: 'Recorremos desde Arica hasta Punta Arenas. Cobertura en todo Chile.',
   },
   {
-    icon: Users,
-    title: 'Ayudantes',
-    description: 'Personal calificado para carga, descarga y organización de bienes.',
+    icon: Warehouse,
+    title: 'Minibodegas',
+    description: 'Almacenamiento seguro para tus pertenencias mientras decides tu próximo paso.',
   },
 ];
 
