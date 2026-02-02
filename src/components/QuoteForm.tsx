@@ -1,8 +1,17 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  User, MapPin, Home, Building2, Calendar, Package, 
-  ArrowRight, ArrowLeft, CheckCircle, Send, Loader2 
+import {
+  User,
+  MapPin,
+  Package,
+  ArrowRight,
+  ArrowLeft,
+  CheckCircle,
+  Send,
+  Loader2,
+  Home,
+  Building2,
+  Calendar,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,150 +19,202 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
+import { INVENTORY_CATEGORIES, VIVIENDA_OPTIONS, MUDANZA_OPTIONS } from '@/lib/constants';
+import type { QuoteInsert, QuoteItemInsert } from '@/types/database';
 
-type FormData = {
-  // Step 1: Contact
-  nombre: string;
+// Form data type
+interface FormData {
+  // Cliente
+  clienteNombre: string;
+  clienteApellido: string;
   telefono: string;
+  celular: string;
   email: string;
-  // Step 2: Origin
+  // Origen
   origenDireccion: string;
   origenComuna: string;
   origenTipo: string;
+  origenPiso: string;
   origenAscensor: boolean;
-  // Step 3: Destination
+  // Destino
   destinoDireccion: string;
   destinoComuna: string;
   destinoTipo: string;
+  destinoPiso: string;
   destinoAscensor: boolean;
-  // Step 4: Details
+  // Detalles
   tipoMudanza: string;
-  fechaTentativa: string;
-  descripcion: string;
-};
+  fechaTraslado: string;
+  fechaIndefinida: boolean;
+  sugerenciaAdicional: string;
+}
 
 const initialFormData: FormData = {
-  nombre: '',
+  clienteNombre: '',
+  clienteApellido: '',
   telefono: '',
+  celular: '',
   email: '',
   origenDireccion: '',
   origenComuna: '',
   origenTipo: 'departamento',
+  origenPiso: '',
   origenAscensor: false,
   destinoDireccion: '',
   destinoComuna: '',
   destinoTipo: 'departamento',
+  destinoPiso: '',
   destinoAscensor: false,
   tipoMudanza: 'hogar',
-  fechaTentativa: '',
-  descripcion: '',
+  fechaTraslado: '',
+  fechaIndefinida: false,
+  sugerenciaAdicional: '',
 };
 
-const viviendaOptions = [
-  { value: 'departamento', label: 'Departamento' },
-  { value: 'casa-1', label: 'Casa 1 piso' },
-  { value: 'casa-2', label: 'Casa 2+ pisos' },
-  { value: 'oficina', label: 'Oficina' },
-  { value: 'bodega', label: 'Bodega' },
-];
-
-const mudanzaOptions = [
-  { value: 'hogar', label: 'Mudanza del Hogar', icon: Home },
-  { value: 'oficina', label: 'Mudanza de Oficina', icon: Building2 },
-  { value: 'especial', label: 'Traslado Especial', icon: Package },
-];
-
 const steps = [
-  { id: 1, title: 'Contacto', icon: User },
-  { id: 2, title: 'Origen', icon: MapPin },
-  { id: 3, title: 'Destino', icon: MapPin },
-  { id: 4, title: 'Detalles', icon: Calendar },
+  { id: 1, title: 'Datos Generales', icon: User },
+  { id: 2, title: 'Inventario', icon: Package },
 ];
 
 const QuoteForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>(initialFormData);
+  const [inventory, setInventory] = useState<Record<string, number>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submittedId, setSubmittedId] = useState<string | null>(null);
   const { ref, isVisible } = useScrollAnimation();
   const { toast } = useToast();
 
   const updateField = (field: keyof FormData, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const validateStep = (step: number): boolean => {
-    switch (step) {
-      case 1:
-        return formData.nombre.trim() !== '' && formData.telefono.trim() !== '';
-      case 2:
-        return formData.origenDireccion.trim() !== '' && formData.origenComuna.trim() !== '';
-      case 3:
-        return formData.destinoDireccion.trim() !== '' && formData.destinoComuna.trim() !== '';
-      case 4:
-        return true;
-      default:
-        return false;
-    }
+  const updateInventory = (key: string, value: number) => {
+    setInventory((prev) => {
+      if (value <= 0) {
+        const { [key]: _, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, [key]: value };
+    });
+  };
+
+  const validateStep1 = (): boolean => {
+    const required = [
+      formData.clienteNombre,
+      formData.telefono,
+      formData.origenDireccion,
+      formData.origenComuna,
+      formData.destinoDireccion,
+      formData.destinoComuna,
+    ];
+    return required.every((field) => field.trim() !== '');
   };
 
   const nextStep = () => {
-    if (validateStep(currentStep)) {
-      setCurrentStep(prev => Math.min(prev + 1, 4));
-    } else {
+    if (currentStep === 1 && !validateStep1()) {
       toast({
-        title: "Campos requeridos",
-        description: "Por favor completa los campos obligatorios.",
-        variant: "destructive",
+        title: 'Campos requeridos',
+        description: 'Por favor completa los campos obligatorios (*).',
+        variant: 'destructive',
       });
+      return;
     }
+    setCurrentStep(2);
   };
 
-  const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
+  const prevStep = () => setCurrentStep(1);
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    
-    // Build WhatsApp message
-    const message = `*Nueva Cotización de Mudanza*
 
-*Datos de Contacto:*
-• Nombre: ${formData.nombre}
-• Teléfono: ${formData.telefono}
-• Email: ${formData.email || 'No proporcionado'}
+    try {
+      // Generate UUID in frontend to avoid needing SELECT permission
+      const quoteId = crypto.randomUUID();
 
-*Origen:*
-• Dirección: ${formData.origenDireccion}, ${formData.origenComuna}
-• Tipo: ${viviendaOptions.find(o => o.value === formData.origenTipo)?.label}
-• Ascensor: ${formData.origenAscensor ? 'Sí' : 'No'}
+      // Prepare quote data with generated ID
+      const quoteData: QuoteInsert = {
+        id: quoteId,
+        cliente_nombre: formData.clienteNombre,
+        cliente_apellido: formData.clienteApellido || null,
+        telefono: formData.telefono,
+        celular: formData.celular || null,
+        email: formData.email || null,
+        origen_direccion: formData.origenDireccion,
+        origen_comuna: formData.origenComuna,
+        origen_tipo_vivienda: formData.origenTipo as any,
+        origen_piso: formData.origenPiso ? parseInt(formData.origenPiso) : null,
+        origen_tiene_ascensor: formData.origenAscensor,
+        destino_direccion: formData.destinoDireccion,
+        destino_comuna: formData.destinoComuna,
+        destino_tipo_vivienda: formData.destinoTipo as any,
+        destino_piso: formData.destinoPiso ? parseInt(formData.destinoPiso) : null,
+        destino_tiene_ascensor: formData.destinoAscensor,
+        tipo_mudanza: formData.tipoMudanza as any,
+        fecha_traslado: formData.fechaTraslado || null,
+        fecha_indefinida: formData.fechaIndefinida,
+        sugerencia_adicional: formData.sugerenciaAdicional || null,
+      };
 
-*Destino:*
-• Dirección: ${formData.destinoDireccion}, ${formData.destinoComuna}
-• Tipo: ${viviendaOptions.find(o => o.value === formData.destinoTipo)?.label}
-• Ascensor: ${formData.destinoAscensor ? 'Sí' : 'No'}
+      // Insert quote without .select() to avoid requiring SELECT permission
+      const { error: quoteError } = await supabase
+        .from('quotes')
+        .insert(quoteData);
 
-*Detalles:*
-• Tipo de mudanza: ${mudanzaOptions.find(o => o.value === formData.tipoMudanza)?.label}
-• Fecha tentativa: ${formData.fechaTentativa || 'Por definir'}
-• Descripción: ${formData.descripcion || 'Sin descripción adicional'}`;
+      if (quoteError) throw quoteError;
 
-    // Simulate delay then open WhatsApp
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    const whatsappUrl = `https://wa.me/56991421929?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-    
-    setIsSubmitting(false);
-    setIsSubmitted(true);
+      // Insert inventory items using the generated quoteId
+      const inventoryItems: QuoteItemInsert[] = Object.entries(inventory)
+        .filter(([_, qty]) => qty > 0)
+        .map(([key, quantity]) => {
+          const item = INVENTORY_CATEGORIES.flatMap((c) => c.items).find((i) => i.key === key);
+          return {
+            quote_id: quoteId,
+            item_key: key,
+            item_name: item?.name || key,
+            category: item?.category || 'OTROS',
+            quantity,
+          };
+        });
+
+      if (inventoryItems.length > 0) {
+        const { error: itemsError } = await supabase.from('quote_items').insert(inventoryItems);
+        if (itemsError) throw itemsError;
+      }
+
+      setSubmittedId(quoteId);
+      setIsSubmitted(true);
+    } catch (error) {
+      console.error('Error submitting quote:', error);
+      toast({
+        title: 'Error',
+        description: 'Hubo un problema al enviar tu cotización. Por favor intenta nuevamente.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
+  const getTotalItems = () => Object.values(inventory).reduce((sum, qty) => sum + qty, 0);
+
+  // Success screen
   if (isSubmitted) {
     return (
       <section id="cotizacion" className="py-20 md:py-28 bg-muted/50">
         <div className="container mx-auto px-4">
-          <motion.div 
+          <motion.div
             className="max-w-lg mx-auto text-center bg-card rounded-3xl p-12 shadow-card"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -164,26 +225,25 @@ const QuoteForm = () => {
             <h3 className="text-2xl font-heading font-bold text-foreground mb-4">
               ¡Solicitud Enviada!
             </h3>
+            <p className="text-muted-foreground mb-2">
+              Tu cotización fue registrada exitosamente.
+            </p>
+            {submittedId && (
+              <p className="text-sm text-muted-foreground mb-6">
+                Referencia: <span className="font-mono font-medium">#{submittedId.slice(0, 8)}</span>
+              </p>
+            )}
             <p className="text-muted-foreground mb-6">
-              Se abrió WhatsApp con tu cotización. Si no se abrió automáticamente, 
-              haz clic en el botón de abajo.
+              Tu cotización quedó registrada en nuestro sistema. La revisaremos y te contactaremos pronto.
             </p>
             <div className="flex flex-col gap-3">
-              <Button 
-                className="bg-green-500 hover:bg-green-600 text-white"
-                onClick={() => {
-                  const message = `Hola, solicito cotización de mudanza.`;
-                  window.open(`https://wa.me/56991421929?text=${encodeURIComponent(message)}`, '_blank');
-                }}
-              >
-                Abrir WhatsApp
-              </Button>
-              <Button 
-                variant="outline"
+              <Button
                 onClick={() => {
                   setIsSubmitted(false);
+                  setSubmittedId(null);
                   setCurrentStep(1);
                   setFormData(initialFormData);
+                  setInventory({});
                 }}
               >
                 Nueva Cotización
@@ -199,7 +259,7 @@ const QuoteForm = () => {
     <section id="cotizacion" className="py-20 md:py-28 bg-muted/50 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-      
+
       <div className="container mx-auto px-4 relative z-10">
         {/* Section header */}
         <div ref={ref} className={`text-center mb-12 scroll-animate ${isVisible ? 'visible' : ''}`}>
@@ -210,43 +270,47 @@ const QuoteForm = () => {
             Solicita tu presupuesto gratis
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Completa el formulario en simples pasos y te contactaremos con un presupuesto personalizado.
+            Completa el formulario en 2 simples pasos y te contactaremos con un presupuesto personalizado.
           </p>
         </div>
 
         {/* Progress steps */}
-        <div className="max-w-3xl mx-auto mb-10">
+        <div className="max-w-md mx-auto mb-10">
           <div className="flex justify-between items-center">
             {steps.map((step, index) => {
               const Icon = step.icon;
               const isActive = currentStep === step.id;
               const isCompleted = currentStep > step.id;
-              
+
               return (
                 <div key={step.id} className="flex items-center">
                   <div className="flex flex-col items-center">
-                    <motion.div 
-                      className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
-                        isActive 
-                          ? 'bg-cta-gradient text-primary-foreground shadow-cta' 
-                          : isCompleted 
-                            ? 'bg-green-500 text-white' 
-                            : 'bg-muted text-muted-foreground'
+                    <motion.div
+                      className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${
+                        isActive
+                          ? 'bg-cta-gradient text-primary-foreground shadow-cta'
+                          : isCompleted
+                          ? 'bg-green-500 text-white'
+                          : 'bg-muted text-muted-foreground'
                       }`}
                       animate={{ scale: isActive ? 1.1 : 1 }}
                     >
-                      {isCompleted ? <CheckCircle className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
+                      {isCompleted ? <CheckCircle className="w-6 h-6" /> : <Icon className="w-6 h-6" />}
                     </motion.div>
-                    <span className={`text-xs mt-2 font-medium hidden sm:block ${
-                      isActive ? 'text-primary' : 'text-muted-foreground'
-                    }`}>
+                    <span
+                      className={`text-sm mt-2 font-medium ${
+                        isActive ? 'text-primary' : 'text-muted-foreground'
+                      }`}
+                    >
                       {step.title}
                     </span>
                   </div>
                   {index < steps.length - 1 && (
-                    <div className={`w-12 sm:w-24 h-1 mx-2 rounded-full transition-colors ${
-                      currentStep > step.id ? 'bg-green-500' : 'bg-muted'
-                    }`} />
+                    <div
+                      className={`w-20 sm:w-32 h-1 mx-4 rounded-full transition-colors ${
+                        currentStep > step.id ? 'bg-green-500' : 'bg-muted'
+                      }`}
+                    />
                   )}
                 </div>
               );
@@ -255,268 +319,344 @@ const QuoteForm = () => {
         </div>
 
         {/* Form card */}
-        <div className="max-w-2xl mx-auto">
-          <motion.div 
-            className="bg-card rounded-3xl p-8 md:p-10 shadow-card"
-            layout
-          >
+        <div className="max-w-4xl mx-auto">
+          <motion.div className="bg-card rounded-3xl p-6 md:p-10 shadow-card" layout>
             <AnimatePresence mode="wait">
-              {/* Step 1: Contact Info */}
+              {/* Step 1: General Data */}
               {currentStep === 1 && (
                 <motion.div
                   key="step1"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  className="space-y-6"
+                  className="space-y-8"
                 >
-                  <div className="flex items-center gap-3 mb-6">
-                    <User className="w-6 h-6 text-primary" />
-                    <h3 className="text-xl font-heading font-semibold text-foreground">
-                      Datos de Contacto
-                    </h3>
+                  {/* Cliente Section */}
+                  <div>
+                    <div className="flex items-center gap-3 mb-4">
+                      <User className="w-5 h-5 text-primary" />
+                      <h3 className="text-lg font-heading font-semibold text-foreground">
+                        Datos del Cliente
+                      </h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="clienteNombre">Nombres / Razón Social *</Label>
+                        <Input
+                          id="clienteNombre"
+                          value={formData.clienteNombre}
+                          onChange={(e) => updateField('clienteNombre', e.target.value)}
+                          placeholder="Ej: Juan"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="clienteApellido">Apellido(s)</Label>
+                        <Input
+                          id="clienteApellido"
+                          value={formData.clienteApellido}
+                          onChange={(e) => updateField('clienteApellido', e.target.value)}
+                          placeholder="Ej: Pérez"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="telefono">Teléfono *</Label>
+                        <Input
+                          id="telefono"
+                          type="tel"
+                          value={formData.telefono}
+                          onChange={(e) => updateField('telefono', e.target.value)}
+                          placeholder="Ej: +56 9 1234 5678"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="celular">Celular</Label>
+                        <Input
+                          id="celular"
+                          type="tel"
+                          value={formData.celular}
+                          onChange={(e) => updateField('celular', e.target.value)}
+                          placeholder="Ej: +56 9 8765 4321"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <Label htmlFor="email">Correo electrónico</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => updateField('email', e.target.value)}
+                          placeholder="Ej: correo@ejemplo.cl"
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="nombre">Nombre completo *</Label>
-                      <Input
-                        id="nombre"
-                        value={formData.nombre}
-                        onChange={(e) => updateField('nombre', e.target.value)}
-                        placeholder="Ej: Juan Pérez"
-                        className="mt-1"
-                      />
+                  {/* Origen Section */}
+                  <div>
+                    <div className="flex items-center gap-3 mb-4">
+                      <MapPin className="w-5 h-5 text-green-500" />
+                      <h3 className="text-lg font-heading font-semibold text-foreground">
+                        Punto de Origen
+                      </h3>
                     </div>
-                    <div>
-                      <Label htmlFor="telefono">Teléfono *</Label>
-                      <Input
-                        id="telefono"
-                        type="tel"
-                        value={formData.telefono}
-                        onChange={(e) => updateField('telefono', e.target.value)}
-                        placeholder="Ej: +56 9 1234 5678"
-                        className="mt-1"
-                      />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="origenDireccion">Dirección *</Label>
+                        <Input
+                          id="origenDireccion"
+                          value={formData.origenDireccion}
+                          onChange={(e) => updateField('origenDireccion', e.target.value)}
+                          placeholder="Ej: Av. Providencia 1234"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="origenComuna">Comuna *</Label>
+                        <Input
+                          id="origenComuna"
+                          value={formData.origenComuna}
+                          onChange={(e) => updateField('origenComuna', e.target.value)}
+                          placeholder="Ej: Providencia"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label>Tipo de vivienda</Label>
+                        <Select
+                          value={formData.origenTipo}
+                          onValueChange={(value) => updateField('origenTipo', value)}
+                        >
+                          <SelectTrigger className="mt-1">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {VIVIENDA_OPTIONS.map((opt) => (
+                              <SelectItem key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="origenPiso">Piso (opcional)</Label>
+                        <Input
+                          id="origenPiso"
+                          type="number"
+                          min="1"
+                          value={formData.origenPiso}
+                          onChange={(e) => updateField('origenPiso', e.target.value)}
+                          placeholder="Ej: 5"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div className="md:col-span-2 flex items-center gap-2">
+                        <Checkbox
+                          id="origenAscensor"
+                          checked={formData.origenAscensor}
+                          onCheckedChange={(checked) => updateField('origenAscensor', checked as boolean)}
+                        />
+                        <Label htmlFor="origenAscensor" className="cursor-pointer">
+                          Tiene ascensor en origen
+                        </Label>
+                      </div>
                     </div>
-                    <div>
-                      <Label htmlFor="email">Correo electrónico (opcional)</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => updateField('email', e.target.value)}
-                        placeholder="Ej: correo@ejemplo.cl"
-                        className="mt-1"
-                      />
+                  </div>
+
+                  {/* Destino Section */}
+                  <div>
+                    <div className="flex items-center gap-3 mb-4">
+                      <MapPin className="w-5 h-5 text-red-500" />
+                      <h3 className="text-lg font-heading font-semibold text-foreground">
+                        Punto de Destino
+                      </h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="destinoDireccion">Dirección *</Label>
+                        <Input
+                          id="destinoDireccion"
+                          value={formData.destinoDireccion}
+                          onChange={(e) => updateField('destinoDireccion', e.target.value)}
+                          placeholder="Ej: Los Leones 567"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="destinoComuna">Comuna *</Label>
+                        <Input
+                          id="destinoComuna"
+                          value={formData.destinoComuna}
+                          onChange={(e) => updateField('destinoComuna', e.target.value)}
+                          placeholder="Ej: Las Condes"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label>Tipo de vivienda</Label>
+                        <Select
+                          value={formData.destinoTipo}
+                          onValueChange={(value) => updateField('destinoTipo', value)}
+                        >
+                          <SelectTrigger className="mt-1">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {VIVIENDA_OPTIONS.map((opt) => (
+                              <SelectItem key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="destinoPiso">Piso (opcional)</Label>
+                        <Input
+                          id="destinoPiso"
+                          type="number"
+                          min="1"
+                          value={formData.destinoPiso}
+                          onChange={(e) => updateField('destinoPiso', e.target.value)}
+                          placeholder="Ej: 3"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div className="md:col-span-2 flex items-center gap-2">
+                        <Checkbox
+                          id="destinoAscensor"
+                          checked={formData.destinoAscensor}
+                          onCheckedChange={(checked) => updateField('destinoAscensor', checked as boolean)}
+                        />
+                        <Label htmlFor="destinoAscensor" className="cursor-pointer">
+                          Tiene ascensor en destino
+                        </Label>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Detalles Section */}
+                  <div>
+                    <div className="flex items-center gap-3 mb-4">
+                      <Calendar className="w-5 h-5 text-primary" />
+                      <h3 className="text-lg font-heading font-semibold text-foreground">
+                        Detalles del Traslado
+                      </h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label>Tipo de mudanza</Label>
+                        <Select
+                          value={formData.tipoMudanza}
+                          onValueChange={(value) => updateField('tipoMudanza', value)}
+                        >
+                          <SelectTrigger className="mt-1">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {MUDANZA_OPTIONS.map((opt) => (
+                              <SelectItem key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="fechaTraslado">Fecha tentativa</Label>
+                        <Input
+                          id="fechaTraslado"
+                          type="date"
+                          value={formData.fechaTraslado}
+                          onChange={(e) => updateField('fechaTraslado', e.target.value)}
+                          disabled={formData.fechaIndefinida}
+                          className="mt-1"
+                        />
+                        <div className="flex items-center gap-2 mt-2">
+                          <Checkbox
+                            id="fechaIndefinida"
+                            checked={formData.fechaIndefinida}
+                            onCheckedChange={(checked) => updateField('fechaIndefinida', checked as boolean)}
+                          />
+                          <Label htmlFor="fechaIndefinida" className="cursor-pointer text-sm">
+                            Aún no lo decido
+                          </Label>
+                        </div>
+                      </div>
+                      <div className="md:col-span-2">
+                        <Label htmlFor="sugerenciaAdicional">Sugerencia adicional</Label>
+                        <Textarea
+                          id="sugerenciaAdicional"
+                          value={formData.sugerenciaAdicional}
+                          onChange={(e) => updateField('sugerenciaAdicional', e.target.value)}
+                          placeholder="Describe brevemente qué muebles o artículos principales tienes, si hay objetos delicados, pianos, cajas fuertes, etc."
+                          className="mt-1 min-h-[100px]"
+                        />
+                      </div>
                     </div>
                   </div>
                 </motion.div>
               )}
 
-              {/* Step 2: Origin */}
+              {/* Step 2: Inventory */}
               {currentStep === 2 && (
                 <motion.div
                   key="step2"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  className="space-y-6"
                 >
-                  <div className="flex items-center gap-3 mb-6">
-                    <MapPin className="w-6 h-6 text-primary" />
-                    <h3 className="text-xl font-heading font-semibold text-foreground">
-                      Punto de Origen
-                    </h3>
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                      <Package className="w-5 h-5 text-primary" />
+                      <h3 className="text-lg font-heading font-semibold text-foreground">
+                        Inventario de Muebles
+                      </h3>
+                    </div>
+                    {getTotalItems() > 0 && (
+                      <span className="text-sm bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">
+                        {getTotalItems()} items
+                      </span>
+                    )}
                   </div>
 
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="origenDireccion">Dirección *</Label>
-                      <Input
-                        id="origenDireccion"
-                        value={formData.origenDireccion}
-                        onChange={(e) => updateField('origenDireccion', e.target.value)}
-                        placeholder="Ej: Av. Providencia 1234"
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="origenComuna">Comuna *</Label>
-                      <Input
-                        id="origenComuna"
-                        value={formData.origenComuna}
-                        onChange={(e) => updateField('origenComuna', e.target.value)}
-                        placeholder="Ej: Providencia"
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label>Tipo de vivienda</Label>
-                      <RadioGroup
-                        value={formData.origenTipo}
-                        onValueChange={(value) => updateField('origenTipo', value)}
-                        className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2"
-                      >
-                        {viviendaOptions.map((option) => (
-                          <div key={option.value} className="flex items-center">
-                            <RadioGroupItem value={option.value} id={`origen-${option.value}`} className="peer sr-only" />
-                            <Label
-                              htmlFor={`origen-${option.value}`}
-                              className="flex-1 text-center py-2 px-3 border rounded-lg cursor-pointer text-sm transition-all peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary hover:bg-muted"
-                            >
-                              {option.label}
-                            </Label>
-                          </div>
-                        ))}
-                      </RadioGroup>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="origenAscensor"
-                        checked={formData.origenAscensor}
-                        onCheckedChange={(checked) => updateField('origenAscensor', checked as boolean)}
-                      />
-                      <Label htmlFor="origenAscensor" className="cursor-pointer">
-                        Tiene ascensor
-                      </Label>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
+                  <p className="text-muted-foreground mb-6">
+                    Indica la cantidad de cada mueble que necesitas trasladar. Deja en 0 los que no aplican.
+                  </p>
 
-              {/* Step 3: Destination */}
-              {currentStep === 3 && (
-                <motion.div
-                  key="step3"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="space-y-6"
-                >
-                  <div className="flex items-center gap-3 mb-6">
-                    <MapPin className="w-6 h-6 text-primary" />
-                    <h3 className="text-xl font-heading font-semibold text-foreground">
-                      Punto de Destino
-                    </h3>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="destinoDireccion">Dirección *</Label>
-                      <Input
-                        id="destinoDireccion"
-                        value={formData.destinoDireccion}
-                        onChange={(e) => updateField('destinoDireccion', e.target.value)}
-                        placeholder="Ej: Los Leones 567"
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="destinoComuna">Comuna *</Label>
-                      <Input
-                        id="destinoComuna"
-                        value={formData.destinoComuna}
-                        onChange={(e) => updateField('destinoComuna', e.target.value)}
-                        placeholder="Ej: Las Condes"
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label>Tipo de vivienda</Label>
-                      <RadioGroup
-                        value={formData.destinoTipo}
-                        onValueChange={(value) => updateField('destinoTipo', value)}
-                        className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2"
-                      >
-                        {viviendaOptions.map((option) => (
-                          <div key={option.value} className="flex items-center">
-                            <RadioGroupItem value={option.value} id={`destino-${option.value}`} className="peer sr-only" />
-                            <Label
-                              htmlFor={`destino-${option.value}`}
-                              className="flex-1 text-center py-2 px-3 border rounded-lg cursor-pointer text-sm transition-all peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 peer-data-[state=checked]:text-primary hover:bg-muted"
-                            >
-                              {option.label}
-                            </Label>
-                          </div>
-                        ))}
-                      </RadioGroup>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="destinoAscensor"
-                        checked={formData.destinoAscensor}
-                        onCheckedChange={(checked) => updateField('destinoAscensor', checked as boolean)}
-                      />
-                      <Label htmlFor="destinoAscensor" className="cursor-pointer">
-                        Tiene ascensor
-                      </Label>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Step 4: Details */}
-              {currentStep === 4 && (
-                <motion.div
-                  key="step4"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="space-y-6"
-                >
-                  <div className="flex items-center gap-3 mb-6">
-                    <Package className="w-6 h-6 text-primary" />
-                    <h3 className="text-xl font-heading font-semibold text-foreground">
-                      Detalles de la Mudanza
-                    </h3>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div>
-                      <Label>Tipo de mudanza</Label>
-                      <RadioGroup
-                        value={formData.tipoMudanza}
-                        onValueChange={(value) => updateField('tipoMudanza', value)}
-                        className="grid gap-3 mt-2"
-                      >
-                        {mudanzaOptions.map((option) => {
-                          const Icon = option.icon;
-                          return (
-                            <div key={option.value} className="flex items-center">
-                              <RadioGroupItem value={option.value} id={`mudanza-${option.value}`} className="peer sr-only" />
-                              <Label
-                                htmlFor={`mudanza-${option.value}`}
-                                className="flex items-center gap-3 w-full py-3 px-4 border rounded-lg cursor-pointer transition-all peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/10 hover:bg-muted"
-                              >
-                                <Icon className="w-5 h-5 text-primary" />
-                                <span>{option.label}</span>
-                              </Label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {INVENTORY_CATEGORIES.map((category) => (
+                      <div key={category.key} className="bg-muted/50 rounded-xl p-4">
+                        <h4 className="font-semibold text-primary text-sm mb-3 uppercase tracking-wider">
+                          {category.name}
+                        </h4>
+                        <div className="space-y-2">
+                          {category.items.map((item) => (
+                            <div key={item.key} className="flex items-center justify-between gap-2">
+                              <span className="text-sm text-foreground truncate flex-1">
+                                {item.name}
+                              </span>
+                              <Input
+                                type="number"
+                                min="0"
+                                max="99"
+                                value={inventory[item.key] || ''}
+                                onChange={(e) =>
+                                  updateInventory(item.key, parseInt(e.target.value) || 0)
+                                }
+                                className="w-16 h-8 text-center p-1"
+                                placeholder="0"
+                              />
                             </div>
-                          );
-                        })}
-                      </RadioGroup>
-                    </div>
-                    <div>
-                      <Label htmlFor="fechaTentativa">Fecha tentativa (opcional)</Label>
-                      <Input
-                        id="fechaTentativa"
-                        type="date"
-                        value={formData.fechaTentativa}
-                        onChange={(e) => updateField('fechaTentativa', e.target.value)}
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="descripcion">Descripción adicional (opcional)</Label>
-                      <Textarea
-                        id="descripcion"
-                        value={formData.descripcion}
-                        onChange={(e) => updateField('descripcion', e.target.value)}
-                        placeholder="Describe brevemente qué muebles o artículos principales tienes, si hay objetos delicados, pianos, cajas fuertes, etc."
-                        className="mt-1 min-h-[100px]"
-                      />
-                    </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </motion.div>
               )}
@@ -534,14 +674,14 @@ const QuoteForm = () => {
                 Anterior
               </Button>
 
-              {currentStep < 4 ? (
+              {currentStep === 1 ? (
                 <Button onClick={nextStep} className="bg-cta-gradient text-primary-foreground gap-2">
-                  Siguiente
+                  Siguiente: Agregar Muebles
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               ) : (
-                <Button 
-                  onClick={handleSubmit} 
+                <Button
+                  onClick={handleSubmit}
                   disabled={isSubmitting}
                   className="bg-green-500 hover:bg-green-600 text-white gap-2"
                 >
@@ -553,7 +693,7 @@ const QuoteForm = () => {
                   ) : (
                     <>
                       <Send className="w-4 h-4" />
-                      Enviar por WhatsApp
+                      Enviar Cotización
                     </>
                   )}
                 </Button>
