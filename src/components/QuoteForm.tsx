@@ -28,7 +28,7 @@ import {
 } from '@/components/ui/select';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { INVENTORY_CATEGORIES, VIVIENDA_OPTIONS, MUDANZA_OPTIONS } from '@/lib/constants';
 import type { QuoteInsert, QuoteItemInsert } from '@/types/database';
 
@@ -168,7 +168,7 @@ const QuoteForm = () => {
       };
 
       // Insert quote without .select() to avoid requiring SELECT permission
-      const { error: quoteError } = await supabase
+      const { error: quoteError } = await (supabase as any)
         .from('quotes')
         .insert(quoteData);
 
@@ -189,7 +189,7 @@ const QuoteForm = () => {
         });
 
       if (inventoryItems.length > 0) {
-        const { error: itemsError } = await supabase.from('quote_items').insert(inventoryItems);
+        const { error: itemsError } = await (supabase as any).from('quote_items').insert(inventoryItems);
         if (itemsError) throw itemsError;
       }
 

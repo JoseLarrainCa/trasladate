@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 const Configuracion = () => {
@@ -24,7 +24,7 @@ const Configuracion = () => {
     if (!user) return;
 
     setIsSavingProfile(true);
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('profiles')
       .update({ full_name: fullName })
       .eq('id', user.id);
