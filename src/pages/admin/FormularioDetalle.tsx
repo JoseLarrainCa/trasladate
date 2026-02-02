@@ -109,11 +109,13 @@ const FormularioDetalle = () => {
       .eq('quote_id', quoteId)
       .order('category', { ascending: true });
 
-    setQuote({
-      ...quoteData,
-      quote_items: itemsData || [],
-    });
-    setSelectedStatus(quoteData.estado);
+    if (quoteData) {
+      setQuote({
+        ...quoteData,
+        quote_items: itemsData || [],
+      } as QuoteWithItems);
+      setSelectedStatus(quoteData.estado);
+    }
     setIsLoading(false);
   };
 
