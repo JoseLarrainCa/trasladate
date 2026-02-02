@@ -40,7 +40,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { QuoteWithItems, QuoteStatus, QuoteItem } from '@/types/database';
 
@@ -86,7 +86,7 @@ const FormularioDetalle = () => {
   }, [id]);
 
   const fetchQuote = async (quoteId: string) => {
-    const { data: quoteData, error: quoteError } = await supabase
+    const { data: quoteData, error: quoteError } = await (supabase as any)
       .from('quotes')
       .select('*')
       .eq('id', quoteId)
@@ -103,7 +103,7 @@ const FormularioDetalle = () => {
       return;
     }
 
-    const { data: itemsData } = await supabase
+    const { data: itemsData } = await (supabase as any)
       .from('quote_items')
       .select('*')
       .eq('quote_id', quoteId)
@@ -123,7 +123,7 @@ const FormularioDetalle = () => {
     if (!quote) return;
 
     setIsSaving(true);
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('quotes')
       .update({ estado: newStatus })
       .eq('id', quote.id);
@@ -154,7 +154,7 @@ const FormularioDetalle = () => {
       ? `${quote.notas_internas}\n• ${timestamp} - ${newNote.trim()}`
       : `• ${timestamp} - ${newNote.trim()}`;
 
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('quotes')
       .update({ notas_internas: updatedNotes })
       .eq('id', quote.id);
@@ -179,7 +179,7 @@ const FormularioDetalle = () => {
     if (!quote) return;
 
     setIsDeleting(true);
-    const { error } = await supabase.from('quotes').delete().eq('id', quote.id);
+    const { error } = await (supabase as any).from('quotes').delete().eq('id', quote.id);
 
     if (error) {
       toast({

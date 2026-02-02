@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import type { Quote, QuoteStatus } from '@/types/database';
 
 const statusConfig: Record<QuoteStatus, { label: string; color: string; icon: React.ElementType }> = {
@@ -53,7 +53,7 @@ const Formularios = () => {
   }, [quotes, searchTerm, statusFilter, typeFilter]);
 
   const fetchQuotes = async () => {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('quotes')
       .select('*')
       .order('created_at', { ascending: false });

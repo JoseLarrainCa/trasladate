@@ -21,7 +21,7 @@ import {
   Cell,
 } from 'recharts';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import type { Quote } from '@/types/database';
 
 interface StatCardProps {
@@ -63,7 +63,7 @@ const Dashboard = () => {
   }, []);
 
   const fetchQuotes = async () => {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('quotes')
       .select('*')
       .order('created_at', { ascending: false });
