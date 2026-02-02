@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Truck, Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react';
+import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -59,7 +60,9 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary via-secondary/95 to-primary/20 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex flex-col">
+      <Header />
+      <div className="flex-1 bg-gradient-to-br from-secondary via-secondary/95 to-primary/20 flex items-center justify-center p-4">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
@@ -159,6 +162,7 @@ const Login = () => {
           </div>
         </div>
       </motion.div>
+      </div>
     </div>
   );
 };

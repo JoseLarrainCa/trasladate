@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, Mail, Menu, X } from 'lucide-react';
+import { Phone, Mail, Menu, X, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Header = () => {
@@ -39,7 +40,16 @@ const Header = () => {
               <span className="hidden sm:inline">+56 9 9142 1929</span>
             </a>
           </div>
-          <span className="text-primary-foreground/80">La Gran Aventura de Mudarte</span>
+          <div className="flex items-center gap-4">
+            <span className="text-primary-foreground/80 hidden sm:inline">La Gran Aventura de Mudarte</span>
+            <Link
+              to="/login"
+              className="flex items-center gap-2 text-primary-foreground/90 hover:text-primary-foreground transition-colors font-medium"
+            >
+              <LogIn className="w-4 h-4" />
+              Panel Admin
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -126,6 +136,14 @@ const Header = () => {
                     {item.label}
                   </a>
                 ))}
+                <Link
+                  to="/login"
+                  className="flex items-center justify-center gap-2 font-medium text-foreground hover:text-primary py-2"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <LogIn className="w-4 h-4" />
+                  Panel Admin
+                </Link>
                 <Button 
                   className="bg-cta-gradient text-primary-foreground w-full mt-2"
                   asChild
