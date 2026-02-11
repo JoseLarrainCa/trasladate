@@ -7,8 +7,8 @@ const contactInfo = [
   {
     icon: Phone,
     label: 'Teléfonos',
-    values: ['+56 2 2643 6664', '+56 9 9142 1929', '+56 9 9004 0399'],
-    action: 'tel:+56226436664',
+    values: ['+56 9 9004 0399', '+56 9 9142 1929'],
+    action: 'tel:+56990040399',
   },
   {
     icon: Mail,
