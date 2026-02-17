@@ -19,7 +19,7 @@ const Header = () => {
 
   // Track which section is visible
   useEffect(() => {
-    const sectionIds = ['inicio', 'servicios', 'nosotros', 'flota', 'galeria', 'cotizacion', 'contacto'];
+    const sectionIds = ['inicio', 'servicios', 'nosotros', 'flota', 'galeria', 'cotizacion', 'contacto', 'mini-bodegas'];
     const observers: IntersectionObserver[] = [];
 
     sectionIds.forEach((id) => {
@@ -48,6 +48,7 @@ const Header = () => {
     { label: 'Galería', href: '#galeria' },
     { label: 'Cotización', href: '#cotizacion' },
     { label: 'Contacto', href: '#contacto' },
+    { label: 'Mini Bodegas', href: '#mini-bodegas' },
   ];
 
   return (
