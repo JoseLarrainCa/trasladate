@@ -31,7 +31,7 @@ const Header = () => {
             setActiveSection(id);
           }
         },
-        { rootMargin: '-40% 0px -55% 0px' }
+        { rootMargin: '-30% 0px -60% 0px' }
       );
       observer.observe(el);
       observers.push(observer);
@@ -44,8 +44,8 @@ const Header = () => {
     { label: 'Inicio', href: '#inicio' },
     { label: 'Servicios', href: '#servicios' },
     { label: 'Nosotros', href: '#nosotros' },
-    { label: 'Flota', href: '#flota' },
     { label: 'Galería', href: '#galeria' },
+    { label: 'Flota', href: '#flota' },
     { label: 'Cotización', href: '#cotizacion' },
     { label: 'Contacto', href: '#contacto' },
     { label: 'Mini Bodegas', href: '#mini-bodegas' },
