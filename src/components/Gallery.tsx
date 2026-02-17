@@ -33,6 +33,10 @@ const Gallery = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
   const [isPaused, setIsPaused] = useState(false);
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0);
+  const dragMoved = useRef(false);
 
   // Auto-scroll effect
   useEffect(() => {
@@ -40,11 +44,10 @@ const Gallery = () => {
     if (!el || isPaused) return;
 
     let animId: number;
-    let speed = 0.5;
+    const speed = 0.5;
 
     const step = () => {
       el.scrollLeft += speed;
-      // Loop: when reaching the end, jump back
       if (el.scrollLeft >= el.scrollWidth - el.clientWidth) {
         el.scrollLeft = 0;
       }
@@ -54,6 +57,28 @@ const Gallery = () => {
     animId = requestAnimationFrame(step);
     return () => cancelAnimationFrame(animId);
   }, [isPaused]);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    isDragging.current = true;
+    dragMoved.current = false;
+    setIsPaused(true);
+    startX.current = e.pageX - (scrollRef.current?.offsetLeft || 0);
+    scrollLeft.current = scrollRef.current?.scrollLeft || 0;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging.current || !scrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startX.current) * 1.5;
+    if (Math.abs(walk) > 5) dragMoved.current = true;
+    scrollRef.current.scrollLeft = scrollLeft.current - walk;
+  };
+
+  const handleMouseUp = () => {
+    isDragging.current = false;
+    setTimeout(() => setIsPaused(false), 1000);
+  };
 
   return (
     <section
@@ -83,11 +108,13 @@ const Gallery = () => {
       {/* Scrolling gallery */}
       <div
         ref={scrollRef}
-        className="flex gap-4 overflow-x-auto scrollbar-hide px-4 cursor-grab active:cursor-grabbing"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
+        className="flex gap-4 overflow-x-auto scrollbar-hide px-4 cursor-grab active:cursor-grabbing select-none"
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
         onTouchStart={() => setIsPaused(true)}
-        onTouchEnd={() => setIsPaused(false)}
+        onTouchEnd={() => setTimeout(() => setIsPaused(false), 1000)}
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {/* Duplicate items for infinite scroll effect */}
@@ -98,7 +125,7 @@ const Gallery = () => {
             animate={isVisible ? { opacity: 1, scale: 1 } : {}}
             transition={{ duration: 0.4, delay: Math.min(i * 0.05, 0.4) }}
             className="flex-shrink-0 w-72 h-80 md:w-80 md:h-96 rounded-2xl overflow-hidden relative group cursor-pointer shadow-lg"
-            onClick={() => setSelectedItem(item)}
+            onClick={() => { if (!dragMoved.current) setSelectedItem(item); }}
           >
             {item.type === 'image' ? (
               <img
