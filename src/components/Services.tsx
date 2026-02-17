@@ -35,42 +35,50 @@ const mudanzaHogarPlans = [
   },
 ];
 
+const trasladosEspeciales = [
+  'Movimiento y Traslado de Caja Fuerte',
+  'Movimiento y Traslado de Piano Vertical',
+  'Embalaje y Traslados de Obras de Arte',
+  'Embalaje y Traslado de Instrumentos',
+  'Embalaje y Traslado de Equipos de Laboratorio',
+];
+
 const services = [
   {
     icon: Home,
     title: 'Mudanza del Hogar',
     description: 'Mediante la información brindada, le ofrecemos distintos servicios adaptados a sus necesidades.',
-    expandable: true,
+    expandable: 'plans' as const,
   },
   {
     icon: Building2,
     title: 'Mudanza de Oficina',
     description: 'Concretamos el servicio de mudanza de oficinas en tu lugar de trabajo con eficiencia.',
-    expandable: false,
+    expandable: false as const,
   },
   {
     icon: Star,
     title: 'Exclusividad',
     description: 'Lo exclusivo, requiere un servicio exclusivo. Atención personalizada para clientes exigentes.',
-    expandable: false,
+    expandable: false as const,
   },
   {
     icon: Piano,
     title: 'Traslados Especiales',
     description: 'Caja fuerte, piano de cola, instrumentos musicales, obras de arte y otros objetos delicados.',
-    expandable: false,
+    expandable: 'list' as const,
   },
   {
     icon: Truck,
     title: 'Transporte Nacional',
     description: 'Recorremos desde Arica hasta Punta Arenas. Cobertura en todo Chile.',
-    expandable: false,
+    expandable: false as const,
   },
   {
     icon: Warehouse,
     title: 'Minibodegas',
     description: 'Almacenamiento seguro para tus pertenencias mientras decides tu próximo paso.',
-    expandable: false,
+    expandable: false as const,
   },
 ];
 
@@ -154,7 +162,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
           {service.description}
         </p>
 
-        {/* Expandable sub-plans */}
+        {/* Expandable content */}
         <AnimatePresence>
           {service.expandable && isExpanded && (
             <motion.div
@@ -164,23 +172,37 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
               transition={{ duration: 0.3 }}
               className="overflow-hidden"
             >
-              <div className="mt-6 space-y-5 border-t border-border pt-5">
-                {mudanzaHogarPlans.map((plan) => (
-                  <div key={plan.name}>
-                    <h4 className="font-heading font-semibold text-foreground text-lg mb-2 flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-primary" />
-                      {plan.name}
-                    </h4>
-                    <ul className="space-y-1.5 pl-4">
-                      {plan.items.map((item) => (
-                        <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
-                          <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
+              <div className="mt-6 border-t border-border pt-5">
+                {service.expandable === 'plans' && (
+                  <div className="space-y-5">
+                    {mudanzaHogarPlans.map((plan) => (
+                      <div key={plan.name}>
+                        <h4 className="font-heading font-semibold text-foreground text-lg mb-2 flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-primary" />
+                          {plan.name}
+                        </h4>
+                        <ul className="space-y-1.5 pl-4">
+                          {plan.items.map((item) => (
+                            <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
+                              <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
+                {service.expandable === 'list' && (
+                  <ul className="space-y-2">
+                    {trasladosEspeciales.map((item) => (
+                      <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
+                        <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </motion.div>
           )}
