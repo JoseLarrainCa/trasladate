@@ -91,8 +91,9 @@ const Header = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <motion.div 
-              className="flex items-center gap-3"
+            <motion.a
+              href="#inicio"
+              className="flex items-center gap-3 cursor-pointer"
               whileHover={{ scale: 1.02 }}
             >
               <div className="w-12 h-12 bg-cta-gradient rounded-lg flex items-center justify-center">
@@ -102,7 +103,7 @@ const Header = () => {
                 <h1 className="font-heading font-bold text-xl text-foreground">Trasladarte</h1>
                 <p className="text-xs text-muted-foreground">La Gran Aventura de Mudarte</p>
               </div>
-            </motion.div>
+            </motion.a>
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-8">
