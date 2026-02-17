@@ -263,7 +263,7 @@ const QuoteForm = () => {
       <div className="container mx-auto px-4 relative z-10">
         {/* Section header */}
         <div ref={ref} className={`text-center mb-12 scroll-animate ${isVisible ? 'visible' : ''}`}>
-          <span className="inline-block text-primary font-semibold text-sm uppercase tracking-wider mb-4">
+          <span className="inline-block text-primary font-semibold text-base md:text-lg uppercase tracking-wider mb-4">
             Cotización Online
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold text-foreground mb-6">
