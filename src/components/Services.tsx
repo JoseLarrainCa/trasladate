@@ -1,37 +1,76 @@
-import { motion } from 'framer-motion';
-import { Home, Building2, Package, Warehouse, Truck, Piano, Star } from 'lucide-react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Home, Building2, Package, Warehouse, Truck, Piano, Star, ChevronDown, Check } from 'lucide-react';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+
+const mudanzaHogarPlans = [
+  {
+    name: 'Express',
+    items: [
+      'Camión Cerrado',
+      'Chofer',
+      'Ayudantes para cargar en casa, dpto ó bodega',
+      'Descargar en casa, dpto ó bodega destino',
+    ],
+  },
+  {
+    name: 'Principal',
+    items: [
+      'Camión Cerrado',
+      'Chofer',
+      'Ayudantes para embalar TODOS los muebles grandes de su casa o dpto',
+      'Cargar al camión en casa o dpto',
+      'Descargar desde el camión en casa ó dpto destino',
+    ],
+  },
+  {
+    name: 'Exclusivo',
+    items: [
+      'Camión Cerrado',
+      'Chofer',
+      'Ayudantes para embalar absolutamente TODO lo existente en su casa o dpto',
+      'Cargar todo en casa o dpto origen',
+      'Descargar todo en casa, dpto ó bodega destino',
+    ],
+  },
+];
 
 const services = [
   {
     icon: Home,
     title: 'Mudanza del Hogar',
     description: 'Mediante la información brindada, le ofrecemos distintos servicios adaptados a sus necesidades.',
+    expandable: true,
   },
   {
     icon: Building2,
     title: 'Mudanza de Oficina',
     description: 'Concretamos el servicio de mudanza de oficinas en tu lugar de trabajo con eficiencia.',
+    expandable: false,
   },
   {
     icon: Star,
     title: 'Exclusividad',
     description: 'Lo exclusivo, requiere un servicio exclusivo. Atención personalizada para clientes exigentes.',
+    expandable: false,
   },
   {
     icon: Piano,
     title: 'Traslados Especiales',
     description: 'Caja fuerte, piano de cola, instrumentos musicales, obras de arte y otros objetos delicados.',
+    expandable: false,
   },
   {
     icon: Truck,
     title: 'Transporte Nacional',
     description: 'Recorremos desde Arica hasta Punta Arenas. Cobertura en todo Chile.',
+    expandable: false,
   },
   {
     icon: Warehouse,
     title: 'Minibodegas',
     description: 'Almacenamiento seguro para tus pertenencias mientras decides tu próximo paso.',
+    expandable: false,
   },
 ];
 
@@ -79,6 +118,7 @@ interface ServiceCardProps {
 
 const ServiceCard = ({ service, index }: ServiceCardProps) => {
   const { ref, isVisible } = useScrollAnimation(0.2);
+  const [isExpanded, setIsExpanded] = useState(false);
   const Icon = service.icon;
 
   return (
@@ -88,18 +128,63 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
       style={{ transitionDelay: `${index * 0.1}s` }}
     >
       <motion.div
-        className="group bg-card rounded-2xl p-8 shadow-soft hover:shadow-card transition-all duration-500 h-full border border-transparent hover:border-primary/20"
+        className={`group bg-card rounded-2xl p-8 shadow-soft hover:shadow-card transition-all duration-500 h-full border border-transparent hover:border-primary/20 ${
+          service.expandable ? 'cursor-pointer' : ''
+        }`}
         whileHover={{ y: -8 }}
+        onClick={() => service.expandable && setIsExpanded(!isExpanded)}
       >
         <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-cta-gradient group-hover:shadow-cta transition-all duration-500">
           <Icon className="w-7 h-7 text-primary group-hover:text-primary-foreground transition-colors duration-500" />
         </div>
-        <h3 className="text-xl font-heading font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">
-          {service.title}
-        </h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-xl font-heading font-semibold text-foreground group-hover:text-primary transition-colors">
+            {service.title}
+          </h3>
+          {service.expandable && (
+            <motion.div
+              animate={{ rotate: isExpanded ? 180 : 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <ChevronDown className="w-5 h-5 text-primary" />
+            </motion.div>
+          )}
+        </div>
         <p className="text-muted-foreground leading-relaxed">
           {service.description}
         </p>
+
+        {/* Expandable sub-plans */}
+        <AnimatePresence>
+          {service.expandable && isExpanded && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="overflow-hidden"
+            >
+              <div className="mt-6 space-y-5 border-t border-border pt-5">
+                {mudanzaHogarPlans.map((plan) => (
+                  <div key={plan.name}>
+                    <h4 className="font-heading font-semibold text-foreground text-lg mb-2 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-primary" />
+                      {plan.name}
+                    </h4>
+                    <ul className="space-y-1.5 pl-4">
+                      {plan.items.map((item) => (
+                        <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
+                          <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </motion.div>
   );
