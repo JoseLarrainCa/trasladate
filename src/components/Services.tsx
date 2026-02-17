@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, Building2, Package, Warehouse, Truck, Piano, Star, ChevronDown, Check } from 'lucide-react';
+import { Home, Building2, Package, Warehouse, Truck, Piano, Star, ChevronDown, Check, Send } from 'lucide-react';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
 
 const mudanzaHogarPlans = [
   {
@@ -54,7 +58,7 @@ const services = [
     icon: Building2,
     title: 'Mudanza de Oficina',
     description: 'Concretamos el servicio de mudanza de oficinas en tu lugar de trabajo con eficiencia.',
-    expandable: false as const,
+    expandable: 'office' as const,
   },
   {
     icon: Star,
@@ -203,12 +207,123 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
                     ))}
                   </ul>
                 )}
+                {service.expandable === 'office' && (
+                  <OfficeExpandable />
+                )}
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </motion.div>
     </motion.div>
+  );
+};
+
+const OfficeExpandable = () => {
+  const { toast } = useToast();
+  const [form, setForm] = useState({ nombre: '', celular: '', correo: '', direccion: '', mensaje: '' });
+  const [showForm, setShowForm] = useState(false);
+  const [sending, setSending] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.nombre.trim() || !form.celular.trim() || !form.correo.trim()) {
+      toast({ title: 'Completa los campos requeridos', variant: 'destructive' });
+      return;
+    }
+    setSending(true);
+    const msg = encodeURIComponent(
+      `*Consulta Mudanza de Oficina*\n\nNombre: ${form.nombre}\nCelular: ${form.celular}\nCorreo: ${form.correo}\nDirección: ${form.direccion}\nMensaje: ${form.mensaje}`
+    );
+    window.open(`https://wa.me/56990040399?text=${msg}`, '_blank');
+    setSending(false);
+    toast({ title: '¡Mensaje enviado!', description: 'Nos pondremos en contacto contigo pronto.' });
+    setForm({ nombre: '', celular: '', correo: '', direccion: '', mensaje: '' });
+    setShowForm(false);
+  };
+
+  return (
+    <div className="space-y-4" onClick={(e) => e.stopPropagation()}>
+      <p className="text-muted-foreground leading-relaxed text-sm">
+        Concretamos cada servicio con una <span className="text-foreground font-medium">visita técnica presencial</span> de nuestro ejecutivo, 
+        quien evalúa in situ las necesidades de su empresa para entregarle una cotización precisa y sin sorpresas.
+      </p>
+      <p className="text-muted-foreground leading-relaxed text-sm">
+        Además, programamos su mudanza en <span className="text-foreground font-medium">horario nocturno, fines de semana o feriados</span>, 
+        para que su operación no se detenga ni un solo minuto.
+      </p>
+
+      {!showForm ? (
+        <Button
+          className="bg-cta-gradient text-primary-foreground shadow-cta hover:opacity-90 w-full mt-2"
+          onClick={() => setShowForm(true)}
+        >
+          <Send className="w-4 h-4 mr-2" />
+          Solicitar Visita Técnica
+        </Button>
+      ) : (
+        <motion.form
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          className="space-y-3 mt-2"
+          onSubmit={handleSubmit}
+        >
+          <Input
+            placeholder="Nombre *"
+            value={form.nombre}
+            onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+            maxLength={100}
+            required
+          />
+          <Input
+            placeholder="Celular *"
+            type="tel"
+            value={form.celular}
+            onChange={(e) => setForm({ ...form, celular: e.target.value })}
+            maxLength={20}
+            required
+          />
+          <Input
+            placeholder="Correo *"
+            type="email"
+            value={form.correo}
+            onChange={(e) => setForm({ ...form, correo: e.target.value })}
+            maxLength={255}
+            required
+          />
+          <Input
+            placeholder="Dirección de la oficina"
+            value={form.direccion}
+            onChange={(e) => setForm({ ...form, direccion: e.target.value })}
+            maxLength={200}
+          />
+          <Textarea
+            placeholder="Cuéntanos sobre tu mudanza..."
+            value={form.mensaje}
+            onChange={(e) => setForm({ ...form, mensaje: e.target.value })}
+            maxLength={500}
+            rows={3}
+          />
+          <div className="flex gap-2">
+            <Button
+              type="submit"
+              className="bg-cta-gradient text-primary-foreground shadow-cta hover:opacity-90 flex-1"
+              disabled={sending}
+            >
+              <Send className="w-4 h-4 mr-2" />
+              Enviar
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowForm(false)}
+            >
+              Cancelar
+            </Button>
+          </div>
+        </motion.form>
+      )}
+    </div>
   );
 };
 
