@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('inicio');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,11 +17,35 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Track which section is visible
+  useEffect(() => {
+    const sectionIds = ['inicio', 'servicios', 'nosotros', 'flota', 'galeria', 'cotizacion', 'contacto'];
+    const observers: IntersectionObserver[] = [];
+
+    sectionIds.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setActiveSection(id);
+          }
+        },
+        { rootMargin: '-40% 0px -55% 0px' }
+      );
+      observer.observe(el);
+      observers.push(observer);
+    });
+
+    return () => observers.forEach((o) => o.disconnect());
+  }, []);
+
   const navItems = [
     { label: 'Inicio', href: '#inicio' },
     { label: 'Servicios', href: '#servicios' },
     { label: 'Nosotros', href: '#nosotros' },
     { label: 'Flota', href: '#flota' },
+    { label: 'Galería', href: '#galeria' },
     { label: 'Cotización', href: '#cotizacion' },
     { label: 'Contacto', href: '#contacto' },
   ];
@@ -80,17 +105,26 @@ const Header = () => {
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-8">
-              {navItems.map((item) => (
-                <motion.a
-                  key={item.label}
-                  href={item.href}
-                  className="font-medium text-foreground hover:text-primary transition-colors relative group"
-                  whileHover={{ y: -2 }}
-                >
-                  {item.label}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
-                </motion.a>
-              ))}
+              {navItems.map((item) => {
+                const isActive = activeSection === item.href.slice(1);
+                return (
+                  <motion.a
+                    key={item.label}
+                    href={item.href}
+                    className={`font-medium transition-colors relative group ${
+                      isActive ? 'text-primary' : 'text-foreground hover:text-primary'
+                    }`}
+                    whileHover={{ y: -2 }}
+                  >
+                    {item.label}
+                    <span
+                      className={`absolute -bottom-1 left-0 h-0.5 bg-primary transition-all duration-300 ${
+                        isActive ? 'w-full' : 'w-0 group-hover:w-full'
+                      }`}
+                    />
+                  </motion.a>
+                );
+              })}
             </nav>
 
             {/* CTA Button */}
@@ -126,16 +160,21 @@ const Header = () => {
               transition={{ duration: 0.3 }}
             >
               <nav className="container mx-auto px-4 py-4 flex flex-col gap-4">
-                {navItems.map((item) => (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    className="font-medium text-foreground hover:text-primary transition-colors py-2"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {item.label}
-                  </a>
-                ))}
+                {navItems.map((item) => {
+                  const isActive = activeSection === item.href.slice(1);
+                  return (
+                    <a
+                      key={item.label}
+                      href={item.href}
+                      className={`font-medium transition-colors py-2 ${
+                        isActive ? 'text-primary' : 'text-foreground hover:text-primary'
+                      }`}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {item.label}
+                    </a>
+                  );
+                })}
                 <Link
                   to="/login"
                   className="flex items-center justify-center gap-2 font-medium text-foreground hover:text-primary py-2"
