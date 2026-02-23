@@ -265,57 +265,85 @@ const OfficeExpandable = () => {
         <motion.form
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
-          className="space-y-3 mt-2"
+          className="mt-3 rounded-xl bg-secondary/10 border border-secondary/20 p-5 space-y-4"
           onSubmit={handleSubmit}
         >
-          <Input
-            placeholder="Nombre *"
-            value={form.nombre}
-            onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-            maxLength={100}
-            required
-          />
-          <Input
-            placeholder="Celular *"
-            type="tel"
-            value={form.celular}
-            onChange={(e) => setForm({ ...form, celular: e.target.value })}
-            maxLength={20}
-            required
-          />
-          <Input
-            placeholder="Correo *"
-            type="email"
-            value={form.correo}
-            onChange={(e) => setForm({ ...form, correo: e.target.value })}
-            maxLength={255}
-            required
-          />
-          <Input
-            placeholder="Dirección de la oficina"
-            value={form.direccion}
-            onChange={(e) => setForm({ ...form, direccion: e.target.value })}
-            maxLength={200}
-          />
-          <Textarea
-            placeholder="Cuéntanos sobre tu mudanza..."
-            value={form.mensaje}
-            onChange={(e) => setForm({ ...form, mensaje: e.target.value })}
-            maxLength={500}
-            rows={3}
-          />
-          <div className="flex gap-2">
+          <h4 className="font-heading font-semibold text-foreground text-base flex items-center gap-2">
+            <Send className="w-4 h-4 text-primary" />
+            Solicitar Visita Técnica
+          </h4>
+
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-secondary uppercase tracking-wide">Nombre *</label>
+            <Input
+              placeholder="Tu nombre completo"
+              value={form.nombre}
+              onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+              maxLength={100}
+              required
+              className="bg-background/80 border-secondary/20 focus-visible:ring-primary"
+            />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-secondary uppercase tracking-wide">Celular *</label>
+              <Input
+                placeholder="+56 9 1234 5678"
+                type="tel"
+                value={form.celular}
+                onChange={(e) => setForm({ ...form, celular: e.target.value })}
+                maxLength={20}
+                required
+                className="bg-background/80 border-secondary/20 focus-visible:ring-primary"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-secondary uppercase tracking-wide">Correo *</label>
+              <Input
+                placeholder="correo@ejemplo.com"
+                type="email"
+                value={form.correo}
+                onChange={(e) => setForm({ ...form, correo: e.target.value })}
+                maxLength={255}
+                required
+                className="bg-background/80 border-secondary/20 focus-visible:ring-primary"
+              />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-secondary uppercase tracking-wide">Dirección</label>
+            <Input
+              placeholder="Dirección de la oficina"
+              value={form.direccion}
+              onChange={(e) => setForm({ ...form, direccion: e.target.value })}
+              maxLength={200}
+              className="bg-background/80 border-secondary/20 focus-visible:ring-primary"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-secondary uppercase tracking-wide">Mensaje</label>
+            <Textarea
+              placeholder="Cuéntanos sobre tu mudanza..."
+              value={form.mensaje}
+              onChange={(e) => setForm({ ...form, mensaje: e.target.value })}
+              maxLength={500}
+              rows={3}
+              className="bg-background/80 border-secondary/20 focus-visible:ring-primary"
+            />
+          </div>
+          <div className="flex gap-2 pt-1">
             <Button
               type="submit"
               className="bg-cta-gradient text-primary-foreground shadow-cta hover:opacity-90 flex-1"
               disabled={sending}
             >
               <Send className="w-4 h-4 mr-2" />
-              Enviar
+              Enviar por WhatsApp
             </Button>
             <Button
               type="button"
               variant="outline"
+              className="border-secondary/30 hover:bg-secondary/10"
               onClick={() => setShowForm(false)}
             >
               Cancelar
