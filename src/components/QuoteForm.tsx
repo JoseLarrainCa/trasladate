@@ -638,7 +638,7 @@ const QuoteForm = () => {
                         <div className="space-y-2">
                           {category.items.map((item) => (
                             <div key={item.key} className="flex items-center justify-between gap-2">
-                              <span className="text-sm text-foreground truncate flex-1">
+                              <span className="text-sm text-foreground flex-1 leading-tight">
                                 {item.name}
                               </span>
                               <Input
