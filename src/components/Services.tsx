@@ -181,10 +181,19 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
                   <div className="space-y-5">
                     {mudanzaHogarPlans.map((plan) => (
                       <div key={plan.name}>
-                        <h4 className="font-heading font-semibold text-foreground text-lg mb-2 flex items-center gap-2">
-                          <span className="w-2 h-2 rounded-full bg-primary" />
-                          {plan.name}
-                        </h4>
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-heading font-semibold text-foreground text-lg flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-primary" />
+                            {plan.name}
+                          </h4>
+                          <a
+                            href="#cotizacion"
+                            className="inline-flex items-center gap-1 bg-cta-gradient text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-full shadow-cta hover:opacity-90 transition-opacity uppercase tracking-wide"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Cotiza Ahora
+                          </a>
+                        </div>
                         <ul className="space-y-1.5 pl-4">
                           {plan.items.map((item) => (
                             <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
