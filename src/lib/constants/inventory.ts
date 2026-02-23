@@ -128,11 +128,7 @@ export const INVENTORY_CATEGORIES: InventoryCategory[] = [
   {
     key: 'otros',
     name: 'OTROS',
-    items: [
-      { key: 'otros_1', name: 'Otro item 1', category: 'OTROS' },
-      { key: 'otros_2', name: 'Otro item 2', category: 'OTROS' },
-      { key: 'otros_3', name: 'Otro item 3', category: 'OTROS' },
-    ],
+    items: [],
   },
 ];
 

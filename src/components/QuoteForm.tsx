@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
+  Plus,
   User,
   MapPin,
   Package,
@@ -90,6 +91,11 @@ const QuoteForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [inventory, setInventory] = useState<Record<string, number>>({});
+  const [customItems, setCustomItems] = useState<{ name: string; qty: number }[]>([
+    { name: '', qty: 0 },
+    { name: '', qty: 0 },
+    { name: '', qty: 0 },
+  ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submittedId, setSubmittedId] = useState<string | null>(null);
@@ -188,8 +194,21 @@ const QuoteForm = () => {
           };
         });
 
-      if (inventoryItems.length > 0) {
-        const { error: itemsError } = await (supabase as any).from('quote_items').insert(inventoryItems);
+      // Add custom items
+      const customInventoryItems: QuoteItemInsert[] = customItems
+        .filter((ci) => ci.name.trim() && ci.qty > 0)
+        .map((ci, idx) => ({
+          quote_id: quoteId,
+          item_key: `custom_${idx}`,
+          item_name: ci.name.trim(),
+          category: 'OTROS',
+          quantity: ci.qty,
+        }));
+
+      const allItems = [...inventoryItems, ...customInventoryItems];
+
+      if (allItems.length > 0) {
+        const { error: itemsError } = await (supabase as any).from('quote_items').insert(allItems);
         if (itemsError) throw itemsError;
       }
 
@@ -207,7 +226,8 @@ const QuoteForm = () => {
     }
   };
 
-  const getTotalItems = () => Object.values(inventory).reduce((sum, qty) => sum + qty, 0);
+  const getCustomItemsTotal = () => customItems.reduce((sum, ci) => sum + (ci.name.trim() ? ci.qty : 0), 0);
+  const getTotalItems = () => Object.values(inventory).reduce((sum, qty) => sum + qty, 0) + getCustomItemsTotal();
 
   // Success screen
   if (isSubmitted) {
@@ -244,6 +264,7 @@ const QuoteForm = () => {
                   setCurrentStep(1);
                   setFormData(initialFormData);
                   setInventory({});
+                  setCustomItems([{ name: '', qty: 0 }, { name: '', qty: 0 }, { name: '', qty: 0 }]);
                 }}
               >
                 Nueva Cotización
@@ -654,6 +675,49 @@ const QuoteForm = () => {
                               />
                             </div>
                           ))}
+                          {/* Custom editable items for OTROS */}
+                          {category.key === 'otros' && (
+                            <>
+                              {customItems.map((ci, idx) => (
+                                <div key={`custom-${idx}`} className="flex items-center gap-2">
+                                  <Input
+                                    value={ci.name}
+                                    onChange={(e) => {
+                                      const updated = [...customItems];
+                                      updated[idx] = { ...updated[idx], name: e.target.value };
+                                      setCustomItems(updated);
+                                    }}
+                                    placeholder={`Otro item ${idx + 1}`}
+                                    maxLength={100}
+                                    className="flex-1 h-8 text-sm"
+                                  />
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    max="99"
+                                    value={ci.qty || ''}
+                                    onChange={(e) => {
+                                      const updated = [...customItems];
+                                      updated[idx] = { ...updated[idx], qty: parseInt(e.target.value) || 0 };
+                                      setCustomItems(updated);
+                                    }}
+                                    className="w-16 h-8 text-center p-1"
+                                    placeholder="0"
+                                  />
+                                </div>
+                              ))}
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="w-full mt-2 gap-1 text-xs border-dashed border-primary/30 text-primary hover:bg-primary/5"
+                                onClick={() => setCustomItems((prev) => [...prev, { name: '', qty: 0 }])}
+                              >
+                                <Plus className="w-3 h-3" />
+                                Agregar otro item
+                              </Button>
+                            </>
+                          )}
                         </div>
                       </div>
                     ))}
