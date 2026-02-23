@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, Mail, Menu, X, LogIn } from 'lucide-react';
+import { Phone, Menu, X, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import logo from '@/assets/logo.svg';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -96,9 +97,7 @@ const Header = () => {
               className="flex items-center gap-3 cursor-pointer"
               whileHover={{ scale: 1.02 }}
             >
-              <div className="w-12 h-12 bg-cta-gradient rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-heading font-bold text-xl">T</span>
-              </div>
+              <img src={logo} alt="Trasladarte" className="w-12 h-12 rounded-lg object-contain" />
               <div>
                 <h1 className="font-heading font-bold text-xl text-foreground">Trasladarte</h1>
                 <p className="text-xs text-muted-foreground">La Gran Aventura de Mudarte</p>
