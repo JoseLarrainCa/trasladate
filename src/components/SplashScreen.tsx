@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Truck } from 'lucide-react';
+import logo from '@/assets/logo.svg';
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -42,12 +43,12 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         >
           {/* Logo */}
           <motion.div
-            className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-cta"
+            className="mb-6"
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ duration: 0.6, ease: 'backOut' }}
           >
-            <span className="text-4xl font-heading font-bold text-primary-foreground">T</span>
+            <img src={logo} alt="Trasladarte" className="h-24 w-24 rounded-2xl object-contain shadow-cta" />
           </motion.div>
 
           {/* Truck animation */}
