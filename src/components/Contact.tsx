@@ -4,31 +4,31 @@ import { Button } from '@/components/ui/button';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 const contactInfo = [
-  {
-    icon: Phone,
-    label: 'Teléfonos',
-    values: ['+56 9 9004 0399', '+56 9 9142 1929'],
-    action: 'tel:+56990040399',
-  },
-  {
-    icon: Mail,
-    label: 'Correos',
-    values: ['contacto@trasladarte.cl'],
-    action: 'mailto:contacto@trasladarte.cl',
-  },
-  {
-    icon: Clock,
-    label: 'Horario',
-    values: ['Lunes a Sábado', '08:00 - 20:00 hrs'],
-    action: null,
-  },
-  {
-    icon: MapPin,
-    label: 'Ubicación',
-    values: ['Santiago, Chile', 'Arica a Punta Arenas'],
-    action: null,
-  },
-];
+{
+  icon: Phone,
+  label: 'Teléfonos',
+  values: ['+56 9 9004 0399', '+56 9 9142 1929'],
+  action: 'tel:+56990040399'
+},
+{
+  icon: Mail,
+  label: 'Correos',
+  values: ['contacto@trasladarte.cl'],
+  action: 'mailto:contacto@trasladarte.cl'
+},
+{
+  icon: Clock,
+  label: 'Horario',
+  values: ['Lunes a Sábado', '08:00 - 20:00 hrs'],
+  action: null
+},
+{
+  icon: MapPin,
+  label: 'Ubicación',
+  values: ['Santiago, Chile', 'Arica a Punta Arenas'],
+  action: null
+}];
+
 
 const Contact = () => {
   const { ref, isVisible } = useScrollAnimation();
@@ -58,44 +58,44 @@ const Contact = () => {
             const Icon = info.icon;
             const Wrapper = info.action ? 'a' : 'div';
             const wrapperProps = info.action ? { href: info.action } : {};
-            
+
             return (
               <motion.div
                 key={info.label}
                 initial={{ opacity: 0, y: 20 }}
                 animate={isVisible ? { opacity: 1, y: 0 } : {}}
-                transition={{ delay: 0.1 + index * 0.1 }}
-              >
+                transition={{ delay: 0.1 + index * 0.1 }}>
+
                 <Wrapper
                   {...wrapperProps}
                   className={`block bg-card rounded-2xl p-6 shadow-soft hover:shadow-card transition-all h-full ${
-                    info.action ? 'cursor-pointer group' : ''
-                  }`}
-                >
+                  info.action ? 'cursor-pointer group' : ''}`
+                  }>
+
                   <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-cta-gradient group-hover:shadow-cta transition-all">
                     <Icon className="w-6 h-6 text-primary group-hover:text-primary-foreground transition-colors" />
                   </div>
                   <h3 className="font-heading font-semibold text-foreground mb-2">{info.label}</h3>
-                  {info.values.map((value) => (
-                    <p key={value} className="text-muted-foreground text-sm">{value}</p>
-                  ))}
+                  {info.values.map((value) =>
+                  <p key={value} className="text-muted-foreground text-sm">{value}</p>
+                  )}
                 </Wrapper>
-              </motion.div>
-            );
+              </motion.div>);
+
           })}
         </div>
 
         {/* Main CTA */}
         <motion.div
           className={`text-center scroll-animate ${isVisible ? 'visible' : ''}`}
-          style={{ transitionDelay: '0.4s' }}
-        >
+          style={{ transitionDelay: '0.4s' }}>
+
           <div className="bg-card rounded-3xl p-8 md:p-12 shadow-card max-w-2xl mx-auto">
             <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
               <MessageCircle className="w-8 h-8 text-green-500" />
             </div>
             <h3 className="text-2xl font-heading font-bold text-foreground mb-4">
-              Cotiza por WhatsApp
+              Háblanos por WhatsApp
             </h3>
             <p className="text-muted-foreground mb-6">
               Respuesta inmediata. Cuéntanos sobre tu mudanza y te enviamos un presupuesto sin compromiso.
@@ -103,15 +103,15 @@ const Contact = () => {
             <Button
               size="lg"
               className="bg-green-500 hover:bg-green-600 text-white shadow-lg hover:shadow-xl transition-all font-semibold text-lg px-10"
-              asChild
-            >
+              asChild>
+
               <motion.a
                 href="https://wa.me/56991421929"
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
+                whileTap={{ scale: 0.98 }}>
+
                 <MessageCircle className="mr-2 w-5 h-5" />
                 Escribir por WhatsApp
               </motion.a>
@@ -119,8 +119,8 @@ const Contact = () => {
           </div>
         </motion.div>
       </div>
-    </section>
-  );
+    </section>);
+
 };
 
 export default Contact;
