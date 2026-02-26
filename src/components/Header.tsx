@@ -42,7 +42,6 @@ const Header = () => {
   }, []);
 
   const navItems = [
-    { label: 'Inicio', href: '#inicio' },
     { label: 'Servicios', href: '#servicios' },
     { label: 'Nosotros', href: '#nosotros' },
     { label: 'Galería', href: '#galeria' },
