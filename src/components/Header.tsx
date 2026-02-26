@@ -4,11 +4,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Phone, Menu, X, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import logo from '@/assets/logo.svg';
+import MiniBodegas from '@/components/MiniBodegas';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('inicio');
+  const [showMiniBodegas, setShowMiniBodegas] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,7 +22,7 @@ const Header = () => {
 
   // Track which section is visible
   useEffect(() => {
-    const sectionIds = ['inicio', 'servicios', 'nosotros', 'flota', 'galeria', 'cotizacion', 'contacto', 'mini-bodegas'];
+    const sectionIds = ['inicio', 'servicios', 'nosotros', 'flota', 'galeria', 'cotizacion', 'contacto'];
     const observers: IntersectionObserver[] = [];
 
     sectionIds.forEach((id) => {
@@ -48,7 +50,6 @@ const Header = () => {
     { label: 'Flota', href: '#flota' },
     { label: 'Cotización', href: '#cotizacion' },
     { label: 'Contacto', href: '#contacto' },
-    { label: 'Mini Bodegas', href: '#mini-bodegas' },
   ];
 
   return (
@@ -125,6 +126,15 @@ const Header = () => {
                   </motion.a>
                 );
               })}
+              {/* Mini Bodegas - opens dialog */}
+              <motion.button
+                onClick={() => setShowMiniBodegas(true)}
+                className="font-medium transition-colors relative group text-foreground hover:text-primary"
+                whileHover={{ y: -2 }}
+              >
+                Mini Bodegas
+                <span className="absolute -bottom-1 left-0 h-0.5 bg-primary transition-all duration-300 w-0 group-hover:w-full" />
+              </motion.button>
             </nav>
 
             {/* CTA Button */}
@@ -175,6 +185,13 @@ const Header = () => {
                     </a>
                   );
                 })}
+                {/* Mini Bodegas - opens dialog */}
+                <button
+                  className="font-medium transition-colors py-2 text-foreground hover:text-primary text-left"
+                  onClick={() => { setShowMiniBodegas(true); setIsMobileMenuOpen(false); }}
+                >
+                  Mini Bodegas
+                </button>
                 <Link
                   to="/login"
                   className="flex items-center justify-center gap-2 font-medium text-foreground hover:text-primary py-2"
@@ -196,6 +213,7 @@ const Header = () => {
           )}
         </AnimatePresence>
       </motion.header>
+      <MiniBodegas open={showMiniBodegas} onOpenChange={setShowMiniBodegas} />
     </>
   );
 };

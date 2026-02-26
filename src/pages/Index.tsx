@@ -5,7 +5,7 @@ import Services from '@/components/Services';
 import About from '@/components/About';
 import Fleet from '@/components/Fleet';
 import Gallery from '@/components/Gallery';
-import MiniBodegas from '@/components/MiniBodegas';
+
 import Coverage from '@/components/Coverage';
 import QuoteForm from '@/components/QuoteForm';
 import Contact from '@/components/Contact';
@@ -31,7 +31,7 @@ const Index = () => {
           <Coverage />
           <QuoteForm />
           <Contact />
-          <MiniBodegas />
+          
         </main>
         <Footer />
         <WhatsAppButton />
