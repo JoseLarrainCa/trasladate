@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Phone, Mail, MessageCircle, Clock, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import WhatsAppContactForm from './WhatsAppContactForm';
 
 const contactInfo = [
 {
@@ -116,6 +117,17 @@ const Contact = () => {
                 Escribir por WhatsApp
               </motion.a>
             </Button>
+
+            {/* Divider */}
+            <div className="flex items-center gap-3 my-8">
+              <div className="flex-1 h-px bg-border" />
+              <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
+                O envíanos un mensaje
+              </span>
+              <div className="flex-1 h-px bg-border" />
+            </div>
+
+            <WhatsAppContactForm />
           </div>
         </motion.div>
       </div>
