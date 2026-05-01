@@ -147,41 +147,10 @@ const QuoteForm = () => {
     setIsSubmitting(true);
 
     try {
-      // Generate UUID in frontend to avoid needing SELECT permission
+      // Generate UUID in frontend
       const quoteId = crypto.randomUUID();
 
-      // Prepare quote data with generated ID
-      const quoteData: QuoteInsert = {
-        id: quoteId,
-        cliente_nombre: formData.clienteNombre,
-        cliente_apellido: formData.clienteApellido || null,
-        telefono: formData.telefono,
-        celular: formData.celular || null,
-        email: formData.email || null,
-        origen_direccion: formData.origenDireccion,
-        origen_comuna: formData.origenComuna,
-        origen_tipo_vivienda: formData.origenTipo as any,
-        origen_piso: formData.origenPiso ? parseInt(formData.origenPiso) : null,
-        origen_tiene_ascensor: formData.origenAscensor,
-        destino_direccion: formData.destinoDireccion,
-        destino_comuna: formData.destinoComuna,
-        destino_tipo_vivienda: formData.destinoTipo as any,
-        destino_piso: formData.destinoPiso ? parseInt(formData.destinoPiso) : null,
-        destino_tiene_ascensor: formData.destinoAscensor,
-        tipo_mudanza: formData.tipoMudanza as any,
-        fecha_traslado: formData.fechaTraslado || null,
-        fecha_indefinida: formData.fechaIndefinida,
-        sugerencia_adicional: formData.sugerenciaAdicional || null,
-      };
-
-      // Insert quote without .select() to avoid requiring SELECT permission
-      const { error: quoteError } = await (supabase as any)
-        .from('quotes')
-        .insert(quoteData);
-
-      if (quoteError) throw quoteError;
-
-      // Insert inventory items using the generated quoteId
+      // Build inventory list (used for both DB and email)
       const inventoryItems: QuoteItemInsert[] = Object.entries(inventory)
         .filter(([_, qty]) => qty > 0)
         .map(([key, quantity]) => {
@@ -195,7 +164,6 @@ const QuoteForm = () => {
           };
         });
 
-      // Add custom items
       const customInventoryItems: QuoteItemInsert[] = customItems
         .filter((ci) => ci.name.trim() && ci.qty > 0)
         .map((ci, idx) => ({
@@ -208,17 +176,51 @@ const QuoteForm = () => {
 
       const allItems = [...inventoryItems, ...customInventoryItems];
 
-      if (allItems.length > 0) {
-        const { error: itemsError } = await (supabase as any).from('quote_items').insert(allItems);
-        if (itemsError) throw itemsError;
+      // Try to save to database (optional — don't block if it fails)
+      try {
+        const quoteData: QuoteInsert = {
+          id: quoteId,
+          cliente_nombre: formData.clienteNombre,
+          cliente_apellido: formData.clienteApellido || null,
+          telefono: formData.telefono,
+          celular: formData.celular || null,
+          email: formData.email || null,
+          origen_direccion: formData.origenDireccion,
+          origen_comuna: formData.origenComuna,
+          origen_tipo_vivienda: formData.origenTipo as any,
+          origen_piso: formData.origenPiso ? parseInt(formData.origenPiso) : null,
+          origen_tiene_ascensor: formData.origenAscensor,
+          destino_direccion: formData.destinoDireccion,
+          destino_comuna: formData.destinoComuna,
+          destino_tipo_vivienda: formData.destinoTipo as any,
+          destino_piso: formData.destinoPiso ? parseInt(formData.destinoPiso) : null,
+          destino_tiene_ascensor: formData.destinoAscensor,
+          tipo_mudanza: formData.tipoMudanza as any,
+          fecha_traslado: formData.fechaTraslado || null,
+          fecha_indefinida: formData.fechaIndefinida,
+          sugerencia_adicional: formData.sugerenciaAdicional || null,
+        };
+
+        const { error: quoteError } = await (supabase as any)
+          .from('quotes')
+          .insert(quoteData);
+
+        if (!quoteError && allItems.length > 0) {
+          await (supabase as any).from('quote_items').insert(allItems);
+        }
+        if (quoteError) {
+          console.warn('DB save skipped:', quoteError.message);
+        }
+      } catch (dbErr) {
+        console.warn('DB save failed, continuing with email notification:', dbErr);
       }
 
-      // Notify by email (Formspree) — non-blocking
+      // Send email notification (this is the source of truth for success)
       const inventoryResumen = allItems
         .map((it) => `• ${it.item_name} (${it.category}) x${it.quantity}`)
         .join('\n') || 'Sin ítems en inventario';
 
-      sendToFormspree({
+      const emailOk = await sendToFormspree({
         _subject: `Nueva cotización #${quoteId.slice(0, 8)} — ${formData.clienteNombre} ${formData.clienteApellido}`,
         tipo: 'Cotización completada',
         referencia: quoteId,
@@ -233,7 +235,11 @@ const QuoteForm = () => {
         sugerencia: formData.sugerenciaAdicional,
         total_items: getTotalItems(),
         inventario: inventoryResumen,
-      }).catch((e) => console.error('Formspree notify failed:', e));
+      });
+
+      if (!emailOk) {
+        throw new Error('No se pudo enviar el correo de notificación');
+      }
 
       setSubmittedId(quoteId);
       setIsSubmitted(true);
