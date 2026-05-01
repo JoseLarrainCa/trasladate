@@ -30,6 +30,7 @@ import {
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { sendToFormspree } from '@/lib/formspree';
 import { INVENTORY_CATEGORIES, VIVIENDA_OPTIONS, MUDANZA_OPTIONS } from '@/lib/constants';
 import type { QuoteInsert, QuoteItemInsert } from '@/types/database';
 
@@ -211,6 +212,28 @@ const QuoteForm = () => {
         const { error: itemsError } = await (supabase as any).from('quote_items').insert(allItems);
         if (itemsError) throw itemsError;
       }
+
+      // Notify by email (Formspree) — non-blocking
+      const inventoryResumen = allItems
+        .map((it) => `• ${it.item_name} (${it.category}) x${it.quantity}`)
+        .join('\n') || 'Sin ítems en inventario';
+
+      sendToFormspree({
+        _subject: `Nueva cotización #${quoteId.slice(0, 8)} — ${formData.clienteNombre} ${formData.clienteApellido}`,
+        tipo: 'Cotización completada',
+        referencia: quoteId,
+        cliente: `${formData.clienteNombre} ${formData.clienteApellido}`.trim(),
+        telefono: formData.telefono,
+        celular: formData.celular,
+        email: formData.email,
+        origen: `${formData.origenDireccion}, ${formData.origenComuna} (${formData.origenTipo}${formData.origenPiso ? `, piso ${formData.origenPiso}` : ''}${formData.origenAscensor ? ', con ascensor' : ''})`,
+        destino: `${formData.destinoDireccion}, ${formData.destinoComuna} (${formData.destinoTipo}${formData.destinoPiso ? `, piso ${formData.destinoPiso}` : ''}${formData.destinoAscensor ? ', con ascensor' : ''})`,
+        tipo_mudanza: formData.tipoMudanza,
+        fecha: formData.fechaIndefinida ? 'Fecha indefinida' : (formData.fechaTraslado || 'No especificada'),
+        sugerencia: formData.sugerenciaAdicional,
+        total_items: getTotalItems(),
+        inventario: inventoryResumen,
+      }).catch((e) => console.error('Formspree notify failed:', e));
 
       setSubmittedId(quoteId);
       setIsSubmitted(true);
