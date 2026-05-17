@@ -83,6 +83,14 @@ const initialFormData: FormData = {
   sugerenciaAdicional: '',
 };
 
+const createQuoteId = () => {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    return crypto.randomUUID();
+  }
+
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+};
+
 const steps = [
   { id: 1, title: 'Datos Generales', icon: User },
   { id: 2, title: 'Inventario', icon: Package },
@@ -148,7 +156,8 @@ const QuoteForm = () => {
 
     try {
       // Generate UUID in frontend
-      const quoteId = crypto.randomUUID();
+      const quoteId = createQuoteId();
+      let savedInDatabase = false;
 
       // Build inventory list (used for both DB and email)
       const inventoryItems: QuoteItemInsert[] = Object.entries(inventory)
@@ -205,8 +214,15 @@ const QuoteForm = () => {
           .from('quotes')
           .insert(quoteData);
 
+        if (!quoteError) {
+          savedInDatabase = true;
+        }
+
         if (!quoteError && allItems.length > 0) {
-          await (supabase as any).from('quote_items').insert(allItems);
+          const { error: itemsError } = await (supabase as any).from('quote_items').insert(allItems);
+          if (itemsError) {
+            console.warn('Quote items save skipped:', itemsError.message);
+          }
         }
         if (quoteError) {
           console.warn('DB save skipped:', quoteError.message);
@@ -237,8 +253,12 @@ const QuoteForm = () => {
         inventario: inventoryResumen,
       });
 
+      if (!emailOk && !savedInDatabase) {
+        throw new Error('No se pudo guardar ni enviar la cotización');
+      }
+
       if (!emailOk) {
-        throw new Error('No se pudo enviar el correo de notificación');
+        console.warn('Formspree notification failed, but quote was saved in the database');
       }
 
       setSubmittedId(quoteId);
