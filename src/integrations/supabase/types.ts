@@ -14,16 +14,197 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      quote_items: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          item_key: string
+          item_name: string
+          quantity: number
+          quote_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          item_key: string
+          item_name: string
+          quantity?: number
+          quote_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          item_key?: string
+          item_name?: string
+          quantity?: number
+          quote_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_items_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quotes: {
+        Row: {
+          celular: string | null
+          cliente_apellido: string | null
+          cliente_nombre: string
+          cliente_razon_social: string | null
+          created_at: string
+          destino_comuna: string
+          destino_direccion: string
+          destino_piso: number | null
+          destino_tiene_ascensor: boolean
+          destino_tipo_vivienda: string
+          email: string | null
+          estado: string
+          excel_import_date: string | null
+          fecha_indefinida: boolean
+          fecha_traslado: string | null
+          id: string
+          imported_from_excel: boolean
+          notas_internas: string | null
+          origen_comuna: string
+          origen_direccion: string
+          origen_piso: number | null
+          origen_tiene_ascensor: boolean
+          origen_tipo_vivienda: string
+          sugerencia_adicional: string | null
+          telefono: string
+          tipo_mudanza: string
+          updated_at: string
+        }
+        Insert: {
+          celular?: string | null
+          cliente_apellido?: string | null
+          cliente_nombre: string
+          cliente_razon_social?: string | null
+          created_at?: string
+          destino_comuna: string
+          destino_direccion: string
+          destino_piso?: number | null
+          destino_tiene_ascensor?: boolean
+          destino_tipo_vivienda: string
+          email?: string | null
+          estado?: string
+          excel_import_date?: string | null
+          fecha_indefinida?: boolean
+          fecha_traslado?: string | null
+          id?: string
+          imported_from_excel?: boolean
+          notas_internas?: string | null
+          origen_comuna: string
+          origen_direccion: string
+          origen_piso?: number | null
+          origen_tiene_ascensor?: boolean
+          origen_tipo_vivienda: string
+          sugerencia_adicional?: string | null
+          telefono: string
+          tipo_mudanza: string
+          updated_at?: string
+        }
+        Update: {
+          celular?: string | null
+          cliente_apellido?: string | null
+          cliente_nombre?: string
+          cliente_razon_social?: string | null
+          created_at?: string
+          destino_comuna?: string
+          destino_direccion?: string
+          destino_piso?: number | null
+          destino_tiene_ascensor?: boolean
+          destino_tipo_vivienda?: string
+          email?: string | null
+          estado?: string
+          excel_import_date?: string | null
+          fecha_indefinida?: boolean
+          fecha_traslado?: string | null
+          id?: string
+          imported_from_excel?: boolean
+          notas_internas?: string | null
+          origen_comuna?: string
+          origen_direccion?: string
+          origen_piso?: number | null
+          origen_tiene_ascensor?: boolean
+          origen_tipo_vivienda?: string
+          sugerencia_adicional?: string | null
+          telefono?: string
+          tipo_mudanza?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "viewer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +331,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "viewer"],
+    },
   },
 } as const

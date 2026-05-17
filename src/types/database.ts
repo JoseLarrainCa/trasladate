@@ -29,27 +29,47 @@ export interface Database {
       profiles: {
         Row: {
           id: string;
+          user_id: string | null;
           email: string;
           full_name: string | null;
-          role: 'admin' | 'viewer';
           created_at: string;
           updated_at: string;
         };
         Insert: {
-          id: string;
+          id?: string;
+          user_id?: string | null;
           email: string;
           full_name?: string | null;
-          role?: 'admin' | 'viewer';
           created_at?: string;
           updated_at?: string;
         };
         Update: {
           id?: string;
+          user_id?: string | null;
           email?: string;
           full_name?: string | null;
-          role?: 'admin' | 'viewer';
           created_at?: string;
           updated_at?: string;
+        };
+      };
+      user_roles: {
+        Row: {
+          id: string;
+          user_id: string;
+          role: 'admin' | 'viewer';
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          role: 'admin' | 'viewer';
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          role?: 'admin' | 'viewer';
+          created_at?: string;
         };
       };
       quotes: {
