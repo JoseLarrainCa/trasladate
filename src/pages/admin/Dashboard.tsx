@@ -60,6 +60,20 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchQuotes();
+
+    // Realtime: refresh when new quotes arrive
+    const channel = supabase
+      .channel('dashboard-quotes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'quotes' },
+        () => fetchQuotes()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchQuotes = async () => {
