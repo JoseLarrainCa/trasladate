@@ -46,6 +46,19 @@ const Formularios = () => {
 
   useEffect(() => {
     fetchQuotes();
+
+    const channel = supabase
+      .channel('formularios-quotes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'quotes' },
+        () => fetchQuotes()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
