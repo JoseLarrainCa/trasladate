@@ -280,6 +280,8 @@ const QuoteForm = () => {
 
   const getCustomItemsTotal = () => customItems.reduce((sum, ci) => sum + (ci.name.trim() ? ci.qty : 0), 0);
   const getTotalItems = () => Object.values(inventory).reduce((sum, qty) => sum + qty, 0) + getCustomItemsTotal();
+  const totalM3 = calculateTotalM3(inventory);
+  const totalM2 = m3ToM2(totalM3);
 
   // Success screen
   if (isSubmitted) {
