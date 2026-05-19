@@ -53,8 +53,11 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   const { user, signOut } = useAuth();
 
   const handleSignOut = async () => {
-    await signOut();
-    navigate('/login');
+    try {
+      await signOut();
+    } finally {
+      navigate('/login', { replace: true });
+    }
   };
 
   const isActive = (href: string) => {

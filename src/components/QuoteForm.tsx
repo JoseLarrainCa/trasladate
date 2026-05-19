@@ -32,6 +32,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { sendToFormspree } from '@/lib/formspree';
 import { INVENTORY_CATEGORIES, VIVIENDA_OPTIONS, MUDANZA_OPTIONS } from '@/lib/constants';
+import { calculateTotalM3, m3ToM2, getInventoryItem } from '@/lib/constants/inventory';
 import type { QuoteInsert, QuoteItemInsert } from '@/types/database';
 
 // Form data type
@@ -235,7 +236,11 @@ const QuoteForm = () => {
 
       // Send email notification (this is the source of truth for success)
       const inventoryResumen = allItems
-        .map((it) => `• ${it.item_name} (${it.category}) x${it.quantity}`)
+        .map((it) => {
+          const m3 = getInventoryItem(it.item_key)?.m3;
+          const m3Str = m3 ? ` · ${(m3 * it.quantity).toFixed(2)} m³` : '';
+          return `• ${it.item_name} (${it.category}) x${it.quantity}${m3Str}`;
+        })
         .join('\n') || 'Sin ítems en inventario';
 
       const emailOk = await sendToFormspree({
@@ -252,6 +257,8 @@ const QuoteForm = () => {
         fecha: formData.fechaIndefinida ? 'Fecha indefinida' : (formData.fechaTraslado || 'No especificada'),
         sugerencia: formData.sugerenciaAdicional,
         total_items: getTotalItems(),
+        total_m3: `${totalM3.toFixed(2)} m³`,
+        total_m2_bodega: `${totalM2.toFixed(2)} m²`,
         inventario: inventoryResumen,
       });
 
@@ -279,6 +286,8 @@ const QuoteForm = () => {
 
   const getCustomItemsTotal = () => customItems.reduce((sum, ci) => sum + (ci.name.trim() ? ci.qty : 0), 0);
   const getTotalItems = () => Object.values(inventory).reduce((sum, qty) => sum + qty, 0) + getCustomItemsTotal();
+  const totalM3 = calculateTotalM3(inventory);
+  const totalM2 = m3ToM2(totalM3);
 
   // Success screen
   if (isSubmitted) {
@@ -691,15 +700,25 @@ const QuoteForm = () => {
                       </h3>
                     </div>
                     {getTotalItems() > 0 && (
-                      <span className="text-sm bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">
-                        {getTotalItems()} items
-                      </span>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-sm bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">
+                          {getTotalItems()} items
+                        </span>
+                        <span className="text-sm bg-secondary/10 text-secondary px-3 py-1 rounded-full font-semibold">
+                          {totalM3.toFixed(2)} m³
+                        </span>
+                        <span className="text-sm bg-muted text-foreground px-3 py-1 rounded-full font-medium">
+                          ≈ {totalM2.toFixed(2)} m² bodega
+                        </span>
+                      </div>
                     )}
                   </div>
 
                   <p className="text-muted-foreground mb-6">
                     Indica la cantidad de cada mueble que necesitas trasladar. Deja en 0 los que no aplican.
+                    El cálculo de m³ y m² se actualiza automáticamente según la planilla oficial Trasladarte.
                   </p>
+
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {INVENTORY_CATEGORIES.map((category) => (
@@ -708,24 +727,31 @@ const QuoteForm = () => {
                           {category.name}
                         </h4>
                         <div className="space-y-2">
-                          {category.items.map((item) => (
-                            <div key={item.key} className="flex items-center justify-between gap-2">
-                              <span className="text-sm text-foreground flex-1 leading-tight">
-                                {item.name}
-                              </span>
-                              <Input
-                                type="number"
-                                min="0"
-                                max="99"
-                                value={inventory[item.key] || ''}
-                                onChange={(e) =>
-                                  updateInventory(item.key, parseInt(e.target.value) || 0)
-                                }
-                                className="w-16 h-8 text-center p-1"
-                                placeholder="0"
-                              />
-                            </div>
-                          ))}
+                          {category.items.map((item) => {
+                            const qty = inventory[item.key] || 0;
+                            const itemM3 = qty * item.m3;
+                            return (
+                              <div key={item.key} className="flex items-center justify-between gap-2">
+                                <span className="text-sm text-foreground flex-1 leading-tight">
+                                  {item.name}
+                                  <span className="block text-[10px] text-muted-foreground">
+                                    {item.m3} m³ c/u{qty > 0 ? ` · subtotal ${itemM3.toFixed(2)} m³` : ''}
+                                  </span>
+                                </span>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  max="99"
+                                  value={inventory[item.key] || ''}
+                                  onChange={(e) =>
+                                    updateInventory(item.key, parseInt(e.target.value) || 0)
+                                  }
+                                  className="w-16 h-8 text-center p-1"
+                                  placeholder="0"
+                                />
+                              </div>
+                            );
+                          })}
                           {/* Custom editable items for OTROS */}
                           {category.key === 'otros' && (
                             <>

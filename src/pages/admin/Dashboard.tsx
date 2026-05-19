@@ -7,6 +7,8 @@ import {
   TrendingUp,
   Package,
   MapPin,
+  Boxes,
+  Ruler,
 } from 'lucide-react';
 import {
   BarChart,
@@ -22,7 +24,8 @@ import {
 } from 'recharts';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { supabase } from '@/integrations/supabase/client';
-import type { Quote } from '@/types/database';
+import type { Quote, QuoteItem } from '@/types/database';
+import { getInventoryItem, m3ToM2 } from '@/lib/constants/inventory';
 
 interface StatCardProps {
   title: string;
@@ -56,18 +59,24 @@ const COLORS = ['#f97316', '#3b82f6', '#22c55e', '#eab308', '#ef4444', '#8b5cf6'
 
 const Dashboard = () => {
   const [quotes, setQuotes] = useState<Quote[]>([]);
+  const [items, setItems] = useState<QuoteItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchQuotes();
+    fetchAll();
 
-    // Realtime: refresh when new quotes arrive
+    // Realtime: refresh on any change to quotes or quote_items
     const channel = supabase
       .channel('dashboard-quotes')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'quotes' },
-        () => fetchQuotes()
+        () => fetchAll()
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'quote_items' },
+        () => fetchAll()
       )
       .subscribe();
 
@@ -76,17 +85,17 @@ const Dashboard = () => {
     };
   }, []);
 
-  const fetchQuotes = async () => {
-    const { data, error } = await (supabase as any)
-      .from('quotes')
-      .select('*')
-      .order('created_at', { ascending: false });
+  const fetchAll = async () => {
+    const [{ data: qData, error: qErr }, { data: iData, error: iErr }] = await Promise.all([
+      (supabase as any).from('quotes').select('*').order('created_at', { ascending: false }),
+      (supabase as any).from('quote_items').select('*'),
+    ]);
 
-    if (error) {
-      console.error('Error fetching quotes:', error);
-    } else {
-      setQuotes(data || []);
-    }
+    if (qErr) console.error('Error fetching quotes:', qErr);
+    if (iErr) console.error('Error fetching quote_items:', iErr);
+
+    setQuotes(qData || []);
+    setItems(iData || []);
     setIsLoading(false);
   };
 
@@ -99,6 +108,17 @@ const Dashboard = () => {
 
   const pendingCount = quotes.filter((q) => q.estado === 'pendiente').length;
   const completedCount = quotes.filter((q) => q.estado === 'completado').length;
+
+  // M³ totals (computed from quote_items via planilla)
+  const m3ByQuote = items.reduce<Record<string, number>>((acc, it) => {
+    const def = getInventoryItem(it.item_key);
+    if (def) acc[it.quote_id] = (acc[it.quote_id] || 0) + def.m3 * it.quantity;
+    return acc;
+  }, {});
+  const totalM3 = Object.values(m3ByQuote).reduce((s, v) => s + v, 0);
+  const quotesWithM3 = Object.keys(m3ByQuote).length;
+  const avgM3 = quotesWithM3 > 0 ? totalM3 / quotesWithM3 : 0;
+  const totalM2 = m3ToM2(totalM3);
 
   // Quotes by month (last 6 months)
   const monthlyData = Array.from({ length: 6 }, (_, i) => {
@@ -173,6 +193,28 @@ const Dashboard = () => {
             value={quotes.length > 0 ? `${Math.round((completedCount / quotes.length) * 100)}%` : '0%'}
             description="Completadas / Total"
             icon={TrendingUp}
+          />
+        </div>
+
+        {/* M³ KPIs (planilla Trasladarte) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <StatCard
+            title="Total m³ cotizados"
+            value={`${totalM3.toFixed(1)} m³`}
+            description={`${quotesWithM3} cotizaciones con inventario`}
+            icon={Boxes}
+          />
+          <StatCard
+            title="m² estimados de bodega"
+            value={`${totalM2.toFixed(1)} m²`}
+            description="Conversión planilla: m³ ÷ 2.5"
+            icon={Ruler}
+          />
+          <StatCard
+            title="Promedio m³ por mudanza"
+            value={`${avgM3.toFixed(2)} m³`}
+            description="Solo cotizaciones con ítems"
+            icon={Package}
           />
         </div>
 
