@@ -7,6 +7,8 @@ import {
   TrendingUp,
   Package,
   MapPin,
+  Boxes,
+  Ruler,
 } from 'lucide-react';
 import {
   BarChart,
@@ -22,7 +24,8 @@ import {
 } from 'recharts';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { supabase } from '@/integrations/supabase/client';
-import type { Quote } from '@/types/database';
+import type { Quote, QuoteItem } from '@/types/database';
+import { getInventoryItem, m3ToM2 } from '@/lib/constants/inventory';
 
 interface StatCardProps {
   title: string;
