@@ -32,6 +32,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { sendToFormspree } from '@/lib/formspree';
 import { INVENTORY_CATEGORIES, VIVIENDA_OPTIONS, MUDANZA_OPTIONS } from '@/lib/constants';
+import { calculateTotalM3, m3ToM2, getInventoryItem } from '@/lib/constants/inventory';
 import type { QuoteInsert, QuoteItemInsert } from '@/types/database';
 
 // Form data type
