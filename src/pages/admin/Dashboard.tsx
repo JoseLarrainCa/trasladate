@@ -109,6 +109,17 @@ const Dashboard = () => {
   const pendingCount = quotes.filter((q) => q.estado === 'pendiente').length;
   const completedCount = quotes.filter((q) => q.estado === 'completado').length;
 
+  // M³ totals (computed from quote_items via planilla)
+  const m3ByQuote = items.reduce<Record<string, number>>((acc, it) => {
+    const def = getInventoryItem(it.item_key);
+    if (def) acc[it.quote_id] = (acc[it.quote_id] || 0) + def.m3 * it.quantity;
+    return acc;
+  }, {});
+  const totalM3 = Object.values(m3ByQuote).reduce((s, v) => s + v, 0);
+  const quotesWithM3 = Object.keys(m3ByQuote).length;
+  const avgM3 = quotesWithM3 > 0 ? totalM3 / quotesWithM3 : 0;
+  const totalM2 = m3ToM2(totalM3);
+
   // Quotes by month (last 6 months)
   const monthlyData = Array.from({ length: 6 }, (_, i) => {
     const date = new Date();
