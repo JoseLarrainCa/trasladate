@@ -8,7 +8,7 @@ const contactInfo = [
 {
   icon: Phone,
   label: 'Teléfonos',
-  values: ['+56 9 9004 0399', '+56 9 9142 1929'],
+  values: ['+56 9 9004 0399', '+56 9 9004 0399'],
   action: 'tel:+56990040399'
 },
 {
@@ -107,7 +107,7 @@ const Contact = () => {
               asChild>
 
               <motion.a
-                href="https://wa.me/56991421929"
+                href="https://wa.me/56990040399"
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.02 }}

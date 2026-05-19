@@ -62,9 +62,9 @@ const Header = () => {
               <Phone className="w-4 h-4" />
               <span>+56 9 9004 0399</span>
             </a>
-            <a href="tel:+56991421929" className="flex items-center gap-2 hover:text-primary transition-colors">
+            <a href="tel:+56990040399" className="flex items-center gap-2 hover:text-primary transition-colors">
               <Phone className="w-4 h-4" />
-              <span className="hidden sm:inline">+56 9 9142 1929</span>
+              <span className="hidden sm:inline">+56 9 9004 0399</span>
             </a>
           </div>
           <div className="flex items-center gap-4">
@@ -143,7 +143,7 @@ const Header = () => {
                 className="bg-cta-gradient text-primary-foreground shadow-cta hover:opacity-90 transition-opacity font-semibold"
                 asChild
               >
-              <a href="https://wa.me/56991421929" target="_blank" rel="noopener noreferrer">
+              <a href="https://wa.me/56990040399" target="_blank" rel="noopener noreferrer">
                 Cotizar Ahora
               </a>
             </Button>
@@ -204,7 +204,7 @@ const Header = () => {
                   className="bg-cta-gradient text-primary-foreground w-full mt-2"
                   asChild
                 >
-                  <a href="https://wa.me/56991421929" target="_blank" rel="noopener noreferrer">
+                  <a href="https://wa.me/56990040399" target="_blank" rel="noopener noreferrer">
                     Cotizar Ahora
                   </a>
                 </Button>

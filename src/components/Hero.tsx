@@ -109,7 +109,7 @@ const Hero = () => {
               className="bg-cta-gradient text-primary-foreground shadow-cta hover:opacity-90 transition-all font-semibold text-lg px-8 group"
               asChild
             >
-              <a href="https://wa.me/56991421929" target="_blank" rel="noopener noreferrer">
+              <a href="https://wa.me/56990040399" target="_blank" rel="noopener noreferrer">
                 Cotizar por WhatsApp
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
