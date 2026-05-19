@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Phone, Menu, X, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import logo from '@/assets/logo.svg';
+import logo from '@/assets/logo-trasladarte.png';
 import MiniBodegas from '@/components/MiniBodegas';
 
 const Header = () => {
@@ -97,7 +97,7 @@ const Header = () => {
               className="flex items-center gap-3 cursor-pointer"
               whileHover={{ scale: 1.02 }}
             >
-              <img src={logo} alt="Trasladarte" className="w-12 h-12 rounded-lg object-contain" />
+              <img src={logo} alt="Trasladarte" className="h-12 w-auto object-contain" />
               <div>
                 <h1 className="font-heading font-bold text-xl text-foreground">Trasladarte</h1>
                 <p className="text-xs text-muted-foreground">La Gran Aventura de Mudarte</p>
