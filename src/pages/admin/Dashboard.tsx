@@ -59,18 +59,24 @@ const COLORS = ['#f97316', '#3b82f6', '#22c55e', '#eab308', '#ef4444', '#8b5cf6'
 
 const Dashboard = () => {
   const [quotes, setQuotes] = useState<Quote[]>([]);
+  const [items, setItems] = useState<QuoteItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchQuotes();
+    fetchAll();
 
-    // Realtime: refresh when new quotes arrive
+    // Realtime: refresh on any change to quotes or quote_items
     const channel = supabase
       .channel('dashboard-quotes')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'quotes' },
-        () => fetchQuotes()
+        () => fetchAll()
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'quote_items' },
+        () => fetchAll()
       )
       .subscribe();
 
@@ -79,17 +85,17 @@ const Dashboard = () => {
     };
   }, []);
 
-  const fetchQuotes = async () => {
-    const { data, error } = await (supabase as any)
-      .from('quotes')
-      .select('*')
-      .order('created_at', { ascending: false });
+  const fetchAll = async () => {
+    const [{ data: qData, error: qErr }, { data: iData, error: iErr }] = await Promise.all([
+      (supabase as any).from('quotes').select('*').order('created_at', { ascending: false }),
+      (supabase as any).from('quote_items').select('*'),
+    ]);
 
-    if (error) {
-      console.error('Error fetching quotes:', error);
-    } else {
-      setQuotes(data || []);
-    }
+    if (qErr) console.error('Error fetching quotes:', qErr);
+    if (iErr) console.error('Error fetching quote_items:', iErr);
+
+    setQuotes(qData || []);
+    setItems(iData || []);
     setIsLoading(false);
   };
 
