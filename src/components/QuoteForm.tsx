@@ -236,7 +236,11 @@ const QuoteForm = () => {
 
       // Send email notification (this is the source of truth for success)
       const inventoryResumen = allItems
-        .map((it) => `• ${it.item_name} (${it.category}) x${it.quantity}`)
+        .map((it) => {
+          const m3 = getInventoryItem(it.item_key)?.m3;
+          const m3Str = m3 ? ` · ${(m3 * it.quantity).toFixed(2)} m³` : '';
+          return `• ${it.item_name} (${it.category}) x${it.quantity}${m3Str}`;
+        })
         .join('\n') || 'Sin ítems en inventario';
 
       const emailOk = await sendToFormspree({
@@ -253,6 +257,8 @@ const QuoteForm = () => {
         fecha: formData.fechaIndefinida ? 'Fecha indefinida' : (formData.fechaTraslado || 'No especificada'),
         sugerencia: formData.sugerenciaAdicional,
         total_items: getTotalItems(),
+        total_m3: `${totalM3.toFixed(2)} m³`,
+        total_m2_bodega: `${totalM2.toFixed(2)} m²`,
         inventario: inventoryResumen,
       });
 
