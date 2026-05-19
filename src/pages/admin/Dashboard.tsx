@@ -196,6 +196,28 @@ const Dashboard = () => {
           />
         </div>
 
+        {/* M³ KPIs (planilla Trasladarte) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <StatCard
+            title="Total m³ cotizados"
+            value={`${totalM3.toFixed(1)} m³`}
+            description={`${quotesWithM3} cotizaciones con inventario`}
+            icon={Boxes}
+          />
+          <StatCard
+            title="m² estimados de bodega"
+            value={`${totalM2.toFixed(1)} m²`}
+            description="Conversión planilla: m³ ÷ 2.5"
+            icon={Ruler}
+          />
+          <StatCard
+            title="Promedio m³ por mudanza"
+            value={`${avgM3.toFixed(2)} m³`}
+            description="Solo cotizaciones con ítems"
+            icon={Package}
+          />
+        </div>
+
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Monthly Chart */}
