@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import Services from '@/components/Services';
@@ -16,6 +16,14 @@ import SplashScreen from '@/components/SplashScreen';
 const Index = () => {
   const [showSplash, setShowSplash] = useState(true);
   const handleSplashComplete = useCallback(() => setShowSplash(false), []);
+
+  useEffect(() => {
+    if (showSplash || !window.location.hash) return;
+
+    const sectionId = window.location.hash.replace('#', '');
+    const target = document.getElementById(sectionId);
+    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [showSplash]);
 
   return (
     <>
