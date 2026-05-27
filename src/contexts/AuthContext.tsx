@@ -37,36 +37,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        fetchProfile(session.user.id).then(setProfile);
-      }
-      
-      setIsLoading(false);
-    });
+    let mounted = true;
 
-    // Listen for auth changes
+    // Listen for auth changes FIRST (sync callback — never await inside)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
+        if (!mounted) return;
         setSession(session);
         setUser(session?.user ?? null);
-        
         if (session?.user) {
-          const profile = await fetchProfile(session.user.id);
-          setProfile(profile);
+          fetchProfile(session.user.id).then((p) => mounted && setProfile(p));
         } else {
           setProfile(null);
         }
-        
         setIsLoading(false);
       }
     );
 
-    return () => subscription.unsubscribe();
+    // Then get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchProfile(session.user.id).then((p) => mounted && setProfile(p));
+      }
+      setIsLoading(false);
+    });
+
+    // Safety net: never stay loading more than 5s
+    const timeout = setTimeout(() => mounted && setIsLoading(false), 5000);
+
+    return () => {
+      mounted = false;
+      clearTimeout(timeout);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
