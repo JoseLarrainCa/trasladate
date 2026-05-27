@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Phone, Menu, X, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,8 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('inicio');
   const [showMiniBodegas, setShowMiniBodegas] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -51,6 +53,22 @@ const Header = () => {
     { label: 'Cotización', href: '#cotizacion' },
     { label: 'Contacto', href: '#contacto' },
   ];
+
+  const handleSectionClick = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    const sectionId = href.replace('#', '');
+    const element = document.getElementById(sectionId);
+
+    event.preventDefault();
+    setIsMobileMenuOpen(false);
+
+    if (location.pathname !== '/') {
+      navigate(`/${href}`);
+      return;
+    }
+
+    window.history.pushState(null, '', href);
+    element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   return (
     <>
@@ -93,7 +111,8 @@ const Header = () => {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <motion.a
-              href="#inicio"
+              href="/#inicio"
+              onClick={(event) => handleSectionClick(event, '#inicio')}
               className="flex items-center gap-3 cursor-pointer"
               whileHover={{ scale: 1.02 }}
             >
@@ -111,7 +130,8 @@ const Header = () => {
                 return (
                   <motion.a
                     key={item.label}
-                    href={item.href}
+                    href={`/${item.href}`}
+                    onClick={(event) => handleSectionClick(event, item.href)}
                     className={`font-medium transition-colors relative group ${
                       isActive ? 'text-primary' : 'text-foreground hover:text-primary'
                     }`}
@@ -175,11 +195,11 @@ const Header = () => {
                   return (
                     <a
                       key={item.label}
-                      href={item.href}
+                      href={`/${item.href}`}
                       className={`font-medium transition-colors py-2 ${
                         isActive ? 'text-primary' : 'text-foreground hover:text-primary'
                       }`}
-                      onClick={() => setIsMobileMenuOpen(false)}
+                      onClick={(event) => handleSectionClick(event, item.href)}
                     >
                       {item.label}
                     </a>
