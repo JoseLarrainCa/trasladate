@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type MouseEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Phone, Menu, X, LogIn } from 'lucide-react';
@@ -54,7 +54,7 @@ const Header = () => {
     { label: 'Contacto', href: '#contacto' },
   ];
 
-  const handleSectionClick = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const handleSectionClick = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
     const sectionId = href.replace('#', '');
     const element = document.getElementById(sectionId);
 
