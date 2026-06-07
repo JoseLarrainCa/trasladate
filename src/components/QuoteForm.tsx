@@ -234,32 +234,76 @@ const QuoteForm = () => {
         console.warn('DB save failed, continuing with email notification:', dbErr);
       }
 
-      // Send email notification (this is the source of truth for success)
-      const inventoryResumen = allItems
-        .map((it) => {
-          const m3 = getInventoryItem(it.item_key)?.m3;
-          const m3Str = m3 ? ` · ${(m3 * it.quantity).toFixed(2)} m³` : '';
-          return `• ${it.item_name} (${it.category}) x${it.quantity}${m3Str}`;
+      // Build inventory grouped by category, in the canonical order of INVENTORY_CATEGORIES,
+      // showing only quantities (no m³), to match the legacy email format the admin team prefers.
+      const categoryOrder = INVENTORY_CATEGORIES.map((c) => c.name);
+      const itemsByCategory: Record<string, { name: string; quantity: number }[]> = {};
+      for (const it of allItems) {
+        const cat = it.category || 'OTROS';
+        if (!itemsByCategory[cat]) itemsByCategory[cat] = [];
+        itemsByCategory[cat].push({ name: it.item_name, quantity: it.quantity });
+      }
+      const orderedCategories = [
+        ...categoryOrder.filter((c) => itemsByCategory[c]),
+        ...Object.keys(itemsByCategory).filter((c) => !categoryOrder.includes(c)),
+      ];
+      // Always include OTROS at the end if not present (legacy format does so)
+      if (!orderedCategories.includes('OTROS')) orderedCategories.push('OTROS');
+
+      const inventarioFormateado = orderedCategories
+        .map((cat) => {
+          const items = itemsByCategory[cat] || [];
+          const lines = items.map((i) => `${i.name}: ${i.quantity}`).join('\n');
+          return `${cat}:\n${lines}`.trimEnd();
         })
-        .join('\n') || 'Sin ítems en inventario';
+        .join('\n\n');
+
+      const fechaStr = formData.fechaIndefinida
+        ? 'Fecha indefinida'
+        : (formData.fechaTraslado || 'No especificada');
+
+      const ascensorOrigen = formData.origenAscensor ? 'Si' : 'No';
+      const ascensorDestino = formData.destinoAscensor ? 'Si' : 'No';
+      const pisoOrigen = formData.origenPiso || '---';
+      const pisoDestino = formData.destinoPiso || '---';
+
+      const tipoViviendaOrigen = VIVIENDA_OPTIONS.find((v) => v.value === formData.origenTipo)?.label || formData.origenTipo;
+      const tipoViviendaDestino = VIVIENDA_OPTIONS.find((v) => v.value === formData.destinoTipo)?.label || formData.destinoTipo;
+
+      const mensajeLegacy = `DATOS DEL CLIENTE:
+__________________
+Cliente: ${formData.clienteNombre} ${formData.clienteApellido}
+Telefono: ${formData.telefono}
+Celular: ${formData.celular || '---'}
+Correo: ${formData.email || '---'}
+
+DATOS VIVIENDA ORIGEN
+_____________________
+Direccion origen: ${formData.origenDireccion}
+Comuna origen: ${formData.origenComuna}
+Tipo de vivienda: ${tipoViviendaOrigen}
+Numero departamento: ${pisoOrigen}
+Ascensor: ${ascensorOrigen}
+
+DATOS VIVIENDA DESTINO
+_______________________
+Direccion destino: ${formData.destinoDireccion}
+Comuna destino: ${formData.destinoComuna}
+Tipo de vivienda destino: ${tipoViviendaDestino}
+Numero departamento: ${pisoDestino}
+Ascensor destino: ${ascensorDestino}
+FECHA DE TRASLADO: ${fechaStr}
+Sugerencia (Parte del cliente): ${formData.sugerenciaAdicional || '---'}
+
+DESCRIPCION DETALLADA
+_______________________
+Total de metros cubicos: ${totalM3.toFixed(2)}
+
+${inventarioFormateado}`;
 
       const emailOk = await sendToFormspree({
-        _subject: `Nueva cotización #${quoteId.slice(0, 8)} — ${formData.clienteNombre} ${formData.clienteApellido}`,
-        tipo: 'Cotización completada',
-        referencia: quoteId,
-        cliente: `${formData.clienteNombre} ${formData.clienteApellido}`.trim(),
-        telefono: formData.telefono,
-        celular: formData.celular,
-        email: formData.email,
-        origen: `${formData.origenDireccion}, ${formData.origenComuna} (${formData.origenTipo}${formData.origenPiso ? `, piso ${formData.origenPiso}` : ''}${formData.origenAscensor ? ', con ascensor' : ''})`,
-        destino: `${formData.destinoDireccion}, ${formData.destinoComuna} (${formData.destinoTipo}${formData.destinoPiso ? `, piso ${formData.destinoPiso}` : ''}${formData.destinoAscensor ? ', con ascensor' : ''})`,
-        tipo_mudanza: formData.tipoMudanza,
-        fecha: formData.fechaIndefinida ? 'Fecha indefinida' : (formData.fechaTraslado || 'No especificada'),
-        sugerencia: formData.sugerenciaAdicional,
-        total_items: getTotalItems(),
-        total_m3: `${totalM3.toFixed(2)} m³`,
-        total_m2_bodega: `${totalM2.toFixed(2)} m²`,
-        inventario: inventoryResumen,
+        _subject: `COTIZACION DE CLIENTE - PAGINA WEB`,
+        message: mensajeLegacy,
       });
 
       if (!emailOk && !savedInDatabase) {
