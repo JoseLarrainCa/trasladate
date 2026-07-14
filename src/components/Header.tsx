@@ -67,11 +67,22 @@ const Header = () => {
     }
 
     window.history.pushState(null, '', href);
-    // Defer to next frame so mobile menu close animation doesn't cancel the scroll
-    window.requestAnimationFrame(() => {
+
+    const scrollToSection = () => {
       const target = document.getElementById(sectionId);
-      target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
+      if (!target) return;
+      const header = document.querySelector('header');
+      const headerHeight = header ? (header as HTMLElement).offsetHeight : 0;
+      const top = target.getBoundingClientRect().top + window.scrollY - headerHeight - 8;
+      window.scrollTo({ top, behavior: 'smooth' });
+    };
+
+    // Wait for mobile menu close animation (~300ms) before scrolling to get accurate position
+    if (isMobileMenuOpen) {
+      window.setTimeout(scrollToSection, 320);
+    } else {
+      window.requestAnimationFrame(scrollToSection);
+    }
   };
 
   return (
