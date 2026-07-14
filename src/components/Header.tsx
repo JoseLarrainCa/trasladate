@@ -67,7 +67,11 @@ const Header = () => {
     }
 
     window.history.pushState(null, '', href);
-    element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Defer to next frame so mobile menu close animation doesn't cancel the scroll
+    window.requestAnimationFrame(() => {
+      const target = document.getElementById(sectionId);
+      target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   };
 
   return (
