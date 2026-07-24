@@ -95,9 +95,9 @@ const Header = () => {
               <Phone className="w-4 h-4" />
               <span>+56 9 9004 0399</span>
             </a>
-            <a href="tel:+56990040399" className="flex items-center gap-2 hover:text-primary transition-colors">
+            <a href="tel:+56991421929" className="flex items-center gap-2 hover:text-primary transition-colors">
               <Phone className="w-4 h-4" />
-              <span className="hidden sm:inline">+56 9 9004 0399</span>
+              <span className="hidden sm:inline">+56 9 9142 1929</span>
             </a>
           </div>
           <div className="flex items-center gap-4">
