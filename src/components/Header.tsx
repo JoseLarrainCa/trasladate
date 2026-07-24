@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Phone, Menu, X, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import logo from '@/assets/logo-trasladarte.png';
+import logoAsset from '@/assets/logo-trasladarte.svg.asset.json';
 import MiniBodegas from '@/components/MiniBodegas';
 
 const Header = () => {
