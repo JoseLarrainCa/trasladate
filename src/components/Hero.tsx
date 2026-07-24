@@ -122,7 +122,7 @@ const Hero = () => {
             >
               <a href="tel:+56990040399">
                 <Phone className="mr-2 w-5 h-5" />
-                Llamar Ahora
+                +56 9 9004 0399
               </a>
             </Button>
           </motion.div>
