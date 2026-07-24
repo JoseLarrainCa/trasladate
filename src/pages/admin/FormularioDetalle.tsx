@@ -428,22 +428,67 @@ const FormularioDetalle = () => {
               </span>
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Object.entries(groupedItems).map(([category, items]) => (
-                <div key={category}>
-                  <h3 className="font-medium text-sm text-primary mb-2 uppercase tracking-wider">
-                    {category}
-                  </h3>
-                  <ul className="space-y-1">
-                    {items.map((item) => (
-                      <li key={item.id} className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">{item.item_name}</span>
-                        <span className="font-medium">{item.quantity}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+              {Object.entries(groupedItems).map(([category, items]) => {
+                const categoryM3 = items.reduce((sum, it) => {
+                  const def = getInventoryItem(it.item_key);
+                  return sum + (def ? def.m3 * it.quantity : 0);
+                }, 0);
+                return (
+                  <div key={category}>
+                    <div className="flex items-baseline justify-between mb-2">
+                      <h3 className="font-medium text-sm text-primary uppercase tracking-wider">
+                        {category}
+                      </h3>
+                      <span className="text-xs text-muted-foreground">
+                        {categoryM3.toFixed(2)} m³
+                      </span>
+                    </div>
+                    <ul className="space-y-1">
+                      {items.map((item) => {
+                        const def = getInventoryItem(item.item_key);
+                        const itemM3 = def ? def.m3 * item.quantity : 0;
+                        return (
+                          <li key={item.id} className="flex justify-between text-sm gap-2">
+                            <span className="text-muted-foreground flex-1">{item.item_name}</span>
+                            <span className="font-medium tabular-nums">{item.quantity}</span>
+                            <span className="text-xs text-muted-foreground tabular-nums w-16 text-right">
+                              {itemM3.toFixed(2)} m³
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                );
+              })}
             </div>
+
+            {/* Totales m³ / m² (planilla Trasladarte) */}
+            {(() => {
+              const totalM3 = quote.quote_items.reduce((sum, it) => {
+                const def = getInventoryItem(it.item_key);
+                return sum + (def ? def.m3 * it.quantity : 0);
+              }, 0);
+              const totalM2 = m3ToM2(totalM3);
+              const totalItems = quote.quote_items.reduce((s, it) => s + it.quantity, 0);
+              return (
+                <div className="mt-6 pt-6 border-t border-border grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="bg-primary/5 rounded-xl p-4">
+                    <p className="text-xs text-muted-foreground">Total m³ cotizados</p>
+                    <p className="text-2xl font-bold text-primary">{totalM3.toFixed(2)} m³</p>
+                  </div>
+                  <div className="bg-secondary/5 rounded-xl p-4">
+                    <p className="text-xs text-muted-foreground">m² estimados de bodega</p>
+                    <p className="text-2xl font-bold text-secondary">{totalM2.toFixed(2)} m²</p>
+                    <p className="text-[10px] text-muted-foreground mt-1">Fórmula planilla: m³ ÷ 2.5</p>
+                  </div>
+                  <div className="bg-muted/50 rounded-xl p-4">
+                    <p className="text-xs text-muted-foreground">Total ítems</p>
+                    <p className="text-2xl font-bold text-foreground">{totalItems}</p>
+                  </div>
+                </div>
+              );
+            })()}
           </motion.div>
         )}
 
