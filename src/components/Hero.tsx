@@ -120,7 +120,7 @@ const Hero = () => {
               className="border-2 border-primary-foreground/30 text-primary-foreground bg-transparent hover:bg-primary-foreground/10 font-semibold text-lg px-8"
               asChild
             >
-              <a href="tel:+56226436664">
+              <a href="tel:+56990040399">
                 <Phone className="mr-2 w-5 h-5" />
                 Llamar Ahora
               </a>

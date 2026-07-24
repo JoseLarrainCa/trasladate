@@ -8,19 +8,19 @@ const contactInfo = [
 {
   icon: Phone,
   label: 'Teléfonos',
-  values: ['+56 9 9004 0399', '+56 9 9004 0399'],
+  values: ['+56 9 9004 0399', '+56 9 9142 1929'],
   action: 'tel:+56990040399'
 },
 {
   icon: Mail,
   label: 'Correos',
-  values: ['contacto@trasladarte.cl'],
-  action: 'mailto:contacto@trasladarte.cl'
+  values: ['servicios@trasladarte.cl'],
+  action: 'mailto:servicios@trasladarte.cl'
 },
 {
   icon: Clock,
-  label: 'Horario',
-  values: ['Lunes a Sábado', '08:00 - 20:00 hrs'],
+  label: 'Horario Comercial',
+  values: ['Lunes a Viernes: 09:00 - 18:00', 'Sábados: 09:00 - 14:00', 'Mudanzas agendadas: 24/7'],
   action: null
 },
 {

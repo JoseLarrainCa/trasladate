@@ -52,9 +52,15 @@ const Footer = () => {
                 </a>
               </li>
               <li className="flex items-center gap-2 text-secondary-foreground/70">
+                <Phone className="w-4 h-4 text-primary" />
+                <a href="tel:+56991421929" className="hover:text-primary transition-colors">
+                  +56 9 9142 1929
+                </a>
+              </li>
+              <li className="flex items-center gap-2 text-secondary-foreground/70">
                 <Mail className="w-4 h-4 text-primary" />
-                <a href="mailto:contacto@trasladarte.cl" className="hover:text-primary transition-colors text-sm">
-                  contacto@trasladarte.cl
+                <a href="mailto:servicios@trasladarte.cl" className="hover:text-primary transition-colors text-sm">
+                  servicios@trasladarte.cl
                 </a>
               </li>
               <li className="flex items-center gap-2 text-secondary-foreground/70">
