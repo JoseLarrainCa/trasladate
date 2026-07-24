@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import logo from '@/assets/logo-trasladarte.png';
+import logoAsset from '@/assets/logo-trasladarte.svg.asset.json';
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -29,7 +29,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           transition={{ duration: 0.5, ease: 'easeInOut' }}
         >
           <motion.img
-            src={logo}
+            src={logoAsset.url}
             alt="Trasladarte — La Gran Aventura de Mudarte"
             className="w-[min(70vw,420px)] h-auto object-contain"
             initial={{ scale: 0.7, opacity: 0 }}
