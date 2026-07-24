@@ -42,6 +42,7 @@ import {
 import AdminLayout from '@/components/admin/AdminLayout';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { getInventoryItem, m3ToM2 } from '@/lib/constants/inventory';
 import type { QuoteWithItems, QuoteStatus, QuoteItem } from '@/types/database';
 
 const viviendaLabels: Record<string, string> = {
