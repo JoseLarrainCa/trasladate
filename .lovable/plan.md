@@ -1,32 +1,27 @@
+## Objetivo
+Mostrar en el detalle de cada cotización (admin) los mismos cálculos de m³ y m² que usa el Dashboard, aplicando la fórmula de la planilla oficial de Trasladarte.
 
-## Splash Screen de Carga para Trasladarte
+## Confirmación
+Sí, las fórmulas ya están guardadas en el proyecto — en `src/lib/constants/inventory.ts`. Cada ítem del inventario tiene su valor unitario en m³ (tomado directo de `Planilla_Trasladarte_JEM_1.xlsx`) y ya existen los helpers `calculateTotalM3()` y `m3ToM2()` (factor de conversión 2.5, igual que la planilla). El Dashboard ya los usa; solo falta aplicarlos también en el detalle de la cotización.
 
-Se creara una pantalla de bienvenida animada que aparece brevemente (aproximadamente 2 segundos) cada vez que alguien entra al sitio. Sera elegante, rapida y acorde con la marca.
+## Cambios
 
-### Que veras
+**Archivo:** `src/pages/admin/FormularioDetalle.tsx`
 
-1. Fondo con el gradiente oscuro de la marca (azul oscuro a naranja)
-2. El logo de Trasladarte (la "T" naranja en cuadrado redondeado) aparece con efecto de escala
-3. Un camion pequeno animado que se desplaza de izquierda a derecha debajo del logo
-4. El nombre "Trasladarte" aparece con efecto de escritura/fade
-5. El slogan "La Gran Aventura de Mudarte" aparece suavemente debajo
-6. Una barra de progreso naranja que se llena rapidamente
-7. Despues de ~2 segundos, todo se desvanece y aparece la pagina principal
+1. Importar `getInventoryItem` y `m3ToM2` desde `@/lib/constants/inventory`.
+2. En la sección de Inventario:
+   - Calcular `m³` por cada ítem (`item.m3 × quantity`) y mostrarlo junto a la cantidad.
+   - Calcular `m³` subtotal por categoría y mostrarlo en el título de cada grupo.
+   - Añadir un resumen al final del bloque con **Total m³**, **m² estimados de bodega** (m³ ÷ 2.5) y **Total ítems**, con el mismo estilo visual de tarjeta que usa el Dashboard.
 
-### Detalles tecnicos
+## Detalle técnico
+- Fórmulas ya existentes que se reutilizan:
+  - `m3_item = getInventoryItem(item_key).m3 × quantity`
+  - `total_m3 = Σ m3_item`
+  - `total_m2 = total_m3 / 2.5` (constante `M2_CONVERSION_FACTOR`)
+- No se toca el backend: los datos ya se guardan con `item_key`, por lo que el cálculo es determinístico desde el frontend.
+- No se modifica el Dashboard ni el `QuoteForm` (siguen funcionando igual).
 
-1. **Nuevo componente `src/components/SplashScreen.tsx`**
-   - Componente con estado interno que controla visibilidad
-   - Usa Framer Motion para las animaciones (ya instalado)
-   - El icono Truck de Lucide como el camion animado
-   - Barra de progreso usando el componente Progress existente
-   - Despues de 2 segundos, ejecuta animacion de salida (fade out + scale)
-   - Al terminar la animacion de salida, se desmonta del DOM
-
-2. **Modificar `src/pages/Index.tsx`**
-   - Agregar estado `showSplash` (inicia en `true`)
-   - Mostrar `SplashScreen` cuando `showSplash` es `true`
-   - Cuando termina el splash, cambiar a `false` y mostrar el contenido normal
-   - El contenido de la pagina se renderiza detras pero oculto hasta que termine el splash
-
-3. **No se toca nada del backend ni la base de datos** - Es puramente visual/frontend
+## Fuera de alcance
+- Cambios en la base de datos o en el email de Formspree.
+- Recalcular cotizaciones antiguas — la fórmula es en vivo, así que aplica automáticamente.
