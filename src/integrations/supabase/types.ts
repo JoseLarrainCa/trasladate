@@ -202,7 +202,6 @@ export type Database = {
         }
         Returns: boolean
       }
-      quote_is_recent: { Args: { _quote_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "viewer"
