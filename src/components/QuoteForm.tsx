@@ -766,16 +766,12 @@ ${inventarioFormateado}`;
                         </h4>
                         <div className="space-y-2">
                           {category.items.map((item) => {
-                            const qty = inventory[item.key] || 0;
-                            const itemM3 = qty * item.m3;
                             return (
                               <div key={item.key} className="flex items-center justify-between gap-2">
                                 <span className="text-sm text-foreground flex-1 leading-tight">
                                   {item.name}
-                                  <span className="block text-[10px] text-muted-foreground">
-                                    {item.m3} m³ c/u{qty > 0 ? ` · subtotal ${itemM3.toFixed(2)} m³` : ''}
-                                  </span>
                                 </span>
+
                                 <Input
                                   type="number"
                                   min="0"
