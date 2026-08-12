@@ -748,20 +748,14 @@ ${inventarioFormateado}`;
                         <span className="text-sm bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">
                           {getTotalItems()} items
                         </span>
-                        <span className="text-sm bg-secondary/10 text-secondary px-3 py-1 rounded-full font-semibold">
-                          {totalM3.toFixed(2)} m³
-                        </span>
-                        <span className="text-sm bg-muted text-foreground px-3 py-1 rounded-full font-medium">
-                          ≈ {totalM2.toFixed(2)} m² bodega
-                        </span>
                       </div>
                     )}
                   </div>
 
                   <p className="text-muted-foreground mb-6">
                     Indica la cantidad de cada mueble que necesitas trasladar. Deja en 0 los que no aplican.
-                    El cálculo de m³ y m² se actualiza automáticamente según la planilla oficial Trasladarte.
                   </p>
+
 
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
