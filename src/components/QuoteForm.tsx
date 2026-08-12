@@ -171,7 +171,7 @@ const QuoteForm = () => {
             quote_id: quoteId,
             item_key: key,
             item_name: item?.name || key,
-            category: item?.category || 'OTROS',
+            category: item?.category || 'OTROS CLIENTE',
             quantity,
           };
         });
@@ -182,7 +182,7 @@ const QuoteForm = () => {
           quote_id: quoteId,
           item_key: `custom_${idx}`,
           item_name: ci.name.trim(),
-          category: 'OTROS',
+          category: 'OTROS CLIENTE',
           quantity: ci.qty,
         }));
 
@@ -239,7 +239,7 @@ const QuoteForm = () => {
       const categoryOrder = INVENTORY_CATEGORIES.map((c) => c.name);
       const itemsByCategory: Record<string, { name: string; quantity: number }[]> = {};
       for (const it of allItems) {
-        const cat = it.category || 'OTROS';
+        const cat = it.category || 'OTROS CLIENTE';
         if (!itemsByCategory[cat]) itemsByCategory[cat] = [];
         itemsByCategory[cat].push({ name: it.item_name, quantity: it.quantity });
       }
@@ -248,7 +248,7 @@ const QuoteForm = () => {
         ...Object.keys(itemsByCategory).filter((c) => !categoryOrder.includes(c)),
       ];
       // Always include OTROS at the end if not present (legacy format does so)
-      if (!orderedCategories.includes('OTROS')) orderedCategories.push('OTROS');
+      if (!orderedCategories.includes('OTROS CLIENTE')) orderedCategories.push('OTROS CLIENTE');
 
       const inventarioFormateado = orderedCategories
         .map((cat) => {
