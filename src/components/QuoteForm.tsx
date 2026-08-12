@@ -748,20 +748,14 @@ ${inventarioFormateado}`;
                         <span className="text-sm bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">
                           {getTotalItems()} items
                         </span>
-                        <span className="text-sm bg-secondary/10 text-secondary px-3 py-1 rounded-full font-semibold">
-                          {totalM3.toFixed(2)} m³
-                        </span>
-                        <span className="text-sm bg-muted text-foreground px-3 py-1 rounded-full font-medium">
-                          ≈ {totalM2.toFixed(2)} m² bodega
-                        </span>
                       </div>
                     )}
                   </div>
 
                   <p className="text-muted-foreground mb-6">
                     Indica la cantidad de cada mueble que necesitas trasladar. Deja en 0 los que no aplican.
-                    El cálculo de m³ y m² se actualiza automáticamente según la planilla oficial Trasladarte.
                   </p>
+
 
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -772,16 +766,12 @@ ${inventarioFormateado}`;
                         </h4>
                         <div className="space-y-2">
                           {category.items.map((item) => {
-                            const qty = inventory[item.key] || 0;
-                            const itemM3 = qty * item.m3;
                             return (
                               <div key={item.key} className="flex items-center justify-between gap-2">
                                 <span className="text-sm text-foreground flex-1 leading-tight">
                                   {item.name}
-                                  <span className="block text-[10px] text-muted-foreground">
-                                    {item.m3} m³ c/u{qty > 0 ? ` · subtotal ${itemM3.toFixed(2)} m³` : ''}
-                                  </span>
                                 </span>
+
                                 <Input
                                   type="number"
                                   min="0"
