@@ -57,6 +57,7 @@ interface FormData {
   destinoAscensor: boolean;
   // Detalles
   tipoMudanza: string;
+  tipoServicio: string;
   fechaTraslado: string;
   fechaIndefinida: boolean;
   sugerenciaAdicional: string;
@@ -79,6 +80,7 @@ const initialFormData: FormData = {
   destinoPiso: '',
   destinoAscensor: false,
   tipoMudanza: 'hogar',
+  tipoServicio: 'express',
   fechaTraslado: '',
   fechaIndefinida: false,
   sugerenciaAdicional: '',
@@ -93,6 +95,12 @@ const createQuoteId = () => {
     (Number(c) ^ (Math.random() * 16) >> (Number(c) / 4)).toString(16)
   );
 };
+
+const SERVICIO_OPTIONS = [
+  { value: 'express', label: 'Servicio Express' },
+  { value: 'principal', label: 'Servicio Principal' },
+  { value: 'exclusivo', label: 'Servicio Exclusivo' },
+];
 
 const steps = [
   { id: 1, title: 'Datos Generales', icon: User },
@@ -210,7 +218,14 @@ const QuoteForm = () => {
           tipo_mudanza: formData.tipoMudanza as any,
           fecha_traslado: formData.fechaTraslado || null,
           fecha_indefinida: formData.fechaIndefinida,
-          sugerencia_adicional: formData.sugerenciaAdicional || null,
+          sugerencia_adicional: [
+            formData.tipoMudanza === 'hogar'
+              ? `Tipo de servicio: ${SERVICIO_OPTIONS.find((o) => o.value === formData.tipoServicio)?.label}`
+              : '',
+            formData.sugerenciaAdicional,
+          ]
+            .filter(Boolean)
+            .join(' | ') || null,
         };
 
         const { error: quoteError } = await (supabase as any)
@@ -262,6 +277,15 @@ const QuoteForm = () => {
         ? 'Fecha indefinida'
         : (formData.fechaTraslado || 'No especificada');
 
+      const totalItemsCount = allItems.reduce((sum, it) => sum + it.quantity, 0);
+      const totalCajas = allItems
+        .filter((it) => it.item_name.toLowerCase().includes('caja'))
+        .reduce((sum, it) => sum + it.quantity, 0);
+      const tipoServicioLabel =
+        formData.tipoMudanza === 'hogar'
+          ? SERVICIO_OPTIONS.find((o) => o.value === formData.tipoServicio)?.label || '---'
+          : '---';
+
       const ascensorOrigen = formData.origenAscensor ? 'Si' : 'No';
       const ascensorDestino = formData.destinoAscensor ? 'Si' : 'No';
       const pisoOrigen = formData.origenPiso || '---';
@@ -292,12 +316,15 @@ Comuna destino: ${formData.destinoComuna}
 Tipo de vivienda destino: ${tipoViviendaDestino}
 Numero departamento: ${pisoDestino}
 Ascensor destino: ${ascensorDestino}
+TIPO DE SERVICIO: ${tipoServicioLabel}
 FECHA DE TRASLADO: ${fechaStr}
 Sugerencia (Parte del cliente): ${formData.sugerenciaAdicional || '---'}
 
 DESCRIPCION DETALLADA
 _______________________
 Total de metros cubicos: ${totalM3.toFixed(2)}
+Cantidad total de items: ${totalItemsCount}
+Cantidad de cajas: ${totalCajas}
 
 ${inventarioFormateado}`;
 
@@ -692,6 +719,26 @@ ${inventarioFormateado}`;
                           </SelectContent>
                         </Select>
                       </div>
+                      {formData.tipoMudanza === 'hogar' && (
+                        <div>
+                          <Label>Tipo de servicio</Label>
+                          <Select
+                            value={formData.tipoServicio}
+                            onValueChange={(value) => updateField('tipoServicio', value)}
+                          >
+                            <SelectTrigger className="mt-1">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {SERVICIO_OPTIONS.map((opt) => (
+                                <SelectItem key={opt.value} value={opt.value}>
+                                  {opt.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
                       <div>
                         <Label htmlFor="fechaTraslado">Fecha tentativa</Label>
                         <Input
