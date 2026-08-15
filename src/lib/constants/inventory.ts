@@ -20,7 +20,7 @@ export interface InventoryCategory {
  */
 export const M2_CONVERSION_FACTOR = 2.5;
 
-export const INVENTORY_CATEGORIES: InventoryCategory[] = [
+const RAW_INVENTORY_CATEGORIES: InventoryCategory[] = [
   {
     key: 'living',
     name: 'LIVING',
@@ -193,6 +193,15 @@ export const INVENTORY_CATEGORIES: InventoryCategory[] = [
     ],
   },
 ];
+
+/** Ítems ordenados alfabéticamente dentro de cada categoría (es-CL) */
+export const INVENTORY_CATEGORIES: InventoryCategory[] = RAW_INVENTORY_CATEGORIES.map((cat) => ({
+  ...cat,
+  items: [...cat.items].sort((a, b) =>
+    a.name.localeCompare(b.name, 'es', { sensitivity: 'base', numeric: true })
+  ),
+}));
+
 
 // Flat list of all items for easy lookup
 export const ALL_INVENTORY_ITEMS = INVENTORY_CATEGORIES.flatMap(cat => cat.items);
