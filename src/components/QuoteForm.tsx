@@ -814,7 +814,22 @@ ${inventarioFormateado}`;
                             Aún no lo decido
                           </Label>
                         </div>
-                      </div>
+                       </div>
+                      {formData.tipoMudanza === 'hogar' && SERVICIO_DETALLES[formData.tipoServicio] && (
+                        <div className="rounded-xl border border-border bg-muted/40 p-4">
+                          <p className="font-heading font-semibold text-foreground text-sm mb-2">
+                            {SERVICIO_DETALLES[formData.tipoServicio].titulo}
+                          </p>
+                          <ul className="space-y-2">
+                            {SERVICIO_DETALLES[formData.tipoServicio].lineas.map((l) => (
+                              <li key={l.label} className="text-xs text-muted-foreground leading-relaxed">
+                                <span className="font-semibold text-foreground">{l.label}: </span>
+                                {l.texto}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                       <div className="md:col-span-2">
                         <Label htmlFor="sugerenciaAdicional">Sugerencia adicional</Label>
                         <Textarea
