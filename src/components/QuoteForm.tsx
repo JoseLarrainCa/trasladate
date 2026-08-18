@@ -865,6 +865,12 @@ ${inventarioFormateado}`;
                         <span className="text-sm bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">
                           {getTotalItems()} items
                         </span>
+                        <span className="text-sm bg-blue-500/10 text-blue-600 px-3 py-1 rounded-full font-medium">
+                          {totalM3.toFixed(2)} m³ camión
+                        </span>
+                        <span className="text-sm bg-orange-500/10 text-orange-600 px-3 py-1 rounded-full font-medium">
+                          {totalM2.toFixed(2)} m² bodega
+                        </span>
                       </div>
                     )}
                   </div>
