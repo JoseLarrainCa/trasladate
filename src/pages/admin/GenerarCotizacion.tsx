@@ -703,18 +703,16 @@ const GenerarCotizacion = () => {
               <span>{Math.round(zoom * 100)}%</span>
             </div>
             <div className="rounded-xl bg-muted/40 p-4 overflow-auto">
-              <div
-                className="doc-scale-wrap mx-auto"
-                style={{ width: `calc(210mm * ${zoom})`, height: 'auto' }}
-              >
+              <div className="doc-scale-wrap mx-auto" style={{ width: 'fit-content' }}>
                 <div
                   id="doc"
                   ref={docRef}
-                  style={{ transform: `scale(${zoom})`, transformOrigin: 'top left', width: '210mm' }}
+                  style={{ zoom, width: '210mm' } as React.CSSProperties}
                 >
                   {doc.formato === 'marco' ? <DocMarco doc={doc} cfg={cfg} /> : <DocModerno doc={doc} cfg={cfg} />}
                 </div>
               </div>
+
             </div>
           </div>
         </div>
