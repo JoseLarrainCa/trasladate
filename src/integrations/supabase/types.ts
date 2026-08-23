@@ -41,6 +41,116 @@ export type Database = {
         }
         Relationships: []
       }
+      quote_documents: {
+        Row: {
+          acciones: string[]
+          armado_camas: boolean
+          camion: string
+          camion_qty: number
+          cliente: Json
+          con_embalaje: boolean
+          con_galeria: boolean
+          created_at: string
+          created_by: string | null
+          cuota1: number
+          cuota2: number
+          fecha_servicio: string | null
+          folio: number
+          formato: string
+          id: string
+          inventario_override: Json
+          materiales: string[]
+          observaciones: string[]
+          personas: number
+          precio_calculado: number
+          precio_final: number | null
+          quote_id: string | null
+          recargo_escala: number
+          recargo_estac: number
+          recargo_otro: number
+          recargo_rampa: number
+          saludo: string
+          sin_iva: boolean
+          textos: Json
+          titulo_servicio: string
+          updated_at: string
+        }
+        Insert: {
+          acciones?: string[]
+          armado_camas?: boolean
+          camion?: string
+          camion_qty?: number
+          cliente?: Json
+          con_embalaje?: boolean
+          con_galeria?: boolean
+          created_at?: string
+          created_by?: string | null
+          cuota1?: number
+          cuota2?: number
+          fecha_servicio?: string | null
+          folio: number
+          formato?: string
+          id?: string
+          inventario_override?: Json
+          materiales?: string[]
+          observaciones?: string[]
+          personas?: number
+          precio_calculado?: number
+          precio_final?: number | null
+          quote_id?: string | null
+          recargo_escala?: number
+          recargo_estac?: number
+          recargo_otro?: number
+          recargo_rampa?: number
+          saludo?: string
+          sin_iva?: boolean
+          textos?: Json
+          titulo_servicio?: string
+          updated_at?: string
+        }
+        Update: {
+          acciones?: string[]
+          armado_camas?: boolean
+          camion?: string
+          camion_qty?: number
+          cliente?: Json
+          con_embalaje?: boolean
+          con_galeria?: boolean
+          created_at?: string
+          created_by?: string | null
+          cuota1?: number
+          cuota2?: number
+          fecha_servicio?: string | null
+          folio?: number
+          formato?: string
+          id?: string
+          inventario_override?: Json
+          materiales?: string[]
+          observaciones?: string[]
+          personas?: number
+          precio_calculado?: number
+          precio_final?: number | null
+          quote_id?: string | null
+          recargo_escala?: number
+          recargo_estac?: number
+          recargo_otro?: number
+          recargo_rampa?: number
+          saludo?: string
+          sin_iva?: boolean
+          textos?: Json
+          titulo_servicio?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_documents_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quote_items: {
         Row: {
           category: string
@@ -78,6 +188,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      quote_settings: {
+        Row: {
+          created_at: string
+          empresa: Json
+          id: string
+          materiales: string[]
+          observaciones: string[]
+          siguiente_folio: number
+          tarifas: Json
+          textos: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          empresa?: Json
+          id?: string
+          materiales?: string[]
+          observaciones?: string[]
+          siguiente_folio?: number
+          tarifas?: Json
+          textos?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          empresa?: Json
+          id?: string
+          materiales?: string[]
+          observaciones?: string[]
+          siguiente_folio?: number
+          tarifas?: Json
+          textos?: Json
+          updated_at?: string
+        }
+        Relationships: []
       }
       quotes: {
         Row: {
