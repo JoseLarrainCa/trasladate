@@ -18,6 +18,8 @@ import {
   Loader2,
   Save,
   Send,
+  FileText,
+
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -529,10 +531,16 @@ const FormularioDetalle = () => {
 
         {/* Actions */}
         <div className="flex flex-wrap gap-3 pb-8">
+          <Button onClick={() => navigate(`/admin/formularios/${id}/cotizar`)} className="gap-2">
+            <FileText className="w-4 h-4" />
+            Generar cotización PDF
+          </Button>
+
           <Button onClick={handleSendWhatsApp} variant="outline" className="gap-2">
             <Send className="w-4 h-4" />
             Enviar por WhatsApp
           </Button>
+
 
           <AlertDialog>
             <AlertDialogTrigger asChild>

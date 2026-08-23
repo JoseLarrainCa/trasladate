@@ -17,6 +17,8 @@ import Formularios from "./pages/admin/Formularios";
 import FormularioDetalle from "./pages/admin/FormularioDetalle";
 import Importar from "./pages/admin/Importar";
 import Configuracion from "./pages/admin/Configuracion";
+import GenerarCotizacion from "./pages/admin/GenerarCotizacion";
+
 
 const queryClient = new QueryClient();
 
@@ -57,6 +59,23 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/admin/formularios/:id/cotizar"
+              element={
+                <ProtectedRoute>
+                  <GenerarCotizacion />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/cotizar"
+              element={
+                <ProtectedRoute>
+                  <GenerarCotizacion />
+                </ProtectedRoute>
+              }
+            />
+
             <Route
               path="/admin/importar"
               element={
