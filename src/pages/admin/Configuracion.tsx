@@ -201,7 +201,10 @@ const Configuracion = () => {
             </Button>
           </div>
         </motion.div>
+
+        <QuoteSettingsPanel />
       </div>
+
     </AdminLayout>
   );
 };
