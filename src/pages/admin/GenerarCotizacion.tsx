@@ -707,7 +707,7 @@ const GenerarCotizacion = () => {
                 <div
                   id="doc"
                   ref={docRef}
-                  style={{ zoom, width: '210mm' } as React.CSSProperties}
+                  style={{ zoom, width: '210mm' }}
                 >
                   {doc.formato === 'marco' ? <DocMarco doc={doc} cfg={cfg} /> : <DocModerno doc={doc} cfg={cfg} />}
                 </div>
