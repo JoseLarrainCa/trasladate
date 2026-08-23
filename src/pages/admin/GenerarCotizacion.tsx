@@ -1,0 +1,724 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { ArrowLeft, Loader2, Printer, Save, RefreshCw, Plus, Trash2 } from 'lucide-react';
+import AdminLayout from '@/components/admin/AdminLayout';
+import DocMarco from '@/components/admin/pdf/DocMarco';
+import DocModerno from '@/components/admin/pdf/DocModerno';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { ALL_INVENTORY_ITEMS, getInventoryItem } from '@/lib/constants/inventory';
+import {
+  ACCION_KEYS,
+  CAMIONES,
+  DEFAULT_EMPRESA,
+  DEFAULT_TARIFAS,
+  DEFAULT_TEXTOS,
+  MATERIAL_KEYS,
+  OBSERVACION_KEYS,
+  SALUDO_OPTIONS,
+  TEXTO_DEFS,
+  TITULO_OPTIONS,
+  type Empresa,
+  type Tarifas,
+} from '@/lib/quote/defaults';
+import {
+  calcularPrecio,
+  formatCLP,
+  m3ToBodegaM2,
+  sugerirCamion,
+  sugerirPersonas,
+  totalItems,
+  totalM3,
+  type LineaInventario,
+} from '@/lib/quote/pricing';
+import { imprimirDocumento } from '@/lib/quote/print';
+import type { DocConfig, DocState } from '@/lib/quote/document';
+import '@/styles/quote-pdf.css';
+
+const hoy = () => new Date().toISOString().slice(0, 10);
+
+const emptyDoc = (folio: number): DocState => ({
+  folio,
+  formato: 'marco',
+  fecha_servicio: hoy(),
+  titulo_servicio: TITULO_OPTIONS[0],
+  saludo: SALUDO_OPTIONS[0],
+  cliente: {
+    nombre: '',
+    razonSocial: '',
+    email: '',
+    telefono: '',
+    origenDir: '',
+    origenComuna: '',
+    origenPiso: '',
+    origenAscensor: true,
+    origenTipo: 'departamento',
+    destinoDir: '',
+    destinoComuna: '',
+    destinoPiso: '',
+    destinoAscensor: true,
+    destinoTipo: 'departamento',
+  },
+  camion: 'camion25',
+  camion_qty: 1,
+  personas: 3,
+  con_embalaje: true,
+  armado_camas: true,
+  sin_iva: true,
+  con_galeria: false,
+  cuota1: 50,
+  cuota2: 50,
+  recargo_escala: 0,
+  recargo_rampa: 0,
+  recargo_estac: 0,
+  recargo_otro: 0,
+  precio_calculado: 0,
+  precio_final: null,
+  textos: {},
+  materiales: [...MATERIAL_KEYS],
+  observaciones: [...OBSERVACION_KEYS],
+  acciones: [...ACCION_KEYS],
+  inventario: [],
+});
+
+const TIPOS = [
+  { value: 'departamento', label: 'Departamento' },
+  { value: 'casa-1', label: 'Casa 1 piso' },
+  { value: 'casa-2', label: 'Casa 2+ pisos' },
+  { value: 'oficina', label: 'Oficina' },
+  { value: 'bodega', label: 'Bodega' },
+];
+
+const GenerarCotizacion = () => {
+  const { id } = useParams<{ id: string }>();
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const docRef = useRef<HTMLDivElement>(null);
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [docId, setDocId] = useState<string | null>(null);
+  const [doc, setDoc] = useState<DocState>(emptyDoc(3286));
+  const [cfg, setCfg] = useState<DocConfig>({
+    empresa: DEFAULT_EMPRESA,
+    tarifas: DEFAULT_TARIFAS,
+    textosDefault: DEFAULT_TEXTOS,
+  });
+  const [nuevoItem, setNuevoItem] = useState('');
+  const [zoom, setZoom] = useState(0.62);
+
+  const set = useCallback(<K extends keyof DocState>(key: K, value: DocState[K]) => {
+    setDoc((d) => ({ ...d, [key]: value }));
+  }, []);
+  const setCli = useCallback((patch: Partial<DocState['cliente']>) => {
+    setDoc((d) => ({ ...d, cliente: { ...d.cliente, ...patch } }));
+  }, []);
+
+  /* ------------------------------ carga inicial ------------------------------ */
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      const sb = supabase as any;
+
+      const [{ data: settings }, existing] = await Promise.all([
+        sb.from('quote_settings').select('*').maybeSingle(),
+        id
+          ? sb.from('quote_documents').select('*').eq('quote_id', id).maybeSingle()
+          : Promise.resolve({ data: null }),
+      ]);
+
+      const conf: DocConfig = {
+        empresa: { ...DEFAULT_EMPRESA, ...(settings?.empresa || {}) },
+        tarifas: { ...DEFAULT_TARIFAS, ...(settings?.tarifas || {}) },
+        textosDefault: { ...DEFAULT_TEXTOS, ...(settings?.textos || {}) },
+      };
+      setCfg(conf);
+
+      const folioBase = settings?.siguiente_folio ?? 3286;
+      let next = emptyDoc(folioBase);
+
+      if (id) {
+        const { data: q } = await sb.from('quotes').select('*').eq('id', id).maybeSingle();
+        const { data: items } = await sb.from('quote_items').select('*').eq('quote_id', id);
+        if (q) {
+          next.quote_id = q.id;
+          next.cliente = {
+            nombre: [q.cliente_nombre, q.cliente_apellido].filter(Boolean).join(' '),
+            razonSocial: q.cliente_razon_social || '',
+            email: q.email || '',
+            telefono: q.celular || q.telefono || '',
+            origenDir: q.origen_direccion || '',
+            origenComuna: q.origen_comuna || '',
+            origenPiso: q.origen_piso || '',
+            origenAscensor: !!q.origen_tiene_ascensor,
+            origenTipo: q.origen_tipo_vivienda || 'departamento',
+            destinoDir: q.destino_direccion || '',
+            destinoComuna: q.destino_comuna || '',
+            destinoPiso: q.destino_piso || '',
+            destinoAscensor: !!q.destino_tiene_ascensor,
+            destinoTipo: q.destino_tipo_vivienda || 'departamento',
+          };
+          if (q.fecha_traslado) next.fecha_servicio = String(q.fecha_traslado).slice(0, 10);
+        }
+        next.inventario = (items || []).map((it: any) => ({
+          item_key: it.item_key,
+          name: it.item_name,
+          qty: it.quantity,
+          category: it.category,
+          m3: getInventoryItem(it.item_key)?.m3 ?? 0,
+        }));
+      }
+
+      if (existing?.data) {
+        const d = existing.data;
+        next = {
+          ...next,
+          id: d.id,
+          folio: d.folio,
+          formato: d.formato,
+          fecha_servicio: d.fecha_servicio || next.fecha_servicio,
+          titulo_servicio: d.titulo_servicio,
+          saludo: d.saludo,
+          cliente: { ...next.cliente, ...(d.cliente || {}) },
+          camion: d.camion,
+          camion_qty: d.camion_qty,
+          personas: d.personas,
+          con_embalaje: d.con_embalaje,
+          armado_camas: d.armado_camas,
+          sin_iva: d.sin_iva,
+          con_galeria: d.con_galeria,
+          cuota1: d.cuota1,
+          cuota2: d.cuota2,
+          recargo_escala: d.recargo_escala,
+          recargo_rampa: d.recargo_rampa,
+          recargo_estac: d.recargo_estac,
+          recargo_otro: d.recargo_otro,
+          precio_calculado: d.precio_calculado,
+          precio_final: d.precio_final,
+          textos: d.textos || {},
+          materiales: d.materiales?.length ? d.materiales : next.materiales,
+          observaciones: d.observaciones?.length ? d.observaciones : next.observaciones,
+          acciones: d.acciones?.length ? d.acciones : next.acciones,
+          inventario: d.inventario_override?.length ? d.inventario_override : next.inventario,
+        };
+        setDocId(d.id);
+      } else {
+        const m3 = totalM3(next.inventario);
+        const sug = sugerirCamion(m3);
+        next.camion = sug.camion;
+        next.camion_qty = sug.cantidad;
+        next.personas = sugerirPersonas(m3);
+        if (params.get('formato') === 'moderno') next.formato = 'moderno';
+      }
+
+      setDoc(next);
+      setLoading(false);
+    };
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  /* ------------------------------- cálculos ------------------------------- */
+  const m3 = useMemo(() => totalM3(doc.inventario), [doc.inventario]);
+  const calc = useMemo(
+    () =>
+      calcularPrecio({
+        m3,
+        camion: doc.camion,
+        camionQty: doc.camion_qty,
+        personas: doc.personas,
+        conEmbalaje: doc.con_embalaje,
+        recargos: {
+          escala: doc.recargo_escala,
+          rampa: doc.recargo_rampa,
+          estac: doc.recargo_estac,
+          otro: doc.recargo_otro,
+        },
+        tarifas: cfg.tarifas,
+      }),
+    [m3, doc.camion, doc.camion_qty, doc.personas, doc.con_embalaje, doc.recargo_escala, doc.recargo_rampa, doc.recargo_estac, doc.recargo_otro, cfg.tarifas]
+  );
+
+  useEffect(() => {
+    setDoc((d) => (d.precio_calculado === calc.precioCalculado ? d : { ...d, precio_calculado: calc.precioCalculado }));
+  }, [calc.precioCalculado]);
+
+  const resugerir = () => {
+    const s = sugerirCamion(m3);
+    setDoc((d) => ({ ...d, camion: s.camion, camion_qty: s.cantidad, personas: sugerirPersonas(m3) }));
+  };
+
+  /* ------------------------------ inventario ------------------------------ */
+  const setQty = (key: string, qty: number) =>
+    setDoc((d) => ({
+      ...d,
+      inventario: d.inventario.map((l) => (l.item_key === key ? { ...l, qty: Math.max(0, qty) } : l)),
+    }));
+  const quitar = (key: string) =>
+    setDoc((d) => ({ ...d, inventario: d.inventario.filter((l) => l.item_key !== key) }));
+  const agregar = () => {
+    const item = getInventoryItem(nuevoItem);
+    if (!item) return;
+    setDoc((d) =>
+      d.inventario.some((l) => l.item_key === item.key)
+        ? { ...d, inventario: d.inventario.map((l) => (l.item_key === item.key ? { ...l, qty: l.qty + 1 } : l)) }
+        : {
+            ...d,
+            inventario: [
+              ...d.inventario,
+              { item_key: item.key, name: item.name, qty: 1, m3: item.m3, category: item.category },
+            ],
+          }
+    );
+    setNuevoItem('');
+  };
+
+  /* --------------------------------- guardar -------------------------------- */
+  const guardar = async () => {
+    setSaving(true);
+    const sb = supabase as any;
+    const payload = {
+      quote_id: doc.quote_id ?? id ?? null,
+      folio: doc.folio,
+      formato: doc.formato,
+      fecha_servicio: doc.fecha_servicio || null,
+      titulo_servicio: doc.titulo_servicio,
+      saludo: doc.saludo,
+      cliente: doc.cliente,
+      camion: doc.camion,
+      camion_qty: doc.camion_qty,
+      personas: doc.personas,
+      con_embalaje: doc.con_embalaje,
+      armado_camas: doc.armado_camas,
+      sin_iva: doc.sin_iva,
+      con_galeria: doc.con_galeria,
+      cuota1: doc.cuota1,
+      cuota2: doc.cuota2,
+      recargo_escala: doc.recargo_escala,
+      recargo_rampa: doc.recargo_rampa,
+      recargo_estac: doc.recargo_estac,
+      recargo_otro: doc.recargo_otro,
+      precio_calculado: doc.precio_calculado,
+      precio_final: doc.precio_final,
+      textos: doc.textos,
+      materiales: doc.materiales,
+      observaciones: doc.observaciones,
+      acciones: doc.acciones,
+      inventario_override: doc.inventario,
+      updated_at: new Date().toISOString(),
+    };
+
+    let error;
+    if (docId) {
+      ({ error } = await sb.from('quote_documents').update(payload).eq('id', docId));
+    } else {
+      const res = await sb.from('quote_documents').insert(payload).select('id').single();
+      error = res.error;
+      if (res.data) setDocId(res.data.id);
+      if (!res.error) {
+        await sb
+          .from('quote_settings')
+          .update({ siguiente_folio: doc.folio + 1 })
+          .neq('id', '00000000-0000-0000-0000-000000000000');
+      }
+    }
+
+    setSaving(false);
+    toast(
+      error
+        ? { title: 'Error al guardar', description: error.message, variant: 'destructive' }
+        : { title: 'Cotización guardada', description: `Folio N° ${doc.folio}` }
+    );
+  };
+
+  const toggleList = (field: 'materiales' | 'observaciones' | 'acciones', key: string) =>
+    setDoc((d) => ({
+      ...d,
+      [field]: d[field].includes(key) ? d[field].filter((k) => k !== key) : [...d[field], key],
+    }));
+
+  const setTexto = (key: string, value: string) =>
+    setDoc((d) => ({ ...d, textos: { ...d.textos, [key]: value } }));
+
+  if (loading) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center py-24">
+          <Loader2 className="w-6 h-6 animate-spin text-primary" />
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  const grupos = ['Frases', 'Materiales', 'Acciones', 'Observaciones', 'Pago', 'Tabla'] as const;
+
+  return (
+    <AdminLayout>
+      <div className="space-y-5">
+        {/* Barra superior */}
+        <div className="flex flex-wrap items-center gap-3">
+          <Button variant="ghost" size="sm" onClick={() => navigate(id ? `/admin/formularios/${id}` : '/admin/formularios')}>
+            <ArrowLeft className="w-4 h-4 mr-1" /> Volver
+          </Button>
+          <h1 className="text-xl font-heading font-bold text-foreground">
+            Cotización N° {doc.folio}
+          </h1>
+          <div className="ml-auto flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={guardar} disabled={saving}>
+              {saving ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Save className="w-4 h-4 mr-1" />}
+              Guardar
+            </Button>
+            <Button size="sm" onClick={() => imprimirDocumento(docRef.current, `Cotizacion-${doc.folio}`)}>
+              <Printer className="w-4 h-4 mr-1" /> Descargar PDF
+            </Button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,420px)_1fr] gap-6">
+          {/* -------------------------------- Editor -------------------------------- */}
+          <div className="space-y-4">
+            <Tabs defaultValue="general">
+              <TabsList className="grid grid-cols-4 w-full">
+                <TabsTrigger value="general">General</TabsTrigger>
+                <TabsTrigger value="servicio">Servicio</TabsTrigger>
+                <TabsTrigger value="inventario">Inventario</TabsTrigger>
+                <TabsTrigger value="textos">Textos</TabsTrigger>
+              </TabsList>
+
+              {/* General */}
+              <TabsContent value="general" className="space-y-4 pt-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>Formato</Label>
+                    <Select value={doc.formato} onValueChange={(v) => set('formato', v as DocState['formato'])}>
+                      <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="marco">Formato Marco (3 páginas)</SelectItem>
+                        <SelectItem value="moderno">Formato Moderno (1 página)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>N° Servicio</Label>
+                    <Input
+                      type="number"
+                      className="mt-1"
+                      value={doc.folio}
+                      onChange={(e) => set('folio', Number(e.target.value) || 0)}
+                    />
+                  </div>
+                  <div>
+                    <Label>Fecha de servicio</Label>
+                    <Input
+                      type="date"
+                      className="mt-1"
+                      value={doc.fecha_servicio}
+                      onChange={(e) => set('fecha_servicio', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label>Saludo</Label>
+                    <Select value={doc.saludo} onValueChange={(v) => set('saludo', v)}>
+                      <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {SALUDO_OPTIONS.map((s) => (
+                          <SelectItem key={s} value={s}>{s}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div>
+                  <Label>Título del servicio</Label>
+                  <Input
+                    className="mt-1"
+                    list="titulos"
+                    value={doc.titulo_servicio}
+                    onChange={(e) => set('titulo_servicio', e.target.value.toUpperCase())}
+                  />
+                  <datalist id="titulos">
+                    {TITULO_OPTIONS.map((t) => <option key={t} value={t} />)}
+                  </datalist>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="col-span-2">
+                    <Label>Cliente</Label>
+                    <Input className="mt-1" value={doc.cliente.nombre} onChange={(e) => setCli({ nombre: e.target.value })} />
+                  </div>
+                  <div className="col-span-2">
+                    <Label>Razón social (opcional)</Label>
+                    <Input className="mt-1" value={doc.cliente.razonSocial} onChange={(e) => setCli({ razonSocial: e.target.value })} />
+                  </div>
+                  <div>
+                    <Label>Email</Label>
+                    <Input className="mt-1" value={doc.cliente.email} onChange={(e) => setCli({ email: e.target.value })} />
+                  </div>
+                  <div>
+                    <Label>Teléfono</Label>
+                    <Input className="mt-1" value={doc.cliente.telefono} onChange={(e) => setCli({ telefono: e.target.value })} />
+                  </div>
+                </div>
+
+                {(['origen', 'destino'] as const).map((lado) => (
+                  <div key={lado} className="rounded-xl border border-border p-3 space-y-3">
+                    <div className="text-sm font-semibold uppercase text-muted-foreground">{lado}</div>
+                    <Input
+                      placeholder="Dirección"
+                      value={lado === 'origen' ? doc.cliente.origenDir : doc.cliente.destinoDir}
+                      onChange={(e) => setCli(lado === 'origen' ? { origenDir: e.target.value } : { destinoDir: e.target.value })}
+                    />
+                    <div className="grid grid-cols-2 gap-3">
+                      <Input
+                        placeholder="Comuna"
+                        value={lado === 'origen' ? doc.cliente.origenComuna : doc.cliente.destinoComuna}
+                        onChange={(e) => setCli(lado === 'origen' ? { origenComuna: e.target.value } : { destinoComuna: e.target.value })}
+                      />
+                      <Input
+                        placeholder="Piso"
+                        value={(lado === 'origen' ? doc.cliente.origenPiso : doc.cliente.destinoPiso) || ''}
+                        onChange={(e) => setCli(lado === 'origen' ? { origenPiso: e.target.value } : { destinoPiso: e.target.value })}
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 items-center">
+                      <Select
+                        value={lado === 'origen' ? doc.cliente.origenTipo : doc.cliente.destinoTipo}
+                        onValueChange={(v) => setCli(lado === 'origen' ? { origenTipo: v } : { destinoTipo: v })}
+                      >
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {TIPOS.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                      <label className="flex items-center gap-2 text-sm">
+                        <Switch
+                          checked={lado === 'origen' ? doc.cliente.origenAscensor : doc.cliente.destinoAscensor}
+                          onCheckedChange={(v) => setCli(lado === 'origen' ? { origenAscensor: v } : { destinoAscensor: v })}
+                        />
+                        Ascensor
+                      </label>
+                    </div>
+                  </div>
+                ))}
+              </TabsContent>
+
+              {/* Servicio */}
+              <TabsContent value="servicio" className="space-y-4 pt-4">
+                <div className="rounded-xl bg-muted/50 p-3 text-sm flex items-center justify-between">
+                  <span>
+                    <b>{m3.toFixed(1)} m³</b> · {m3ToBodegaM2(m3).toFixed(1)} m² bodega · {totalItems(doc.inventario)} ítems
+                  </span>
+                  <Button variant="outline" size="sm" onClick={resugerir}>
+                    <RefreshCw className="w-3.5 h-3.5 mr-1" /> Sugerir
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="col-span-2">
+                    <Label>Camión</Label>
+                    <Select value={doc.camion} onValueChange={(v) => set('camion', v)}>
+                      <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {CAMIONES.map((c) => <SelectItem key={c.key} value={c.key}>{c.label}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Cantidad</Label>
+                    <Input type="number" min={1} className="mt-1" value={doc.camion_qty}
+                      onChange={(e) => set('camion_qty', Math.max(1, Number(e.target.value) || 1))} />
+                  </div>
+                  <div>
+                    <Label>Personas</Label>
+                    <Input type="number" min={1} className="mt-1" value={doc.personas}
+                      onChange={(e) => set('personas', Math.max(1, Number(e.target.value) || 1))} />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  {([
+                    ['con_embalaje', 'Servicio de embalaje'],
+                    ['armado_camas', 'Armado de camas'],
+                    ['sin_iva', 'Nota "no incluye IVA"'],
+                    ['con_galeria', 'Página de fotos'],
+                  ] as const).map(([k, label]) => (
+                    <label key={k} className="flex items-center gap-2 text-sm">
+                      <Switch checked={doc[k] as boolean} onCheckedChange={(v) => set(k, v as never)} />
+                      {label}
+                    </label>
+                  ))}
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  {([
+                    ['recargo_escala', 'Recargo escala'],
+                    ['recargo_rampa', 'Recargo rampa'],
+                    ['recargo_estac', 'Recargo estacionamiento'],
+                    ['recargo_otro', 'Otro recargo'],
+                  ] as const).map(([k, label]) => (
+                    <div key={k}>
+                      <Label>{label}</Label>
+                      <Input type="number" className="mt-1" value={doc[k] as number}
+                        onChange={(e) => set(k, (Number(e.target.value) || 0) as never)} />
+                    </div>
+                  ))}
+                </div>
+
+                <div className="rounded-xl border border-border p-3 space-y-1 text-sm">
+                  {calc.desglose.map((d) => (
+                    <div key={d.label} className="flex justify-between text-muted-foreground">
+                      <span>{d.label}</span><span>{formatCLP(d.valor)}</span>
+                    </div>
+                  ))}
+                  <div className="flex justify-between font-semibold pt-1 border-t border-border">
+                    <span>Precio calculado</span><span>{formatCLP(calc.precioCalculado)}</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="col-span-3">
+                    <Label>Precio final (dejar vacío para usar el calculado)</Label>
+                    <Input
+                      type="number"
+                      className="mt-1"
+                      value={doc.precio_final ?? ''}
+                      placeholder={String(calc.precioCalculado)}
+                      onChange={(e) => set('precio_final', e.target.value === '' ? null : Number(e.target.value))}
+                    />
+                  </div>
+                  <div>
+                    <Label>% Cuota 1</Label>
+                    <Input type="number" className="mt-1" value={doc.cuota1}
+                      onChange={(e) => {
+                        const v = Number(e.target.value) || 0;
+                        setDoc((d) => ({ ...d, cuota1: v, cuota2: 100 - v }));
+                      }} />
+                  </div>
+                  <div>
+                    <Label>% Cuota 2</Label>
+                    <Input type="number" className="mt-1" value={doc.cuota2} readOnly />
+                  </div>
+                </div>
+              </TabsContent>
+
+              {/* Inventario */}
+              <TabsContent value="inventario" className="space-y-3 pt-4">
+                <div className="flex gap-2">
+                  <Select value={nuevoItem} onValueChange={setNuevoItem}>
+                    <SelectTrigger><SelectValue placeholder="Agregar ítem…" /></SelectTrigger>
+                    <SelectContent className="max-h-72">
+                      {ALL_INVENTORY_ITEMS.map((i) => (
+                        <SelectItem key={i.key} value={i.key}>{i.name} — {i.category}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button variant="outline" onClick={agregar} disabled={!nuevoItem}>
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+
+                <div className="space-y-1 max-h-[520px] overflow-y-auto pr-1">
+                  {doc.inventario.length === 0 && (
+                    <p className="text-sm text-muted-foreground">Sin ítems. Agrega desde el selector.</p>
+                  )}
+                  {doc.inventario.map((l) => (
+                    <div key={l.item_key} className="flex items-center gap-2 text-sm">
+                      <span className="flex-1 truncate">{l.name}</span>
+                      <span className="text-xs text-muted-foreground w-14 text-right">{(l.m3 * l.qty).toFixed(1)} m³</span>
+                      <Input
+                        type="number"
+                        min={0}
+                        className="w-16 h-8"
+                        value={l.qty}
+                        onChange={(e) => setQty(l.item_key, Number(e.target.value) || 0)}
+                      />
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => quitar(l.item_key)}>
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
+
+              {/* Textos */}
+              <TabsContent value="textos" className="space-y-5 pt-4">
+                {grupos.map((g) => {
+                  const defs = TEXTO_DEFS.filter((t) => t.group === g);
+                  if (!defs.length) return null;
+                  const listField =
+                    g === 'Materiales' ? 'materiales' : g === 'Acciones' ? 'acciones' : g === 'Observaciones' ? 'observaciones' : null;
+                  return (
+                    <div key={g} className="space-y-3">
+                      <h3 className="text-sm font-semibold text-foreground">{g}</h3>
+                      {defs.map((t) => (
+                        <div key={t.key} className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            {listField && (
+                              <Checkbox
+                                checked={(doc[listField] as string[]).includes(t.key)}
+                                onCheckedChange={() => toggleList(listField, t.key)}
+                              />
+                            )}
+                            <Label className="text-xs text-muted-foreground">{t.label}</Label>
+                          </div>
+                          <Textarea
+                            rows={2}
+                            value={doc.textos[t.key] ?? cfg.textosDefault[t.key] ?? ''}
+                            onChange={(e) => setTexto(t.key, e.target.value)}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
+              </TabsContent>
+            </Tabs>
+          </div>
+
+          {/* ------------------------------- Vista previa ------------------------------- */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>Vista previa</span>
+              <input
+                type="range" min={40} max={100} value={zoom * 100}
+                onChange={(e) => setZoom(Number(e.target.value) / 100)}
+                className="ml-auto w-32 accent-primary"
+              />
+              <span>{Math.round(zoom * 100)}%</span>
+            </div>
+            <div className="rounded-xl bg-muted/40 p-4 overflow-auto">
+              <div className="doc-scale-wrap mx-auto" style={{ width: 'fit-content' }}>
+                <div
+                  id="doc"
+                  ref={docRef}
+                  style={{ zoom, width: '210mm' }}
+                >
+                  {doc.formato === 'marco' ? <DocMarco doc={doc} cfg={cfg} /> : <DocModerno doc={doc} cfg={cfg} />}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </AdminLayout>
+  );
+};
+
+export default GenerarCotizacion;

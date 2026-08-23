@@ -1,0 +1,356 @@
+/* ==========================================================================
+   Trasladarte — CSS canónico del documento de cotización (A4).
+   NO convertir a Tailwind. Medidas en mm/pt porque el destino es papel A4.
+   Formato 1 (marco): clases .page .d-*
+   Formato 2 (moderno): clases .m-page .m-*
+   ========================================================================== */
+
+#doc {
+  width: 210mm;
+  margin: 0 auto;
+  color: #000;
+}
+
+.page {
+  width: 210mm;
+  min-height: 297mm;
+  padding: 8mm 9mm;
+  background: #fff;
+  box-sizing: border-box;
+  font-family: Calibri, "Segoe UI", Candara, Arial, sans-serif;
+  font-size: 10.5pt;
+  line-height: 1.35;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ---------- Marca escrita ---------- */
+.d-brand {
+  font-size: 22pt;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #1e46c8;
+  line-height: 1;
+  text-align: right;
+  white-space: nowrap;
+}
+.d-brand .a-org { color: #d93b0f; }
+.d-sub {
+  font-size: 8.5pt;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: #1e46c8;
+  text-align: right;
+  margin-top: 1mm;
+}
+
+/* ---------- Encabezado página ---------- */
+.d-head {
+  border: 2px solid #e8621d;
+  border-radius: 3px;
+  padding: 3mm 4mm;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6mm;
+}
+.d-cot {
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 30pt;
+  color: #1e46c8;
+  -webkit-text-stroke: 1.2px #d93b0f;
+  line-height: 1;
+}
+.d-meta {
+  display: flex;
+  gap: 10mm;
+  margin: 2.5mm 0;
+  font-size: 10.5pt;
+}
+.d-meta b { font-weight: 700; }
+.d-meta i { color: #1e46c8; font-style: italic; font-weight: 700; }
+
+/* ---------- Caja naranja ---------- */
+.d-box {
+  border: 2px solid #e8621d;
+  border-radius: 3px;
+  padding: 4mm 5mm;
+  min-height: 225mm;
+  position: relative;
+}
+.d-box.auto { min-height: 0; }
+.d-lbl { font-weight: 700; text-decoration: underline; margin-bottom: 2mm; }
+.d-title {
+  text-align: center;
+  font-size: 22pt;
+  font-weight: 800;
+  color: #1e46c8;
+  letter-spacing: 0.04em;
+  margin: 5mm 0;
+  line-height: 1.2;
+}
+.d-p { margin: 0 0 3mm 0; }
+.d-p.indent { text-indent: 8mm; text-align: justify; }
+.d-star { margin: 3mm 0 1.5mm 0; font-weight: 700; }
+
+.inv-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0 6mm;
+  margin: 1mm 0 3mm 8mm;
+}
+.inv-grid span {
+  color: #1e46c8;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 10pt;
+  line-height: 1.5;
+}
+.mat-list { margin: 1mm 0 3mm 14mm; }
+.mat-list div {
+  color: #1e46c8;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+/* ---------- Sello ---------- */
+.seal {
+  position: absolute;
+  right: 12mm;
+  bottom: 12mm;
+  width: 34mm;
+  height: 34mm;
+  border: 2.5px solid #c62828;
+  border-radius: 50%;
+  color: #c62828;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(-14deg);
+  text-align: center;
+  font-weight: 800;
+}
+.seal .s1 { font-size: 13pt; line-height: 1; }
+.seal .s2 { font-size: 8pt; letter-spacing: 0.08em; margin-top: 1mm; }
+
+/* ---------- Ficha cliente ---------- */
+.d-client {
+  display: grid;
+  grid-template-columns: 32mm 1fr 30mm 1fr;
+  border: 2px solid #e8621d;
+  border-radius: 3px;
+  margin-bottom: 3mm;
+}
+.d-client > div {
+  border-right: 1px solid #e8621d;
+  border-bottom: 1px solid #e8621d;
+  padding: 1.4mm 2.5mm;
+  font-size: 10pt;
+}
+.d-client > div:nth-child(4n) { border-right: none; }
+.d-client > div.k { font-weight: 700; }
+.d-client > div.v { color: #1e46c8; font-style: italic; font-weight: 700; }
+
+/* ---------- Tabla ---------- */
+.d-tbl {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 3mm;
+  font-size: 9.5pt;
+}
+.d-tbl thead th {
+  background: #17179c;
+  color: #fff;
+  font-size: 8pt;
+  letter-spacing: 0.06em;
+  padding: 1.6mm 2mm;
+  border: 1px solid #17179c;
+  text-align: center;
+}
+.d-tbl td {
+  border: 1px solid #17179c;
+  padding: 1.6mm 2.5mm;
+  vertical-align: middle;
+}
+.d-tbl td.c { text-align: center; width: 22mm; }
+.d-tbl td.v { width: 34mm; text-align: right; }
+.d-emb { display: flex; flex-wrap: wrap; gap: 2mm 8mm; margin-top: 1mm; }
+.d-emb span { color: #1e46c8; font-style: italic; font-weight: 700; }
+.d-total td {
+  background: #17179c;
+  color: #fff;
+  font-weight: 800;
+  border: 1px solid #17179c;
+}
+
+/* ---------- Lo que haremos / observaciones ---------- */
+.d-do, .d-obs { margin-bottom: 3mm; }
+.d-do p, .d-obs p { margin: 0 0 1.6mm 0; text-align: justify; }
+.d-do i, .d-obs i { color: #1e46c8; font-style: italic; }
+
+/* ---------- Pago ---------- */
+.d-pay { margin-bottom: 4mm; }
+.d-pay .row { display: flex; justify-content: space-between; align-items: baseline; }
+.d-pay .cuota { margin: 1mm 0 1mm 8mm; }
+.d-pay .cuota b { color: #1e46c8; }
+.d-bank { margin: 4mm auto; width: 105mm; }
+.d-bank .r { display: flex; margin-bottom: 1mm; }
+.d-bank .r .k { width: 34mm; font-weight: 700; }
+.d-bank .r .v { flex: 1; text-align: right; color: #1e46c8; font-style: italic; font-weight: 700; }
+
+/* ---------- Banda de contacto ---------- */
+.d-contact { margin-top: 6mm; }
+.d-contact .band {
+  display: flex;
+  align-items: center;
+  gap: 6mm;
+  padding: 3mm 4mm;
+  flex-wrap: wrap;
+}
+.d-contact .band.blue { background: #17179c; }
+.d-contact .band.black { background: #000; }
+.d-contact .logo { font-size: 13pt; font-weight: 800; letter-spacing: 0.06em; color: #fff; }
+.d-contact .logo.akikb { color: #e8621d; }
+.d-contact .k { color: #ffd54f; font-style: italic; font-size: 9pt; }
+.d-contact .v { color: #fff; font-style: italic; font-weight: 700; font-size: 9pt; }
+
+/* ---------- Galería ---------- */
+.d-gallery h3 {
+  color: #d32f2f;
+  font-weight: 800;
+  font-size: 13pt;
+  text-align: center;
+  margin: 4mm 0 3mm;
+}
+.d-gallery .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; }
+.d-gallery .ph {
+  border: 1.5px dashed #bbb;
+  border-radius: 3px;
+  height: 38mm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 8pt;
+}
+
+/* ==========================================================================
+   Formato 2 — moderno
+   ========================================================================== */
+.m-page {
+  width: 210mm;
+  min-height: 297mm;
+  padding: 14mm 15mm;
+  background: #fff;
+  box-sizing: border-box;
+  font-family: Calibri, "Segoe UI", Candara, Arial, sans-serif;
+  font-size: 9.5pt;
+  color: #16233c;
+  line-height: 1.35;
+}
+.m-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10mm; }
+.m-brand .name {
+  font-size: 20pt;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #1e46c8;
+  line-height: 1;
+}
+.m-brand .name .a-org { color: #e8621d; }
+.m-brand .tag {
+  font-size: 7pt;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: #e8621d;
+  margin-top: 1mm;
+}
+.m-brand .meta { font-size: 8pt; color: #5a6472; margin-top: 2mm; line-height: 1.5; }
+.m-title { text-align: right; }
+.m-title .t { font-size: 17pt; font-weight: 800; color: #1e46c8; letter-spacing: 0.04em; }
+.m-title .s { font-size: 8.5pt; color: #5a6472; margin-top: 1mm; }
+.m-title .s b { color: #16233c; }
+.m-rule { border: none; border-top: 2.5px solid #e8621d; margin: 4mm 0; }
+
+.m-client { font-size: 10pt; margin-bottom: 3mm; }
+.m-client b { font-weight: 700; }
+.m-client .sub { color: #5a6472; font-size: 8.5pt; }
+
+.m-ruta { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; margin-bottom: 4mm; }
+.m-ruta .card { border: 1px solid #dbe2ea; border-radius: 2mm; padding: 3mm 4mm; }
+.m-ruta .lbl { font-size: 6.5pt; font-weight: 800; letter-spacing: 0.18em; color: #e8621d; }
+.m-ruta .dir { font-size: 9.5pt; font-weight: 600; margin-top: 1mm; }
+.m-ruta .sub { font-size: 8pt; color: #5a6472; margin-top: 0.6mm; }
+
+.m-intro { margin-bottom: 3mm; }
+
+.m-tbl { width: 100%; border-collapse: collapse; font-size: 8.8pt; }
+.m-tbl thead th {
+  background: #1e3a6a;
+  color: #fff;
+  text-align: left;
+  padding: 2mm 3mm;
+  font-size: 7.5pt;
+  letter-spacing: 0.12em;
+}
+.m-tbl thead th.n { width: 10mm; text-align: center; }
+.m-tbl td { padding: 2.4mm 3mm; border-bottom: 1px solid #e4e9ef; vertical-align: top; }
+.m-tbl td.n { text-align: center; color: #5a6472; }
+.m-tbl tbody tr:nth-child(even) { background: #f6f8fb; }
+.m-tbl .t { font-weight: 700; }
+.m-tbl .d { color: #5a6472; margin-top: 0.8mm; }
+
+.m-total {
+  background: #1e3a6a;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 2.6mm 3mm;
+  font-weight: 800;
+  font-size: 11pt;
+}
+.m-total .iva { font-size: 7.5pt; font-weight: 600; opacity: 0.85; }
+
+.m-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; margin-top: 5mm; }
+.m-sec h4 {
+  font-size: 7.5pt;
+  letter-spacing: 0.16em;
+  color: #e8621d;
+  font-weight: 800;
+  margin: 0 0 1.5mm 0;
+}
+.m-sec ul { margin: 0; padding-left: 4mm; }
+.m-sec li { margin-bottom: 1mm; font-size: 8.5pt; }
+.m-sec p { margin: 0 0 1mm 0; font-size: 8.5pt; }
+.m-sec .muted { color: #5a6472; }
+
+.m-foot {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6mm;
+  margin-top: 6mm;
+  padding-top: 3mm;
+  border-top: 1px solid #dbe2ea;
+  font-size: 8pt;
+  color: #5a6472;
+}
+.m-foot b { color: #16233c; }
+
+/* ==========================================================================
+   Impresión
+   ========================================================================== */
+.doc-scale-wrap { overflow: hidden; }
+
+@media print {
+  body.imprimiendo > *:not(#doc) { display: none !important; }
+  body.imprimiendo { background: #fff; margin: 0; }
+  #doc { transform: none !important; width: 210mm; margin: 0; }
+  .page { page-break-after: always; }
+  .page:last-child { page-break-after: auto; }
+  .m-page { page-break-after: auto; }
+  @page { size: A4; margin: 0; }
+}
