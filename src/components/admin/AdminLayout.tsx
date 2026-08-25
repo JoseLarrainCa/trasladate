@@ -225,10 +225,20 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       </aside>
 
       {/* Main Content */}
-      <main className="lg:ml-64 min-h-screen pt-16 lg:pt-0">
-        <div className="p-4 lg:p-8">
+      <main className="lg:ml-64 min-h-screen pt-16 lg:pt-0 flex flex-col">
+        <div className="flex-1 p-4 lg:p-8">
           {children}
         </div>
+        <footer className="p-4 lg:p-8 text-center text-xs text-muted-foreground">
+          <a
+            href="https://www.try-omnis.cl"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-primary transition-colors"
+          >
+            Desarrollado por Omnis
+          </a>
+        </footer>
       </main>
     </div>
   );

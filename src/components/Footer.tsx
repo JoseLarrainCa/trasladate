@@ -77,6 +77,14 @@ const Footer = () => {
           <p>
             Nuestros principios: <span className="text-primary">Soluciones, Garantías, Rapidez, Confianza</span>
           </p>
+          <a
+            href="https://www.try-omnis.cl"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-secondary-foreground/60 hover:text-primary transition-colors"
+          >
+            Desarrollado por Omnis
+          </a>
         </div>
       </div>
     </footer>
