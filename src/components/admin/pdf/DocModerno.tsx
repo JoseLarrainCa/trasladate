@@ -205,8 +205,12 @@ const DocModerno = ({ doc, cfg }: Props) => {
           <b>Mini bodegas akikb</b> — {e.akikb_correo} · {e.akikb_wsp} · Oficina {e.akikb_oficina}
         </div>
       </div>
-    </div>
+      </div>
+
+      <DocInventario doc={doc} variant="moderno" />
+    </>
   );
+
 };
 
 export default DocModerno;
