@@ -11,12 +11,12 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
   const reduceMotion = useReducedMotion();
 
   useEffect(() => {
-    const exitDelay = reduceMotion ? 700 : 1900;
-    const completeDelay = reduceMotion ? 950 : 2300;
+    const exitDelay = reduceMotion ? 700 : 2400;
+    const completeDelay = reduceMotion ? 950 : 2800;
     const wordTimers = reduceMotion
       ? []
       : [1, 2, 3].map((step) =>
-          window.setTimeout(() => setWordStep(step), 180 + step * 220)
+          window.setTimeout(() => setWordStep(step), 250 + step * 280)
         );
     if (reduceMotion) setWordStep(3);
     const exitTimer = window.setTimeout(() => setIsExiting(true), exitDelay);
@@ -49,7 +49,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
             className="absolute inset-x-0 top-0 h-1 origin-left bg-primary"
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
-            transition={{ duration: reduceMotion ? 0.65 : 1.9, ease: 'linear' }}
+            transition={{ duration: reduceMotion ? 0.65 : 2.4, ease: 'linear' }}
           />
 
           <div
