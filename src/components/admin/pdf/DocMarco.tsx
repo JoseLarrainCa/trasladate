@@ -10,6 +10,8 @@ import {
 } from '@/lib/quote/document';
 import { camionLabel, formatCLP, totalM3 } from '@/lib/quote/pricing';
 import { dosDigitos, espaciar, espaciarDigitos } from '@/lib/quote/templates';
+import DocInventario from './DocInventario';
+
 
 const Brand = () => (
   <div>
