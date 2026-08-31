@@ -16,7 +16,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
     const wordTimers = reduceMotion
       ? []
       : [1, 2, 3].map((step) =>
-          window.setTimeout(() => setWordStep(step), 260 + step * 260)
+          window.setTimeout(() => setWordStep(step), 180 + step * 220)
         );
     if (reduceMotion) setWordStep(3);
     const exitTimer = window.setTimeout(() => setIsExiting(true), exitDelay);
