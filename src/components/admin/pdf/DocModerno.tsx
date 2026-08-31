@@ -36,7 +36,9 @@ const DocModerno = ({ doc, cfg }: Props) => {
   const destinoEsBodega = doc.cliente.destinoTipo === 'bodega';
 
   return (
+    <>
     <div className="m-page">
+
       <div className="m-head">
         <div className="m-brand">
           <div className="name">
