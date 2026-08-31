@@ -354,3 +354,45 @@
   .m-page { page-break-after: auto; }
   @page { size: A4; margin: 0; }
 }
+
+/* ==========================================================================
+   Hoja anexa — Inventario del cliente
+   ========================================================================== */
+.anx-title {
+  font-size: 15pt;
+  font-weight: 800;
+  color: #1e46c8;
+  letter-spacing: 0.04em;
+  text-align: center;
+  margin-bottom: 1.5mm;
+}
+.anx-sub {
+  text-align: center;
+  font-size: 9pt;
+  color: #5a6472;
+  margin-bottom: 4mm;
+}
+.anx-cats {
+  column-count: 2;
+  column-gap: 8mm;
+}
+.anx-cat {
+  break-inside: avoid;
+  page-break-inside: avoid;
+  margin-bottom: 4mm;
+}
+.anx-cat-h {
+  font-size: 7.5pt;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: #e8621d;
+  border-bottom: 1px solid #e8621d;
+  padding-bottom: 0.8mm;
+  margin-bottom: 1.2mm;
+}
+.anx-tbl { width: 100%; border-collapse: collapse; font-size: 9pt; }
+.anx-tbl td { padding: 0.7mm 1mm; border-bottom: 1px solid #eceff3; }
+.anx-tbl td.q { width: 10mm; font-weight: 700; color: #1e46c8; text-align: right; padding-right: 2.5mm; }
+.anx-note { margin-top: 3mm; font-size: 8pt; color: #5a6472; font-style: italic; }
+.anx-moderno { page-break-before: always; }
+.page .anx-box { min-height: 0; }

@@ -10,6 +10,8 @@ import {
 } from '@/lib/quote/document';
 import { camionLabel, formatCLP, totalM3 } from '@/lib/quote/pricing';
 import { dosDigitos, espaciar, espaciarDigitos } from '@/lib/quote/templates';
+import DocInventario from './DocInventario';
+
 
 const Brand = () => (
   <div>
@@ -91,13 +93,11 @@ const DocMarco = ({ doc, cfg }: Props) => {
           {personalCalificado && <p className="d-star">* {personalCalificado}</p>}
           {seTrasladara && <p className="d-star">* {seTrasladara}</p>}
 
-          <div className="inv-grid">
-            {doc.inventario.map((l, i) => (
-              <span key={l.item_key + i}>
-                {dosDigitos(l.qty)} {l.name}
-              </span>
-            ))}
-          </div>
+          <p className="d-p indent">
+            El detalle completo del inventario declarado por el cliente ({doc.inventario.length} líneas) se
+            adjunta en la <b>hoja anexa</b> al final de esta cotización.
+          </p>
+
 
           {materiales.length > 0 && (
             <>
@@ -296,6 +296,10 @@ const DocMarco = ({ doc, cfg }: Props) => {
           </div>
         </div>
       </div>
+
+      {/* ---------------- Hoja anexa: inventario ---------------- */}
+      <DocInventario doc={doc} variant="marco" header={<Head folio={doc.folio} fecha={fecha} />} />
+
 
       {/* ---------------- Página 4 (opcional) ---------------- */}
       {doc.con_galeria && (

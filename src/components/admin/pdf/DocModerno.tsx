@@ -1,5 +1,4 @@
 import {
-  agruparInventario,
   buildVars,
   formatFechaCL,
   precioFinal,
@@ -8,7 +7,7 @@ import {
   type DocState,
 } from '@/lib/quote/document';
 import { camionLabel, formatCLP, m3ToBodegaM2, totalM3 } from '@/lib/quote/pricing';
-import { dosDigitos } from '@/lib/quote/templates';
+import DocInventario from './DocInventario';
 
 interface Props {
   doc: DocState;
@@ -21,7 +20,6 @@ const DocModerno = ({ doc, cfg }: Props) => {
   const m3 = totalM3(doc.inventario);
   const m2 = m3ToBodegaM2(m3);
   const precio = precioFinal(doc);
-  const grupos = agruparInventario(doc.inventario);
 
   const materiales = doc.materiales.map((k) => txt(doc, cfg, k, vars)).filter(Boolean);
   const acciones = doc.acciones
@@ -36,7 +34,9 @@ const DocModerno = ({ doc, cfg }: Props) => {
   const destinoEsBodega = doc.cliente.destinoTipo === 'bodega';
 
   return (
+    <>
     <div className="m-page">
+
       <div className="m-head">
         <div className="m-brand">
           <div className="name">
@@ -136,19 +136,13 @@ const DocModerno = ({ doc, cfg }: Props) => {
             <td className="n">3</td>
             <td>
               <div className="t">
-                Inventario a trasladar — {m3.toFixed(1)} m³
+                Inventario a trasladar — {String(vars.items)} ítems · {m3.toFixed(1)} m³
                 {destinoEsBodega && <> ≈ {m2.toFixed(1)} m² de bodega</>}
               </div>
-              <div className="d">
-                {grupos.map((g) => (
-                  <div key={g.category}>
-                    <b>{g.category}:</b>{' '}
-                    {g.items.map((l) => `${dosDigitos(l.qty)} ${l.name}`).join(' · ')}
-                  </div>
-                ))}
-              </div>
+              <div className="d">Detalle completo en la hoja anexa de inventario.</div>
             </td>
           </tr>
+
         </tbody>
       </table>
 
@@ -211,8 +205,12 @@ const DocModerno = ({ doc, cfg }: Props) => {
           <b>Mini bodegas akikb</b> — {e.akikb_correo} · {e.akikb_wsp} · Oficina {e.akikb_oficina}
         </div>
       </div>
-    </div>
+      </div>
+
+      <DocInventario doc={doc} variant="moderno" />
+    </>
   );
+
 };
 
 export default DocModerno;
