@@ -7,15 +7,23 @@ interface SplashScreenProps {
 
 const SplashScreen = ({ onComplete }: SplashScreenProps) => {
   const [isExiting, setIsExiting] = useState(false);
+  const [wordStep, setWordStep] = useState(0);
   const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     const exitDelay = reduceMotion ? 700 : 1900;
     const completeDelay = reduceMotion ? 950 : 2300;
+    const wordTimers = reduceMotion
+      ? []
+      : [1, 2, 3].map((step) =>
+          window.setTimeout(() => setWordStep(step), 260 + step * 260)
+        );
+    if (reduceMotion) setWordStep(3);
     const exitTimer = window.setTimeout(() => setIsExiting(true), exitDelay);
     const completeTimer = window.setTimeout(() => onComplete(), completeDelay);
 
     return () => {
+      wordTimers.forEach((timer) => window.clearTimeout(timer));
       window.clearTimeout(exitTimer);
       window.clearTimeout(completeTimer);
     };
@@ -50,28 +58,26 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
             aria-label="Planificamos, embalamos y trasladamos"
           >
             {reels.map((words, reelIndex) => (
-              <div key={words[words.length - 1]} className="h-8 overflow-hidden sm:h-10">
-                <motion.div
-                  className="flex flex-col"
-                  initial={reduceMotion ? false : { y: '0%' }}
-                  animate={{ y: reduceMotion ? '-75%' : ['0%', '-25%', '-50%', '-75%'] }}
-                  transition={
-                    reduceMotion
-                      ? { duration: 0 }
-                      : {
-                          duration: 1.2,
-                          delay: 0.12 + reelIndex * 0.14,
-                          times: [0, 0.32, 0.64, 1],
-                          ease: [0.76, 0, 0.24, 1],
-                        }
-                  }
-                >
-                  {words.map((word) => (
-                    <span key={word} className="flex h-8 shrink-0 items-center sm:h-10">
-                      {word}
-                    </span>
-                  ))}
-                </motion.div>
+              <div
+                key={words[words.length - 1]}
+                className="relative h-8 overflow-hidden sm:h-10"
+              >
+                <AnimatePresence initial={false} mode="popLayout">
+                  <motion.span
+                    key={words[wordStep]}
+                    className="absolute inset-0 flex items-center"
+                    initial={reduceMotion ? false : { y: '100%', opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: '-100%', opacity: 0 }}
+                    transition={{
+                      duration: reduceMotion ? 0 : 0.22,
+                      delay: reduceMotion ? 0 : reelIndex * 0.04,
+                      ease: [0.76, 0, 0.24, 1],
+                    }}
+                  >
+                    {words[wordStep]}
+                  </motion.span>
+                </AnimatePresence>
               </div>
             ))}
           </div>
