@@ -295,6 +295,10 @@ const DocMarco = ({ doc, cfg }: Props) => {
         </div>
       </div>
 
+      {/* ---------------- Hoja anexa: inventario ---------------- */}
+      <DocInventario doc={doc} variant="marco" header={<Head folio={doc.folio} fecha={fecha} />} />
+
+
       {/* ---------------- Página 4 (opcional) ---------------- */}
       {doc.con_galeria && (
         <div className="page d-gallery">
