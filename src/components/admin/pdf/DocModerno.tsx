@@ -1,5 +1,4 @@
 import {
-  agruparInventario,
   buildVars,
   formatFechaCL,
   precioFinal,
@@ -8,7 +7,7 @@ import {
   type DocState,
 } from '@/lib/quote/document';
 import { camionLabel, formatCLP, m3ToBodegaM2, totalM3 } from '@/lib/quote/pricing';
-import { dosDigitos } from '@/lib/quote/templates';
+import DocInventario from './DocInventario';
 
 interface Props {
   doc: DocState;
@@ -21,7 +20,6 @@ const DocModerno = ({ doc, cfg }: Props) => {
   const m3 = totalM3(doc.inventario);
   const m2 = m3ToBodegaM2(m3);
   const precio = precioFinal(doc);
-  const grupos = agruparInventario(doc.inventario);
 
   const materiales = doc.materiales.map((k) => txt(doc, cfg, k, vars)).filter(Boolean);
   const acciones = doc.acciones
