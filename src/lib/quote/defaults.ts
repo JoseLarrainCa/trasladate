@@ -220,6 +220,15 @@ export const ACCION_KEYS = [
   'accion_ordenar',
 ];
 
+/**
+ * Presets de acciones según tipo de destino.
+ * - Casa / Dpto (domicilio): las 6 acciones, incluidas desembalaje, armado de
+ *   camas y ubicación de muebles (ver referencia del cliente).
+ * - Bodega: solo embalar, cargar y descargar; desembalaje/camas/ordenar no aplican.
+ */
+export const ACCIONES_DOMICILIO = [...ACCION_KEYS];
+export const ACCIONES_BODEGA = ['accion_embalar', 'accion_cargar', 'accion_descargar'];
+
 export const TITULO_OPTIONS = [
   'TRASLADO + EMBALAJE',
   'SOLO TRASLADO',

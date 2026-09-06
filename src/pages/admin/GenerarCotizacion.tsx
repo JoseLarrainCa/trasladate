@@ -29,6 +29,8 @@ import {
   DEFAULT_TEXTOS,
   MATERIALES_BODEGA,
   MATERIALES_DOMICILIO,
+  ACCIONES_BODEGA,
+  ACCIONES_DOMICILIO,
   OBSERVACION_KEYS,
   SALUDO_OPTIONS,
   TEXTO_DEFS,
@@ -191,9 +193,10 @@ const GenerarCotizacion = () => {
           };
           if (q.fecha_traslado) next.fecha_servicio = String(q.fecha_traslado).slice(0, 10);
           next.tipo_servicio = detectarTipoServicio(q.sugerencia_adicional);
-          // Preset de materiales según el destino (bodega vs casa/dpto)
-          next.materiales =
-            next.cliente.destinoTipo === 'bodega' ? [...MATERIALES_BODEGA] : [...MATERIALES_DOMICILIO];
+          // Presets según el destino (bodega vs casa/dpto): materiales y acciones
+          const esBodega = next.cliente.destinoTipo === 'bodega';
+          next.materiales = esBodega ? [...MATERIALES_BODEGA] : [...MATERIALES_DOMICILIO];
+          next.acciones = esBodega ? [...ACCIONES_BODEGA] : [...ACCIONES_DOMICILIO];
         }
         next.inventario = (items || []).map((it: any) => ({
           item_key: it.item_key,
@@ -539,11 +542,12 @@ const GenerarCotizacion = () => {
                         value={lado === 'origen' ? doc.cliente.origenTipo : doc.cliente.destinoTipo}
                         onValueChange={(v) => {
                           setCli(lado === 'origen' ? { origenTipo: v } : { destinoTipo: v });
-                          // Al cambiar el destino, preseleccionar los materiales típicos
+                          // Al cambiar el destino, preseleccionar materiales y acciones típicas
                           if (lado === 'destino') {
                             setDoc((d) => ({
                               ...d,
                               materiales: v === 'bodega' ? [...MATERIALES_BODEGA] : [...MATERIALES_DOMICILIO],
+                              acciones: v === 'bodega' ? [...ACCIONES_BODEGA] : [...ACCIONES_DOMICILIO],
                             }));
                           }
                         }}
