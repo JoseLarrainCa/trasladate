@@ -27,10 +27,13 @@ import {
   DEFAULT_EMPRESA,
   DEFAULT_TARIFAS,
   DEFAULT_TEXTOS,
-  MATERIAL_KEYS,
+  MATERIALES_BODEGA,
+  MATERIALES_DOMICILIO,
   OBSERVACION_KEYS,
   SALUDO_OPTIONS,
   TEXTO_DEFS,
+  TEXTO_VARIANTES,
+  TIPO_SERVICIO_OPTIONS,
   TITULO_OPTIONS,
   type Empresa,
   type Tarifas,
@@ -57,6 +60,7 @@ const emptyDoc = (folio: number): DocState => ({
   fecha_servicio: hoy(),
   titulo_servicio: TITULO_OPTIONS[0],
   saludo: SALUDO_OPTIONS[0],
+  tipo_servicio: '',
   cliente: {
     nombre: '',
     razonSocial: '',
@@ -89,11 +93,23 @@ const emptyDoc = (folio: number): DocState => ({
   precio_calculado: 0,
   precio_final: null,
   textos: {},
-  materiales: [...MATERIAL_KEYS],
+  materiales: [...MATERIALES_DOMICILIO],
   observaciones: [...OBSERVACION_KEYS],
   acciones: [...ACCION_KEYS],
   inventario: [],
 });
+
+/** Detecta el tipo de servicio guardado en la sugerencia adicional de la cotización web. */
+const detectarTipoServicio = (sugerencia?: string | null): string => {
+  if (!sugerencia) return '';
+  const m = sugerencia.match(/Tipo de servicio:\s*(.+)/i);
+  if (!m) return '';
+  const t = m[1].toLowerCase();
+  if (t.includes('express')) return 'express';
+  if (t.includes('exclusivo')) return 'exclusivo';
+  if (t.includes('principal')) return 'principal';
+  return '';
+};
 
 const TIPOS = [
   { value: 'departamento', label: 'Departamento' },
