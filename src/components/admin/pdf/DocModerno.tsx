@@ -70,7 +70,7 @@ const DocModerno = ({ doc, cfg }: Props) => {
 
       <div className="m-ruta">
         <div className="card">
-          <div className="lbl">ORIGEN</div>
+          <div className="lbl">ORIGEN — {tipoCorto(doc.cliente.origenTipo).toUpperCase()}</div>
           <div className="dir">{doc.cliente.origenDir}</div>
           <div className="sub">
             {[
@@ -83,7 +83,7 @@ const DocModerno = ({ doc, cfg }: Props) => {
           </div>
         </div>
         <div className="card">
-          <div className="lbl">DESTINO</div>
+          <div className="lbl">DESTINO — {tipoCorto(doc.cliente.destinoTipo).toUpperCase()}</div>
           <div className="dir">{doc.cliente.destinoDir}</div>
           <div className="sub">
             {[
@@ -111,7 +111,8 @@ const DocModerno = ({ doc, cfg }: Props) => {
             <td className="n">1</td>
             <td>
               <div className="t">
-                {doc.titulo_servicio} — {String(vars.tipoOrigenCorto)} a {String(vars.tipoDestinoCorto)}
+                {servicio ? `${servicio} — ` : ''}
+                {String(vars.tipoOrigenCorto)} a {String(vars.tipoDestinoCorto)}
               </div>
               <div className="d">{txt(doc, cfg, 'personal_calificado', vars)}</div>
             </td>
