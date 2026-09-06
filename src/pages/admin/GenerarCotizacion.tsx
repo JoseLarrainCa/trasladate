@@ -479,6 +479,22 @@ const GenerarCotizacion = () => {
                   </datalist>
                 </div>
 
+                <div>
+                  <Label>Tipo de servicio (se muestra en el PDF)</Label>
+                  <Select
+                    value={doc.tipo_servicio || 'none'}
+                    onValueChange={(v) => set('tipo_servicio', v === 'none' ? '' : v)}
+                  >
+                    <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Sin indicar</SelectItem>
+                      {TIPO_SERVICIO_OPTIONS.map((o) => (
+                        <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <div className="grid grid-cols-2 gap-3">
                   <div className="col-span-2">
                     <Label>Cliente</Label>
@@ -521,7 +537,16 @@ const GenerarCotizacion = () => {
                     <div className="grid grid-cols-2 gap-3 items-center">
                       <Select
                         value={lado === 'origen' ? doc.cliente.origenTipo : doc.cliente.destinoTipo}
-                        onValueChange={(v) => setCli(lado === 'origen' ? { origenTipo: v } : { destinoTipo: v })}
+                        onValueChange={(v) => {
+                          setCli(lado === 'origen' ? { origenTipo: v } : { destinoTipo: v });
+                          // Al cambiar el destino, preseleccionar los materiales típicos
+                          if (lado === 'destino') {
+                            setDoc((d) => ({
+                              ...d,
+                              materiales: v === 'bodega' ? [...MATERIALES_BODEGA] : [...MATERIALES_DOMICILIO],
+                            }));
+                          }
+                        }}
                       >
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
