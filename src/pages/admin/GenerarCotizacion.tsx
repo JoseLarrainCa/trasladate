@@ -191,9 +191,10 @@ const GenerarCotizacion = () => {
           };
           if (q.fecha_traslado) next.fecha_servicio = String(q.fecha_traslado).slice(0, 10);
           next.tipo_servicio = detectarTipoServicio(q.sugerencia_adicional);
-          // Preset de materiales según el destino (bodega vs casa/dpto)
-          next.materiales =
-            next.cliente.destinoTipo === 'bodega' ? [...MATERIALES_BODEGA] : [...MATERIALES_DOMICILIO];
+          // Presets según el destino (bodega vs casa/dpto): materiales y acciones
+          const esBodega = next.cliente.destinoTipo === 'bodega';
+          next.materiales = esBodega ? [...MATERIALES_BODEGA] : [...MATERIALES_DOMICILIO];
+          next.acciones = esBodega ? [...ACCIONES_BODEGA] : [...ACCIONES_DOMICILIO];
         }
         next.inventario = (items || []).map((it: any) => ({
           item_key: it.item_key,
