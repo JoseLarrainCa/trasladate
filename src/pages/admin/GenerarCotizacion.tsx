@@ -29,6 +29,8 @@ import {
   DEFAULT_TEXTOS,
   MATERIALES_BODEGA,
   MATERIALES_DOMICILIO,
+  ACCIONES_BODEGA,
+  ACCIONES_DOMICILIO,
   OBSERVACION_KEYS,
   SALUDO_OPTIONS,
   TEXTO_DEFS,
@@ -540,11 +542,12 @@ const GenerarCotizacion = () => {
                         value={lado === 'origen' ? doc.cliente.origenTipo : doc.cliente.destinoTipo}
                         onValueChange={(v) => {
                           setCli(lado === 'origen' ? { origenTipo: v } : { destinoTipo: v });
-                          // Al cambiar el destino, preseleccionar los materiales típicos
+                          // Al cambiar el destino, preseleccionar materiales y acciones típicas
                           if (lado === 'destino') {
                             setDoc((d) => ({
                               ...d,
                               materiales: v === 'bodega' ? [...MATERIALES_BODEGA] : [...MATERIALES_DOMICILIO],
+                              acciones: v === 'bodega' ? [...ACCIONES_BODEGA] : [...ACCIONES_DOMICILIO],
                             }));
                           }
                         }}
