@@ -72,6 +72,7 @@ export type Database = {
           saludo: string
           sin_iva: boolean
           textos: Json
+          tipo_servicio: string | null
           titulo_servicio: string
           updated_at: string
         }
@@ -105,6 +106,7 @@ export type Database = {
           saludo?: string
           sin_iva?: boolean
           textos?: Json
+          tipo_servicio?: string | null
           titulo_servicio?: string
           updated_at?: string
         }
@@ -138,6 +140,7 @@ export type Database = {
           saludo?: string
           sin_iva?: boolean
           textos?: Json
+          tipo_servicio?: string | null
           titulo_servicio?: string
           updated_at?: string
         }
