@@ -1,11 +1,14 @@
 import {
+  accionesVisibles,
   buildVars,
   formatFechaCL,
   precioFinal,
+  tipoCorto,
   txt,
   type DocConfig,
   type DocState,
 } from '@/lib/quote/document';
+import { tipoServicioLabel } from '@/lib/quote/defaults';
 import { camionLabel, formatCLP, m3ToBodegaM2, totalM3 } from '@/lib/quote/pricing';
 import DocInventario from './DocInventario';
 

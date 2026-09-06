@@ -122,6 +122,12 @@ const DocMarco = ({ doc, cfg }: Props) => {
         <div className="d-client">
           <div className="k">Cliente:</div>
           <div className="v">{String(vars.nombre)}</div>
+          {tipoServicioLabel(doc.tipo_servicio) && (
+            <>
+              <div className="k">Tipo de Servicio:</div>
+              <div className="v">{tipoServicioLabel(doc.tipo_servicio)}</div>
+            </>
+          )}
           <div className="k">Email:</div>
           <div className="v">{doc.cliente.email || ''}</div>
           <div className="k">Domicilio Origen:</div>
