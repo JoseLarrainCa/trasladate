@@ -190,6 +190,10 @@ const GenerarCotizacion = () => {
             destinoTipo: q.destino_tipo_vivienda || 'departamento',
           };
           if (q.fecha_traslado) next.fecha_servicio = String(q.fecha_traslado).slice(0, 10);
+          next.tipo_servicio = detectarTipoServicio(q.sugerencia_adicional);
+          // Preset de materiales según el destino (bodega vs casa/dpto)
+          next.materiales =
+            next.cliente.destinoTipo === 'bodega' ? [...MATERIALES_BODEGA] : [...MATERIALES_DOMICILIO];
         }
         next.inventario = (items || []).map((it: any) => ({
           item_key: it.item_key,
@@ -210,6 +214,7 @@ const GenerarCotizacion = () => {
           fecha_servicio: d.fecha_servicio || next.fecha_servicio,
           titulo_servicio: d.titulo_servicio,
           saludo: d.saludo,
+          tipo_servicio: d.tipo_servicio ?? next.tipo_servicio,
           cliente: { ...next.cliente, ...(d.cliente || {}) },
           camion: d.camion,
           camion_qty: d.camion_qty,
@@ -315,6 +320,7 @@ const GenerarCotizacion = () => {
       fecha_servicio: doc.fecha_servicio || null,
       titulo_servicio: doc.titulo_servicio,
       saludo: doc.saludo,
+      tipo_servicio: doc.tipo_servicio,
       cliente: doc.cliente,
       camion: doc.camion,
       camion_qty: doc.camion_qty,
