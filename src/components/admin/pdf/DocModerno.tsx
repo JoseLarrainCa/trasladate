@@ -25,16 +25,12 @@ const DocModerno = ({ doc, cfg }: Props) => {
   const precio = precioFinal(doc);
 
   const materiales = doc.materiales.map((k) => txt(doc, cfg, k, vars)).filter(Boolean);
-  const acciones = doc.acciones
-    .filter((k) => {
-      if (!doc.con_embalaje && (k === 'accion_embalar' || k === 'accion_desembalar')) return false;
-      if (!doc.armado_camas && k === 'accion_camas') return false;
-      return true;
-    })
+  const acciones = accionesVisibles(doc)
     .map((k) => txt(doc, cfg, k, vars))
     .filter(Boolean);
   const observaciones = doc.observaciones.map((k) => txt(doc, cfg, k, vars)).filter(Boolean);
   const destinoEsBodega = doc.cliente.destinoTipo === 'bodega';
+  const servicio = tipoServicioLabel(doc.tipo_servicio);
 
   return (
     <>
@@ -47,8 +43,6 @@ const DocModerno = ({ doc, cfg }: Props) => {
           </div>
           <div className="tag">LA GRAN AVENTURA DE MUDARTE</div>
           <div className="meta">
-            {e.titular}
-            <br />
             WhatsApp {e.wsp1} · {e.web}
             <br />
             {e.correo}
