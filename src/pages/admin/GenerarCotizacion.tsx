@@ -27,10 +27,13 @@ import {
   DEFAULT_EMPRESA,
   DEFAULT_TARIFAS,
   DEFAULT_TEXTOS,
-  MATERIAL_KEYS,
+  MATERIALES_BODEGA,
+  MATERIALES_DOMICILIO,
   OBSERVACION_KEYS,
   SALUDO_OPTIONS,
   TEXTO_DEFS,
+  TEXTO_VARIANTES,
+  TIPO_SERVICIO_OPTIONS,
   TITULO_OPTIONS,
   type Empresa,
   type Tarifas,
@@ -57,6 +60,7 @@ const emptyDoc = (folio: number): DocState => ({
   fecha_servicio: hoy(),
   titulo_servicio: TITULO_OPTIONS[0],
   saludo: SALUDO_OPTIONS[0],
+  tipo_servicio: '',
   cliente: {
     nombre: '',
     razonSocial: '',
@@ -89,11 +93,23 @@ const emptyDoc = (folio: number): DocState => ({
   precio_calculado: 0,
   precio_final: null,
   textos: {},
-  materiales: [...MATERIAL_KEYS],
+  materiales: [...MATERIALES_DOMICILIO],
   observaciones: [...OBSERVACION_KEYS],
   acciones: [...ACCION_KEYS],
   inventario: [],
 });
+
+/** Detecta el tipo de servicio guardado en la sugerencia adicional de la cotización web. */
+const detectarTipoServicio = (sugerencia?: string | null): string => {
+  if (!sugerencia) return '';
+  const m = sugerencia.match(/Tipo de servicio:\s*(.+)/i);
+  if (!m) return '';
+  const t = m[1].toLowerCase();
+  if (t.includes('express')) return 'express';
+  if (t.includes('exclusivo')) return 'exclusivo';
+  if (t.includes('principal')) return 'principal';
+  return '';
+};
 
 const TIPOS = [
   { value: 'departamento', label: 'Departamento' },
@@ -174,6 +190,10 @@ const GenerarCotizacion = () => {
             destinoTipo: q.destino_tipo_vivienda || 'departamento',
           };
           if (q.fecha_traslado) next.fecha_servicio = String(q.fecha_traslado).slice(0, 10);
+          next.tipo_servicio = detectarTipoServicio(q.sugerencia_adicional);
+          // Preset de materiales según el destino (bodega vs casa/dpto)
+          next.materiales =
+            next.cliente.destinoTipo === 'bodega' ? [...MATERIALES_BODEGA] : [...MATERIALES_DOMICILIO];
         }
         next.inventario = (items || []).map((it: any) => ({
           item_key: it.item_key,
@@ -194,6 +214,7 @@ const GenerarCotizacion = () => {
           fecha_servicio: d.fecha_servicio || next.fecha_servicio,
           titulo_servicio: d.titulo_servicio,
           saludo: d.saludo,
+          tipo_servicio: d.tipo_servicio ?? next.tipo_servicio,
           cliente: { ...next.cliente, ...(d.cliente || {}) },
           camion: d.camion,
           camion_qty: d.camion_qty,
@@ -299,6 +320,7 @@ const GenerarCotizacion = () => {
       fecha_servicio: doc.fecha_servicio || null,
       titulo_servicio: doc.titulo_servicio,
       saludo: doc.saludo,
+      tipo_servicio: doc.tipo_servicio,
       cliente: doc.cliente,
       camion: doc.camion,
       camion_qty: doc.camion_qty,
@@ -457,6 +479,22 @@ const GenerarCotizacion = () => {
                   </datalist>
                 </div>
 
+                <div>
+                  <Label>Tipo de servicio (se muestra en el PDF)</Label>
+                  <Select
+                    value={doc.tipo_servicio || 'none'}
+                    onValueChange={(v) => set('tipo_servicio', v === 'none' ? '' : v)}
+                  >
+                    <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Sin indicar</SelectItem>
+                      {TIPO_SERVICIO_OPTIONS.map((o) => (
+                        <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <div className="grid grid-cols-2 gap-3">
                   <div className="col-span-2">
                     <Label>Cliente</Label>
@@ -499,7 +537,16 @@ const GenerarCotizacion = () => {
                     <div className="grid grid-cols-2 gap-3 items-center">
                       <Select
                         value={lado === 'origen' ? doc.cliente.origenTipo : doc.cliente.destinoTipo}
-                        onValueChange={(v) => setCli(lado === 'origen' ? { origenTipo: v } : { destinoTipo: v })}
+                        onValueChange={(v) => {
+                          setCli(lado === 'origen' ? { origenTipo: v } : { destinoTipo: v });
+                          // Al cambiar el destino, preseleccionar los materiales típicos
+                          if (lado === 'destino') {
+                            setDoc((d) => ({
+                              ...d,
+                              materiales: v === 'bodega' ? [...MATERIALES_BODEGA] : [...MATERIALES_DOMICILIO],
+                            }));
+                          }
+                        }}
                       >
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
@@ -676,6 +723,20 @@ const GenerarCotizacion = () => {
                               />
                             )}
                             <Label className="text-xs text-muted-foreground">{t.label}</Label>
+                            {TEXTO_VARIANTES[t.key] && (
+                              <Select onValueChange={(v) => setTexto(t.key, v)}>
+                                <SelectTrigger className="ml-auto h-7 w-40 text-xs">
+                                  <SelectValue placeholder="Elegir variante…" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {TEXTO_VARIANTES[t.key].map((v, i) => (
+                                    <SelectItem key={i} value={v} className="text-xs">
+                                      Variante {i + 1}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            )}
                           </div>
                           <Textarea
                             rows={2}

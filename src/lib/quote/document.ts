@@ -29,6 +29,7 @@ export interface DocState {
   fecha_servicio: string; // yyyy-mm-dd
   titulo_servicio: string;
   saludo: string;
+  tipo_servicio: string; // 'express' | 'principal' | 'exclusivo' | ''
   cliente: DocCliente;
   camion: string;
   camion_qty: number;
@@ -153,7 +154,21 @@ export function txt(doc: DocState, cfg: DocConfig, key: string, vars: TplVars): 
 
 export { renderTemplate };
 
-/** Agrupa el inventario por categoría preservando el orden del catálogo. */
+/**
+ * Acciones visibles según el estado del documento.
+ * - Sin embalaje: se ocultan embalar/desembalar.
+ * - Destino bodega: se ocultan desembalar y armado de camas (no aplican en bodega).
+ * - Sin armado de camas: se oculta la acción de camas.
+ */
+export function accionesVisibles(doc: DocState): string[] {
+  const esBodega = doc.cliente.destinoTipo === 'bodega';
+  return doc.acciones.filter((k) => {
+    if (!doc.con_embalaje && (k === 'accion_embalar' || k === 'accion_desembalar')) return false;
+    if (esBodega && (k === 'accion_desembalar' || k === 'accion_camas')) return false;
+    if (!doc.armado_camas && k === 'accion_camas') return false;
+    return true;
+  });
+}
 export function agruparInventario(lineas: LineaInventario[]) {
   const groups: { category: string; items: LineaInventario[] }[] = [];
   lineas.forEach((l) => {

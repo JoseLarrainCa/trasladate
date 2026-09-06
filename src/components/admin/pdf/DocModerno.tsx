@@ -1,11 +1,14 @@
 import {
+  accionesVisibles,
   buildVars,
   formatFechaCL,
   precioFinal,
+  tipoCorto,
   txt,
   type DocConfig,
   type DocState,
 } from '@/lib/quote/document';
+import { tipoServicioLabel } from '@/lib/quote/defaults';
 import { camionLabel, formatCLP, m3ToBodegaM2, totalM3 } from '@/lib/quote/pricing';
 import DocInventario from './DocInventario';
 
@@ -22,16 +25,12 @@ const DocModerno = ({ doc, cfg }: Props) => {
   const precio = precioFinal(doc);
 
   const materiales = doc.materiales.map((k) => txt(doc, cfg, k, vars)).filter(Boolean);
-  const acciones = doc.acciones
-    .filter((k) => {
-      if (!doc.con_embalaje && (k === 'accion_embalar' || k === 'accion_desembalar')) return false;
-      if (!doc.armado_camas && k === 'accion_camas') return false;
-      return true;
-    })
+  const acciones = accionesVisibles(doc)
     .map((k) => txt(doc, cfg, k, vars))
     .filter(Boolean);
   const observaciones = doc.observaciones.map((k) => txt(doc, cfg, k, vars)).filter(Boolean);
   const destinoEsBodega = doc.cliente.destinoTipo === 'bodega';
+  const servicio = tipoServicioLabel(doc.tipo_servicio);
 
   return (
     <>
@@ -44,8 +43,6 @@ const DocModerno = ({ doc, cfg }: Props) => {
           </div>
           <div className="tag">LA GRAN AVENTURA DE MUDARTE</div>
           <div className="meta">
-            {e.titular}
-            <br />
             WhatsApp {e.wsp1} · {e.web}
             <br />
             {e.correo}
@@ -73,7 +70,7 @@ const DocModerno = ({ doc, cfg }: Props) => {
 
       <div className="m-ruta">
         <div className="card">
-          <div className="lbl">ORIGEN</div>
+          <div className="lbl">ORIGEN — {tipoCorto(doc.cliente.origenTipo).toUpperCase()}</div>
           <div className="dir">{doc.cliente.origenDir}</div>
           <div className="sub">
             {[
@@ -86,7 +83,7 @@ const DocModerno = ({ doc, cfg }: Props) => {
           </div>
         </div>
         <div className="card">
-          <div className="lbl">DESTINO</div>
+          <div className="lbl">DESTINO — {tipoCorto(doc.cliente.destinoTipo).toUpperCase()}</div>
           <div className="dir">{doc.cliente.destinoDir}</div>
           <div className="sub">
             {[
@@ -114,7 +111,8 @@ const DocModerno = ({ doc, cfg }: Props) => {
             <td className="n">1</td>
             <td>
               <div className="t">
-                {doc.titulo_servicio} — {String(vars.tipoOrigenCorto)} a {String(vars.tipoDestinoCorto)}
+                {servicio ? `${servicio} — ` : ''}
+                {String(vars.tipoOrigenCorto)} a {String(vars.tipoDestinoCorto)}
               </div>
               <div className="d">{txt(doc, cfg, 'personal_calificado', vars)}</div>
             </td>

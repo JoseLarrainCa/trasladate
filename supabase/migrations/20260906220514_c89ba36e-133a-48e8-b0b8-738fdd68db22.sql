@@ -1,0 +1,1 @@
+ALTER TABLE public.quote_documents ADD COLUMN IF NOT EXISTS tipo_servicio text DEFAULT '';

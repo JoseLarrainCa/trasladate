@@ -99,9 +99,11 @@ export const TEXTO_DEFS: TextoDef[] = [
     group: 'Frases',
     default: 'Se {{#embalaje}}embalará y {{/embalaje}}trasladará:',
   },
-  { key: 'mat_frazadas', label: 'Material 1', group: 'Materiales', default: 'Frazadas o Mantas para proteger MUEBLES GRANDES' },
-  { key: 'mat_stretch', label: 'Material 2', group: 'Materiales', default: 'Stretch Film' },
-  { key: 'mat_cintas', label: 'Material 3', group: 'Materiales', default: 'Cintas de embalaje' },
+  { key: 'mat_frazadas', label: 'Material — Frazadas', group: 'Materiales', default: 'Frazadas o Mantas para proteger MUEBLES GRANDES' },
+  { key: 'mat_stretch', label: 'Material — Stretch Film', group: 'Materiales', default: 'Stretch Film' },
+  { key: 'mat_cintas', label: 'Material — Cintas', group: 'Materiales', default: 'Cintas de embalaje' },
+  { key: 'mat_carton', label: 'Material — Cartón corrugado', group: 'Materiales', default: 'Cartón Corrugado para proteger muebles grandes' },
+  { key: 'mat_cajas', label: 'Material — Cajas', group: 'Materiales', default: 'Cajas de cartón' },
   {
     key: 'accion_embalar',
     label: 'Acción — embalar',
@@ -203,6 +205,11 @@ export const DEFAULT_TEXTOS: Record<string, string> = Object.fromEntries(
 );
 
 export const MATERIAL_KEYS = ['mat_frazadas', 'mat_stretch', 'mat_cintas'];
+
+/** Presets de materiales según tipo de destino. */
+export const MATERIALES_BODEGA = ['mat_carton', 'mat_stretch', 'mat_cintas', 'mat_cajas'];
+export const MATERIALES_DOMICILIO = ['mat_frazadas', 'mat_stretch', 'mat_cintas'];
+
 export const OBSERVACION_KEYS = ['obs_a', 'obs_b', 'obs_c', 'obs_d', 'obs_e'];
 export const ACCION_KEYS = [
   'accion_embalar',
@@ -220,3 +227,57 @@ export const TITULO_OPTIONS = [
 ];
 
 export const SALUDO_OPTIONS = ['Buenos días', 'Buenas tardes', 'Buenas noches'];
+
+export const TIPO_SERVICIO_OPTIONS = [
+  { value: 'express', label: 'Servicio Express' },
+  { value: 'principal', label: 'Servicio Principal' },
+  { value: 'exclusivo', label: 'Servicio Exclusivo' },
+] as const;
+
+export const tipoServicioLabel = (v?: string) =>
+  TIPO_SERVICIO_OPTIONS.find((o) => o.value === v)?.label || '';
+
+/**
+ * Variantes predefinidas de textos: el admin puede elegir una alternativa
+ * desde un selector en vez de escribirla a mano. Soportan las mismas
+ * variables {{...}} que los textos por defecto.
+ */
+export const TEXTO_VARIANTES: Record<string, string[]> = {
+  saludo_cuerpo: [
+    '{{saludo}}, junto con saludarle le entrego a través de este documento la información de su cotización solicitada a nuestra empresa, los servicios que nosotros le ofrecemos son los siguientes:',
+    '{{saludo}}, tengo el agrado de cotizar para Ud. lo siguiente:',
+    '{{saludo}}, agradecemos su interés en Trasladarte. A continuación detallamos la propuesta para su servicio:',
+  ],
+  personal_calificado: [
+    'Personal calificado para {{#embalaje}}embalar y {{/embalaje}}cargar en {{tipoOrigen}} origen; descargar, {{#embalaje}}desembalar y {{/embalaje}}ordenar muebles en {{tipoDestino}} destino.',
+    'Equipo profesional de mudanzas a cargo de {{#embalaje}}embalar, {{/embalaje}}cargar, transportar y descargar sus muebles con total cuidado.',
+    'Nuestro personal se encarga de todo: {{#embalaje}}embalaje, {{/embalaje}}carga, traslado y descarga, dejando cada mueble en su lugar.',
+  ],
+  accion_embalar: [
+    'Se embalará TODOS LOS MUEBLES GRANDES, mencionados anteriormente, en {{tipoOrigen}} origen ({{origenComuna}}).',
+    'Embalaje completo de TODOS LOS MUEBLES GRANDES en {{tipoOrigen}} origen ({{origenComuna}}), con materiales de protección incluidos.',
+    'Protegeremos con embalaje TODOS LOS MUEBLES GRANDES en {{tipoOrigen}} origen ({{origenComuna}}) antes de la carga.',
+  ],
+  accion_cargar: [
+    'Se cargará TODO lo antes mencionado hacia camión, en {{tipoOrigen}} origen ({{origenComuna}}).',
+    'Carga de todo el inventario declarado hacia el camión, en {{tipoOrigen}} origen ({{origenComuna}}).',
+    'Nuestro equipo cargará TODO al camión con máximo cuidado, en {{tipoOrigen}} origen ({{origenComuna}}).',
+  ],
+  accion_descargar: [
+    'Se descargará TODO desde camión hacia {{tipoDestino}} destino ({{destinoComuna}}).',
+    'Descarga completa desde el camión hacia {{tipoDestino}} destino ({{destinoComuna}}).',
+    'Al llegar, descargaremos TODO desde el camión hacia {{tipoDestino}} destino ({{destinoComuna}}).',
+  ],
+  accion_desembalar: [
+    'Desembalaje de TODOS LOS MUEBLES GRANDES, en {{tipoDestino}} destino ({{destinoComuna}}).',
+    'Retiro del embalaje de TODOS LOS MUEBLES GRANDES una vez descargados en {{tipoDestino}} destino ({{destinoComuna}}).',
+  ],
+  accion_camas: [
+    'Armado de camas, en {{tipoDestino}} destino ({{destinoComuna}}).',
+    'Armado e instalación de las camas desarmadas en origen, en {{tipoDestino}} destino ({{destinoComuna}}).',
+  ],
+  accion_ordenar: [
+    'Ubicación de los muebles de tal manera que quede todo ordenado en {{tipoDestino}} destino ({{destinoComuna}}).',
+    'Dejaremos cada mueble en el lugar que Ud. indique, todo ordenado en {{tipoDestino}} destino ({{destinoComuna}}).',
+  ],
+};
