@@ -723,6 +723,20 @@ const GenerarCotizacion = () => {
                               />
                             )}
                             <Label className="text-xs text-muted-foreground">{t.label}</Label>
+                            {TEXTO_VARIANTES[t.key] && (
+                              <Select onValueChange={(v) => setTexto(t.key, v)}>
+                                <SelectTrigger className="ml-auto h-7 w-40 text-xs">
+                                  <SelectValue placeholder="Elegir variante…" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {TEXTO_VARIANTES[t.key].map((v, i) => (
+                                    <SelectItem key={i} value={v} className="text-xs">
+                                      Variante {i + 1}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            )}
                           </div>
                           <Textarea
                             rows={2}
