@@ -1,4 +1,5 @@
 import {
+  accionesVisibles,
   agruparInventario,
   buildVars,
   precioFinal,
@@ -8,6 +9,7 @@ import {
   type DocConfig,
   type DocState,
 } from '@/lib/quote/document';
+import { tipoServicioLabel } from '@/lib/quote/defaults';
 import { camionLabel, formatCLP, totalM3 } from '@/lib/quote/pricing';
 import { dosDigitos, espaciar, espaciarDigitos } from '@/lib/quote/templates';
 import DocInventario from './DocInventario';
@@ -63,11 +65,7 @@ const DocMarco = ({ doc, cfg }: Props) => {
   const e = cfg.empresa;
 
   const materiales = doc.materiales.map((k) => txt(doc, cfg, k, vars)).filter(Boolean);
-  const accionesKeys = doc.acciones.filter((k) => {
-    if (!doc.con_embalaje && (k === 'accion_embalar' || k === 'accion_desembalar')) return false;
-    if (!doc.armado_camas && k === 'accion_camas') return false;
-    return true;
-  });
+  const accionesKeys = accionesVisibles(doc);
   const acciones = accionesKeys.map((k) => txt(doc, cfg, k, vars)).filter(Boolean);
   const observaciones = doc.observaciones.map((k) => txt(doc, cfg, k, vars)).filter(Boolean);
 
