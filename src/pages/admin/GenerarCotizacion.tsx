@@ -498,6 +498,17 @@ const GenerarCotizacion = () => {
                   </Select>
                 </div>
 
+                <div>
+                  <Label>Detalle del servicio (texto libre, sale bajo el título)</Label>
+                  <Textarea
+                    className="mt-1"
+                    rows={2}
+                    placeholder="Ej: Traslado completo con embalaje de muebles grandes y armado en destino."
+                    value={doc.textos['detalle_servicio'] ?? ''}
+                    onChange={(e) => setTexto('detalle_servicio', e.target.value)}
+                  />
+                </div>
+
                 <div className="grid grid-cols-2 gap-3">
                   <div className="col-span-2">
                     <Label>Cliente</Label>
