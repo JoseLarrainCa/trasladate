@@ -176,6 +176,47 @@ const QuoteSettingsPanel = () => {
             Puedes usar variables como {'{{nombre}}'}, {'{{m3}}'}, {'{{precio}}'}, {'{{origenComuna}}'}.
           </p>
         </TabsContent>
+
+        <TabsContent value="servicios" className="pt-4 space-y-6">
+          <p className="text-xs text-muted-foreground">
+            Estos textos se muestran en el cotizador web al elegir el tipo de servicio, y se usan
+            para rellenar el detalle del servicio en las cotizaciones PDF.
+          </p>
+          {SERVICIO_KEYS.map((key) => (
+            <div key={key} className="rounded-xl border border-border p-4 space-y-3">
+              <h3 className="font-heading font-semibold text-foreground text-sm">{SERVICIO_LABELS[key]}</h3>
+              <div>
+                <Label className="text-xs text-muted-foreground">Título</Label>
+                <Input
+                  className="mt-1"
+                  value={servicios[key].titulo}
+                  onChange={(e) => setServicio(key, { titulo: e.target.value })}
+                />
+              </div>
+              {servicios[key].lineas.map((l, i) => (
+                <div key={i} className="grid grid-cols-3 gap-2">
+                  <div>
+                    <Label className="text-xs text-muted-foreground">Etiqueta</Label>
+                    <Input
+                      className="mt-1"
+                      value={l.label}
+                      onChange={(e) => setLinea(key, i, { label: e.target.value })}
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <Label className="text-xs text-muted-foreground">Texto</Label>
+                    <Textarea
+                      rows={2}
+                      className="mt-1"
+                      value={l.texto}
+                      onChange={(e) => setLinea(key, i, { texto: e.target.value })}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </TabsContent>
       </Tabs>
 
       <Button onClick={guardar} disabled={saving} className="gap-2 mt-5">
