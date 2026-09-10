@@ -144,6 +144,34 @@ const GenerarCotizacion = () => {
   });
   const [nuevoItem, setNuevoItem] = useState('');
   const [zoom, setZoom] = useState(0.62);
+  const [servicios, setServicios] = useState<ServicioDetalles>(DEFAULT_SERVICIO_DETALLES);
+
+  // Textos de servicio (editables en Configuración → Servicios web).
+  useEffect(() => {
+    (supabase as any)
+      .from('web_service_texts')
+      .select('servicios')
+      .maybeSingle()
+      .then(({ data }: any) => {
+        if (data?.servicios) setServicios(mergeServicioDetalles(data.servicios));
+      });
+  }, []);
+
+  /** Texto detallado del tipo de servicio (ej: Servicio Express con sus líneas). */
+  const detalleDeServicio = (key: string): string => {
+    const s = servicios[key as keyof ServicioDetalles];
+    if (!s) return '';
+    return [s.titulo, ...s.lineas.map((l) => `${l.label}: ${l.texto}`)].join('\n');
+  };
+
+  const elegirTipoServicio = (v: string) => {
+    const tipo = v === 'none' ? '' : v;
+    setDoc((d) => ({
+      ...d,
+      tipo_servicio: tipo,
+      textos: { ...d.textos, detalle_servicio: tipo ? detalleDeServicio(tipo) : '' },
+    }));
+  };
 
   const set = useCallback(<K extends keyof DocState>(key: K, value: DocState[K]) => {
     setDoc((d) => ({ ...d, [key]: value }));
