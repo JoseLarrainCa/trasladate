@@ -120,10 +120,11 @@ const QuoteSettingsPanel = () => {
       </h2>
 
       <Tabs defaultValue="tarifas">
-        <TabsList className="grid grid-cols-3 w-full">
+        <TabsList className="grid grid-cols-4 w-full">
           <TabsTrigger value="tarifas">Tarifas</TabsTrigger>
           <TabsTrigger value="empresa">Datos</TabsTrigger>
           <TabsTrigger value="textos">Textos</TabsTrigger>
+          <TabsTrigger value="servicios">Servicios web</TabsTrigger>
         </TabsList>
 
         <TabsContent value="tarifas" className="pt-4 grid grid-cols-2 gap-3">
