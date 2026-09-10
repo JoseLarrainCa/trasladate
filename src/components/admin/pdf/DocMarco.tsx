@@ -131,7 +131,7 @@ const DocMarco = ({ doc, cfg }: Props) => {
           {(doc.textos?.['detalle_servicio'] || '').trim() && (
             <>
               <div className="k">Detalle del Servicio:</div>
-              <div className="v">{doc.textos['detalle_servicio'].trim()}</div>
+              <div className="v" style={{ whiteSpace: "pre-line" }}>{doc.textos['detalle_servicio'].trim()}</div>
             </>
           )}
           <div className="k">Email:</div>
