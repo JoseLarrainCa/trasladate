@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus,
@@ -33,6 +33,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { sendToFormspree } from '@/lib/formspree';
 import { INVENTORY_CATEGORIES, VIVIENDA_OPTIONS, MUDANZA_OPTIONS } from '@/lib/constants';
 import { calculateTotalM3, m3ToM2, getInventoryItem } from '@/lib/constants/inventory';
+import {
+  DEFAULT_SERVICIO_DETALLES,
+  mergeServicioDetalles,
+  type ServicioDetalles,
+} from '@/lib/constants/services';
 import type { QuoteInsert, QuoteItemInsert } from '@/types/database';
 
 // Form data type
@@ -124,6 +129,18 @@ const QuoteForm = () => {
   const [submittedId, setSubmittedId] = useState<string | null>(null);
   const { ref, isVisible } = useScrollAnimation();
   const { toast } = useToast();
+  const [servicioDetalles, setServicioDetalles] = useState<ServicioDetalles>(DEFAULT_SERVICIO_DETALLES);
+
+  // Carga los textos de servicio editados desde el panel de administración.
+  useEffect(() => {
+    (supabase as any)
+      .from('web_service_texts')
+      .select('servicios')
+      .maybeSingle()
+      .then(({ data }: any) => {
+        if (data?.servicios) setServicioDetalles(mergeServicioDetalles(data.servicios));
+      });
+  }, []);
 
   const updateField = (field: keyof FormData, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
