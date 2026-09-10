@@ -102,57 +102,8 @@ const SERVICIO_OPTIONS = [
   { value: 'exclusivo', label: 'Servicio Exclusivo' },
 ];
 
-// Textos por defecto; se reemplazan por los guardados en la base de datos (editables en el panel admin).
-let SERVICIO_DETALLES = DEFAULT_SERVICIO_DETALLES;
-      {
-        label: 'Operación',
-        texto:
-          'Realizamos la carga, traslado y descarga de todo el inventario pactado, ubicando los enseres en las áreas designadas en el punto de destino.',
-      },
-      {
-        label: 'Nota',
-        texto:
-          'Modalidad sin embalaje incluido. Garantizar que la carga esté lista para trasladarte es responsabilidad del cliente.',
-      },
-    ],
-  },
-  principal: {
-    titulo: '📦 02. Servicio Principal',
-    lineas: [
-      { label: 'Unidad', texto: 'Camión cerrado con capacidad en m³ acordada previamente.' },
-      {
-        label: 'Materiales incluidos',
-        texto:
-          'Frazadas de mudanza, cartón corrugado (según requerimiento técnico), stretch film y cintas de embalaje de alta resistencia.',
-      },
-      {
-        label: 'Operación del cliente',
-        texto:
-          'Embalaje en cajas de contenidos menores (vajilla/cocina, ropa, adornos, libros, juguetes y artículos personales). Nuestro personal se encargará de cargar todas las cajas al camión.',
-      },
-      {
-        label: 'Operación de TRASLADARTE',
-        texto:
-          'Embalaje de todos los muebles de volumen mayor (departamento o casa), estiba segura en camión, transporte, descarga y posicionamiento final de tus bienes.',
-      },
-    ],
-  },
-  exclusivo: {
-    titulo: '✨ 03. Servicio Exclusivo (Servicio Integral)',
-    lineas: [
-      { label: 'Unidad', texto: 'Camión cerrado con capacidad en m³ acordada previamente.' },
-      {
-        label: 'Operación',
-        texto:
-          'El equipo de TRASLADARTE ejecuta el embalaje sistemático de la totalidad de los bienes, estiba, traslado, descarga y ordenamiento completo en el nuevo hogar.',
-      },
-      {
-        label: 'Planificación',
-        texto: 'Tiempo de ejecución estimado en 1 o 2 jornadas operativas (según el metraje y cubicaje de la propiedad).',
-      },
-    ],
-  },
-};
+// Los textos de cada servicio se cargan desde la base de datos (editables en el panel admin);
+// mientras tanto se usan los valores por defecto.
 
 const steps = [
   { id: 1, title: 'Datos Generales', icon: User },
