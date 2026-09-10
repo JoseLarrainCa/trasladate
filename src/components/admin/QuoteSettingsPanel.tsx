@@ -48,10 +48,16 @@ const QuoteSettingsPanel = () => {
   const [empresa, setEmpresa] = useState<Empresa>(DEFAULT_EMPRESA);
   const [textos, setTextos] = useState<Record<string, string>>(DEFAULT_TEXTOS);
   const [folio, setFolio] = useState(3286);
+  const [servicios, setServicios] = useState<ServicioDetalles>(DEFAULT_SERVICIO_DETALLES);
+  const [serviciosId, setServiciosId] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
-      const { data } = await (supabase as any).from('quote_settings').select('*').maybeSingle();
+      const sb = supabase as any;
+      const [{ data }, { data: sv }] = await Promise.all([
+        sb.from('quote_settings').select('*').maybeSingle(),
+        sb.from('web_service_texts').select('*').maybeSingle(),
+      ]);
       if (data) {
         setRowId(data.id);
         setTarifas({ ...DEFAULT_TARIFAS, ...(data.tarifas || {}) });
@@ -59,10 +65,24 @@ const QuoteSettingsPanel = () => {
         setTextos({ ...DEFAULT_TEXTOS, ...(data.textos || {}) });
         setFolio(data.siguiente_folio ?? 3286);
       }
+      if (sv) {
+        setServiciosId(sv.id);
+        setServicios(mergeServicioDetalles(sv.servicios));
+      }
       setLoading(false);
     };
     load();
   }, []);
+
+  const setServicio = (key: string, patch: Partial<ServicioDetalles[keyof ServicioDetalles]>) =>
+    setServicios((s) => ({ ...s, [key]: { ...s[key as keyof ServicioDetalles], ...patch } }));
+
+  const setLinea = (key: string, idx: number, patch: Record<string, string>) =>
+    setServicios((s) => {
+      const svc = s[key as keyof ServicioDetalles];
+      const lineas = svc.lineas.map((l, i) => (i === idx ? { ...l, ...patch } : l));
+      return { ...s, [key]: { ...svc, lineas } };
+    });
 
   const guardar = async () => {
     setSaving(true);
@@ -71,10 +91,15 @@ const QuoteSettingsPanel = () => {
     const { error } = rowId
       ? await sb.from('quote_settings').update(payload).eq('id', rowId)
       : await sb.from('quote_settings').insert(payload);
+    const svPayload = { servicios, updated_at: new Date().toISOString() };
+    const { error: svError } = serviciosId
+      ? await sb.from('web_service_texts').update(svPayload).eq('id', serviciosId)
+      : await sb.from('web_service_texts').insert(svPayload);
     setSaving(false);
+    const anyError = error || svError;
     toast(
-      error
-        ? { title: 'Error', description: error.message, variant: 'destructive' }
+      anyError
+        ? { title: 'Error', description: anyError.message, variant: 'destructive' }
         : { title: 'Configuración guardada', description: 'Los cambios se aplican a las próximas cotizaciones' }
     );
   };
