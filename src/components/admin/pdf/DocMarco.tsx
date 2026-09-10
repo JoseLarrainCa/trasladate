@@ -128,6 +128,12 @@ const DocMarco = ({ doc, cfg }: Props) => {
               <div className="v">{tipoServicioLabel(doc.tipo_servicio)}</div>
             </>
           )}
+          {(doc.textos?.['detalle_servicio'] || '').trim() && (
+            <>
+              <div className="k">Detalle del Servicio:</div>
+              <div className="v">{doc.textos['detalle_servicio'].trim()}</div>
+            </>
+          )}
           <div className="k">Email:</div>
           <div className="v">{doc.cliente.email || ''}</div>
           <div className="k">Domicilio Origen:</div>
