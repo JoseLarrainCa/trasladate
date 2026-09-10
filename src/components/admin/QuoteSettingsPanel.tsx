@@ -16,6 +16,13 @@ import {
   type Empresa,
   type Tarifas,
 } from '@/lib/quote/defaults';
+import {
+  DEFAULT_SERVICIO_DETALLES,
+  SERVICIO_KEYS,
+  SERVICIO_LABELS,
+  mergeServicioDetalles,
+  type ServicioDetalles,
+} from '@/lib/constants/services';
 
 const EMPRESA_LABELS: Record<keyof Empresa, string> = {
   titular: 'Titular de la cuenta',
