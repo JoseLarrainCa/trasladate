@@ -173,6 +173,15 @@ const GenerarCotizacion = () => {
     }));
   };
 
+  // Si el tipo de servicio ya venía detectado pero sin detalle, lo rellena al cargar los textos.
+  useEffect(() => {
+    setDoc((d) =>
+      d.tipo_servicio && !(d.textos['detalle_servicio'] || '').trim()
+        ? { ...d, textos: { ...d.textos, detalle_servicio: detalleDeServicio(d.tipo_servicio) } }
+        : d
+    );
+  }, [servicios]);
+
   const set = useCallback(<K extends keyof DocState>(key: K, value: DocState[K]) => {
     setDoc((d) => ({ ...d, [key]: value }));
   }, []);
