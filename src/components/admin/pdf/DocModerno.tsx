@@ -114,6 +114,7 @@ const DocModerno = ({ doc, cfg }: Props) => {
                 {servicio ? `${servicio} — ` : ''}
                 {String(vars.tipoOrigenCorto)} a {String(vars.tipoDestinoCorto)}
               </div>
+              {detalleServicio && <div className="d">{detalleServicio}</div>}
               <div className="d">{txt(doc, cfg, 'personal_calificado', vars)}</div>
             </td>
           </tr>
