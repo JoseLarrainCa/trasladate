@@ -529,7 +529,7 @@ const GenerarCotizacion = () => {
                   <Label>Tipo de servicio (se muestra en el PDF)</Label>
                   <Select
                     value={doc.tipo_servicio || 'none'}
-                    onValueChange={(v) => set('tipo_servicio', v === 'none' ? '' : v)}
+                    onValueChange={elegirTipoServicio}
                   >
                     <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -539,17 +539,31 @@ const GenerarCotizacion = () => {
                       ))}
                     </SelectContent>
                   </Select>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Al elegirlo, el detalle se rellena solo con la descripción del servicio.
+                  </p>
                 </div>
 
                 <div>
-                  <Label>Detalle del servicio (texto libre, sale bajo el título)</Label>
+                  <Label>Detalle del servicio (editable, sale bajo el título en ambos formatos)</Label>
                   <Textarea
                     className="mt-1"
-                    rows={2}
+                    rows={4}
                     placeholder="Ej: Traslado completo con embalaje de muebles grandes y armado en destino."
                     value={doc.textos['detalle_servicio'] ?? ''}
                     onChange={(e) => setTexto('detalle_servicio', e.target.value)}
                   />
+                  {doc.tipo_servicio && (
+                    <Button
+                      type="button"
+                      variant="link"
+                      size="sm"
+                      className="h-auto px-0 text-xs"
+                      onClick={() => setTexto('detalle_servicio', detalleDeServicio(doc.tipo_servicio))}
+                    >
+                      Restaurar descripción original del servicio
+                    </Button>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
