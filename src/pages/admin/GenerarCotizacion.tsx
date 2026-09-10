@@ -22,6 +22,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { ALL_INVENTORY_ITEMS, getInventoryItem } from '@/lib/constants/inventory';
 import {
+  DEFAULT_SERVICIO_DETALLES,
+  mergeServicioDetalles,
+  type ServicioDetalles,
+} from '@/lib/constants/services';
+import {
   ACCION_KEYS,
   CAMIONES,
   DEFAULT_EMPRESA,
@@ -139,6 +144,43 @@ const GenerarCotizacion = () => {
   });
   const [nuevoItem, setNuevoItem] = useState('');
   const [zoom, setZoom] = useState(0.62);
+  const [servicios, setServicios] = useState<ServicioDetalles>(DEFAULT_SERVICIO_DETALLES);
+
+  // Textos de servicio (editables en Configuración → Servicios web).
+  useEffect(() => {
+    (supabase as any)
+      .from('web_service_texts')
+      .select('servicios')
+      .maybeSingle()
+      .then(({ data }: any) => {
+        if (data?.servicios) setServicios(mergeServicioDetalles(data.servicios));
+      });
+  }, []);
+
+  /** Texto detallado del tipo de servicio (ej: Servicio Express con sus líneas). */
+  const detalleDeServicio = (key: string): string => {
+    const s = servicios[key as keyof ServicioDetalles];
+    if (!s) return '';
+    return [s.titulo, ...s.lineas.map((l) => `${l.label}: ${l.texto}`)].join('\n');
+  };
+
+  const elegirTipoServicio = (v: string) => {
+    const tipo = v === 'none' ? '' : v;
+    setDoc((d) => ({
+      ...d,
+      tipo_servicio: tipo,
+      textos: { ...d.textos, detalle_servicio: tipo ? detalleDeServicio(tipo) : '' },
+    }));
+  };
+
+  // Si el tipo de servicio ya venía detectado pero sin detalle, lo rellena al cargar los textos.
+  useEffect(() => {
+    setDoc((d) =>
+      d.tipo_servicio && !(d.textos['detalle_servicio'] || '').trim()
+        ? { ...d, textos: { ...d.textos, detalle_servicio: detalleDeServicio(d.tipo_servicio) } }
+        : d
+    );
+  }, [servicios]);
 
   const set = useCallback(<K extends keyof DocState>(key: K, value: DocState[K]) => {
     setDoc((d) => ({ ...d, [key]: value }));
@@ -193,6 +235,7 @@ const GenerarCotizacion = () => {
           };
           if (q.fecha_traslado) next.fecha_servicio = String(q.fecha_traslado).slice(0, 10);
           next.tipo_servicio = detectarTipoServicio(q.sugerencia_adicional);
+          if (next.tipo_servicio) next.textos.detalle_servicio = detalleDeServicio(next.tipo_servicio);
           // Presets según el destino (bodega vs casa/dpto): materiales y acciones
           const esBodega = next.cliente.destinoTipo === 'bodega';
           next.materiales = esBodega ? [...MATERIALES_BODEGA] : [...MATERIALES_DOMICILIO];
@@ -486,7 +529,7 @@ const GenerarCotizacion = () => {
                   <Label>Tipo de servicio (se muestra en el PDF)</Label>
                   <Select
                     value={doc.tipo_servicio || 'none'}
-                    onValueChange={(v) => set('tipo_servicio', v === 'none' ? '' : v)}
+                    onValueChange={elegirTipoServicio}
                   >
                     <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -496,17 +539,31 @@ const GenerarCotizacion = () => {
                       ))}
                     </SelectContent>
                   </Select>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Al elegirlo, el detalle se rellena solo con la descripción del servicio.
+                  </p>
                 </div>
 
                 <div>
-                  <Label>Detalle del servicio (texto libre, sale bajo el título)</Label>
+                  <Label>Detalle del servicio (editable, sale bajo el título en ambos formatos)</Label>
                   <Textarea
                     className="mt-1"
-                    rows={2}
+                    rows={4}
                     placeholder="Ej: Traslado completo con embalaje de muebles grandes y armado en destino."
                     value={doc.textos['detalle_servicio'] ?? ''}
                     onChange={(e) => setTexto('detalle_servicio', e.target.value)}
                   />
+                  {doc.tipo_servicio && (
+                    <Button
+                      type="button"
+                      variant="link"
+                      size="sm"
+                      className="h-auto px-0 text-xs"
+                      onClick={() => setTexto('detalle_servicio', detalleDeServicio(doc.tipo_servicio))}
+                    >
+                      Restaurar descripción original del servicio
+                    </Button>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
