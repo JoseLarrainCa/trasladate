@@ -226,6 +226,7 @@ const GenerarCotizacion = () => {
           };
           if (q.fecha_traslado) next.fecha_servicio = String(q.fecha_traslado).slice(0, 10);
           next.tipo_servicio = detectarTipoServicio(q.sugerencia_adicional);
+          if (next.tipo_servicio) next.textos.detalle_servicio = detalleDeServicio(next.tipo_servicio);
           // Presets según el destino (bodega vs casa/dpto): materiales y acciones
           const esBodega = next.cliente.destinoTipo === 'bodega';
           next.materiales = esBodega ? [...MATERIALES_BODEGA] : [...MATERIALES_DOMICILIO];
