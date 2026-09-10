@@ -780,13 +780,13 @@ ${inventarioFormateado}`;
                           </Label>
                         </div>
                        </div>
-                      {formData.tipoMudanza === 'hogar' && SERVICIO_DETALLES[formData.tipoServicio] && (
+                      {formData.tipoMudanza === 'hogar' && servicioDetalles[formData.tipoServicio] && (
                         <div className="rounded-xl border border-border bg-muted/40 p-4">
                           <p className="font-heading font-semibold text-foreground text-sm mb-2">
-                            {SERVICIO_DETALLES[formData.tipoServicio].titulo}
+                            {servicioDetalles[formData.tipoServicio].titulo}
                           </p>
                           <ul className="space-y-2">
-                            {SERVICIO_DETALLES[formData.tipoServicio].lineas.map((l) => (
+                            {servicioDetalles[formData.tipoServicio].lineas.map((l) => (
                               <li key={l.label} className="text-xs text-muted-foreground leading-relaxed">
                                 <span className="font-semibold text-foreground">{l.label}: </span>
                                 {l.texto}
