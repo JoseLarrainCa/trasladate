@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus,
@@ -33,6 +33,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { sendToFormspree } from '@/lib/formspree';
 import { INVENTORY_CATEGORIES, VIVIENDA_OPTIONS, MUDANZA_OPTIONS } from '@/lib/constants';
 import { calculateTotalM3, m3ToM2, getInventoryItem } from '@/lib/constants/inventory';
+import {
+  DEFAULT_SERVICIO_DETALLES,
+  mergeServicioDetalles,
+  type ServicioDetalles,
+} from '@/lib/constants/services';
 import type { QuoteInsert, QuoteItemInsert } from '@/types/database';
 
 // Form data type
@@ -102,60 +107,8 @@ const SERVICIO_OPTIONS = [
   { value: 'exclusivo', label: 'Servicio Exclusivo' },
 ];
 
-const SERVICIO_DETALLES: Record<string, { titulo: string; lineas: { label: string; texto: string }[] }> = {
-  express: {
-    titulo: '🚛 01. Servicio Express',
-    lineas: [
-      { label: 'Unidad', texto: 'Camión cerrado con capacidad en m³ acordada previamente.' },
-      {
-        label: 'Operación',
-        texto:
-          'Realizamos la carga, traslado y descarga de todo el inventario pactado, ubicando los enseres en las áreas designadas en el punto de destino.',
-      },
-      {
-        label: 'Nota',
-        texto:
-          'Modalidad sin embalaje incluido. Garantizar que la carga esté lista para trasladarte es responsabilidad del cliente.',
-      },
-    ],
-  },
-  principal: {
-    titulo: '📦 02. Servicio Principal',
-    lineas: [
-      { label: 'Unidad', texto: 'Camión cerrado con capacidad en m³ acordada previamente.' },
-      {
-        label: 'Materiales incluidos',
-        texto:
-          'Frazadas de mudanza, cartón corrugado (según requerimiento técnico), stretch film y cintas de embalaje de alta resistencia.',
-      },
-      {
-        label: 'Operación del cliente',
-        texto:
-          'Embalaje en cajas de contenidos menores (vajilla/cocina, ropa, adornos, libros, juguetes y artículos personales). Nuestro personal se encargará de cargar todas las cajas al camión.',
-      },
-      {
-        label: 'Operación de TRASLADARTE',
-        texto:
-          'Embalaje de todos los muebles de volumen mayor (departamento o casa), estiba segura en camión, transporte, descarga y posicionamiento final de tus bienes.',
-      },
-    ],
-  },
-  exclusivo: {
-    titulo: '✨ 03. Servicio Exclusivo (Servicio Integral)',
-    lineas: [
-      { label: 'Unidad', texto: 'Camión cerrado con capacidad en m³ acordada previamente.' },
-      {
-        label: 'Operación',
-        texto:
-          'El equipo de TRASLADARTE ejecuta el embalaje sistemático de la totalidad de los bienes, estiba, traslado, descarga y ordenamiento completo en el nuevo hogar.',
-      },
-      {
-        label: 'Planificación',
-        texto: 'Tiempo de ejecución estimado en 1 o 2 jornadas operativas (según el metraje y cubicaje de la propiedad).',
-      },
-    ],
-  },
-};
+// Los textos de cada servicio se cargan desde la base de datos (editables en el panel admin);
+// mientras tanto se usan los valores por defecto.
 
 const steps = [
   { id: 1, title: 'Datos Generales', icon: User },
@@ -176,6 +129,18 @@ const QuoteForm = () => {
   const [submittedId, setSubmittedId] = useState<string | null>(null);
   const { ref, isVisible } = useScrollAnimation();
   const { toast } = useToast();
+  const [servicioDetalles, setServicioDetalles] = useState<ServicioDetalles>(DEFAULT_SERVICIO_DETALLES);
+
+  // Carga los textos de servicio editados desde el panel de administración.
+  useEffect(() => {
+    (supabase as any)
+      .from('web_service_texts')
+      .select('servicios')
+      .maybeSingle()
+      .then(({ data }: any) => {
+        if (data?.servicios) setServicioDetalles(mergeServicioDetalles(data.servicios));
+      });
+  }, []);
 
   const updateField = (field: keyof FormData, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -815,13 +780,13 @@ ${inventarioFormateado}`;
                           </Label>
                         </div>
                        </div>
-                      {formData.tipoMudanza === 'hogar' && SERVICIO_DETALLES[formData.tipoServicio] && (
+                      {formData.tipoMudanza === 'hogar' && servicioDetalles[formData.tipoServicio] && (
                         <div className="rounded-xl border border-border bg-muted/40 p-4">
                           <p className="font-heading font-semibold text-foreground text-sm mb-2">
-                            {SERVICIO_DETALLES[formData.tipoServicio].titulo}
+                            {servicioDetalles[formData.tipoServicio].titulo}
                           </p>
                           <ul className="space-y-2">
-                            {SERVICIO_DETALLES[formData.tipoServicio].lineas.map((l) => (
+                            {servicioDetalles[formData.tipoServicio].lineas.map((l) => (
                               <li key={l.label} className="text-xs text-muted-foreground leading-relaxed">
                                 <span className="font-semibold text-foreground">{l.label}: </span>
                                 {l.texto}

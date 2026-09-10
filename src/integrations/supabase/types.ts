@@ -339,6 +339,24 @@ export type Database = {
         }
         Relationships: []
       }
+      web_service_texts: {
+        Row: {
+          id: string
+          servicios: Json
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          servicios?: Json
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          servicios?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
