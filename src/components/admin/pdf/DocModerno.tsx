@@ -31,6 +31,7 @@ const DocModerno = ({ doc, cfg }: Props) => {
   const observaciones = doc.observaciones.map((k) => txt(doc, cfg, k, vars)).filter(Boolean);
   const destinoEsBodega = doc.cliente.destinoTipo === 'bodega';
   const servicio = tipoServicioLabel(doc.tipo_servicio);
+  const detalleServicio = (doc.textos?.['detalle_servicio'] || '').trim();
 
   return (
     <>
@@ -114,6 +115,7 @@ const DocModerno = ({ doc, cfg }: Props) => {
                 {servicio ? `${servicio} — ` : ''}
                 {String(vars.tipoOrigenCorto)} a {String(vars.tipoDestinoCorto)}
               </div>
+              {detalleServicio && <div className="d">{detalleServicio}</div>}
               <div className="d">{txt(doc, cfg, 'personal_calificado', vars)}</div>
             </td>
           </tr>
