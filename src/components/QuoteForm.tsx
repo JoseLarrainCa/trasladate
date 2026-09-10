@@ -102,11 +102,8 @@ const SERVICIO_OPTIONS = [
   { value: 'exclusivo', label: 'Servicio Exclusivo' },
 ];
 
-const SERVICIO_DETALLES: Record<string, { titulo: string; lineas: { label: string; texto: string }[] }> = {
-  express: {
-    titulo: '🚛 01. Servicio Express',
-    lineas: [
-      { label: 'Unidad', texto: 'Camión cerrado con capacidad en m³ acordada previamente.' },
+// Textos por defecto; se reemplazan por los guardados en la base de datos (editables en el panel admin).
+let SERVICIO_DETALLES = DEFAULT_SERVICIO_DETALLES;
       {
         label: 'Operación',
         texto:
