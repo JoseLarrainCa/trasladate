@@ -144,6 +144,19 @@ export function buildVars(doc: DocState, cfg: DocConfig): TplVars {
     listaMateriales: materiales,
     embalaje: doc.con_embalaje,
     armadoCamas: doc.armado_camas,
+    // Datos de la empresa (para textos editables del pie y encabezado)
+    titular: cfg.empresa.titular,
+    rut: cfg.empresa.rut,
+    banco: cfg.empresa.banco,
+    cuenta: cfg.empresa.cuenta,
+    numeroCuenta: cfg.empresa.numero,
+    correo: cfg.empresa.correo,
+    wsp1: cfg.empresa.wsp1,
+    wsp2: cfg.empresa.wsp2,
+    web: cfg.empresa.web,
+    akikbCorreo: cfg.empresa.akikb_correo,
+    akikbWsp: cfg.empresa.akikb_wsp,
+    akikbOficina: cfg.empresa.akikb_oficina,
   };
 }
 
