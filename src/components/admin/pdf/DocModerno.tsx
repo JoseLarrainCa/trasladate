@@ -9,7 +9,7 @@ import {
   type DocConfig,
   type DocState,
 } from '@/lib/quote/document';
-import { formatCLP, totalM3 } from '@/lib/quote/pricing';
+import { formatCLP } from '@/lib/quote/pricing';
 import DocInventario from './DocInventario';
 
 interface Props {
