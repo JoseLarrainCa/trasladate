@@ -461,11 +461,12 @@ const GenerarCotizacion = () => {
           {/* -------------------------------- Editor -------------------------------- */}
           <div className="space-y-4">
             <Tabs defaultValue="general">
-              <TabsList className="grid grid-cols-4 w-full">
+              <TabsList className="grid grid-cols-5 w-full">
                 <TabsTrigger value="general">General</TabsTrigger>
                 <TabsTrigger value="servicio">Servicio</TabsTrigger>
                 <TabsTrigger value="inventario">Inventario</TabsTrigger>
                 <TabsTrigger value="textos">Textos</TabsTrigger>
+                <TabsTrigger value="secciones">Secciones</TabsTrigger>
               </TabsList>
 
               {/* General */}
