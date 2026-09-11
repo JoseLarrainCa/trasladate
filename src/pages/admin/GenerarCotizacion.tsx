@@ -38,6 +38,7 @@ import {
   ACCIONES_DOMICILIO,
   OBSERVACION_KEYS,
   SALUDO_OPTIONS,
+  SECCIONES_MODERNO,
   TEXTO_DEFS,
   TEXTO_VARIANTES,
   TIPO_SERVICIO_OPTIONS,
@@ -433,7 +434,7 @@ const GenerarCotizacion = () => {
     );
   }
 
-  const grupos = ['Frases', 'Materiales', 'Acciones', 'Observaciones', 'Pago', 'Tabla'] as const;
+  const grupos = ['Frases', 'Materiales', 'Acciones', 'Observaciones', 'Pago', 'Tabla', 'Moderno'] as const;
 
   return (
     <AdminLayout>
@@ -461,11 +462,12 @@ const GenerarCotizacion = () => {
           {/* -------------------------------- Editor -------------------------------- */}
           <div className="space-y-4">
             <Tabs defaultValue="general">
-              <TabsList className="grid grid-cols-4 w-full">
+              <TabsList className="grid grid-cols-5 w-full">
                 <TabsTrigger value="general">General</TabsTrigger>
                 <TabsTrigger value="servicio">Servicio</TabsTrigger>
                 <TabsTrigger value="inventario">Inventario</TabsTrigger>
                 <TabsTrigger value="textos">Textos</TabsTrigger>
+                <TabsTrigger value="secciones">Secciones</TabsTrigger>
               </TabsList>
 
               {/* General */}
@@ -820,6 +822,23 @@ const GenerarCotizacion = () => {
                     </div>
                   );
                 })}
+              </TabsContent>
+
+              {/* Secciones visibles (formato Moderno) */}
+              <TabsContent value="secciones" className="space-y-3 pt-4">
+                <p className="text-xs text-muted-foreground">
+                  Elige qué bloques aparecen en el documento. Si dejas un texto vacío en la pestaña
+                  "Textos", esa línea tampoco se imprime.
+                </p>
+                {SECCIONES_MODERNO.map((s) => (
+                  <label key={s.key} className="flex items-center gap-3 text-sm">
+                    <Switch
+                      checked={doc.textos[`ver_${s.key}`] !== '0'}
+                      onCheckedChange={(v) => setTexto(`ver_${s.key}`, v ? '1' : '0')}
+                    />
+                    {s.label}
+                  </label>
+                ))}
               </TabsContent>
             </Tabs>
           </div>

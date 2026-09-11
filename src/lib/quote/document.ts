@@ -154,6 +154,9 @@ export function txt(doc: DocState, cfg: DocConfig, key: string, vars: TplVars): 
 
 export { renderTemplate };
 
+/** ¿Se muestra una sección del documento? Por defecto sí; se oculta con "0". */
+export const verSeccion = (doc: DocState, key: string) => (doc.textos || {})[`ver_${key}`] !== '0';
+
 /**
  * Acciones visibles según el estado del documento.
  * - Sin embalaje: se ocultan embalar/desembalar.

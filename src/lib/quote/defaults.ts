@@ -74,7 +74,7 @@ export const DEFAULT_EMPRESA: Empresa = {
 export interface TextoDef {
   key: string;
   label: string;
-  group: 'Frases' | 'Materiales' | 'Acciones' | 'Observaciones' | 'Pago' | 'Tabla';
+  group: 'Frases' | 'Materiales' | 'Acciones' | 'Observaciones' | 'Pago' | 'Tabla' | 'Moderno';
   default: string;
 }
 
@@ -198,7 +198,71 @@ export const TEXTO_DEFS: TextoDef[] = [
   },
   { key: 'fila_embalaje', label: 'Fila tabla — embalaje', group: 'Tabla', default: 'Servicio de embalaje:' },
   { key: 'fila_embalaje_incluye', label: 'Fila tabla — materiales', group: 'Tabla', default: 'Incluye Materiales:' },
+
+  /* --- Formato Moderno: todas las palabras fijas del documento --- */
+  { key: 'mod_tagline', label: 'Moderno — bajada del logo', group: 'Moderno', default: 'LA GRAN AVENTURA DE MUDARTE' },
+  { key: 'mod_titulo', label: 'Moderno — título del documento', group: 'Moderno', default: 'COTIZACIÓN' },
+  { key: 'mod_lbl_folio', label: 'Moderno — etiqueta N° servicio', group: 'Moderno', default: 'N° Servicio:' },
+  { key: 'mod_lbl_fecha', label: 'Moderno — etiqueta fecha', group: 'Moderno', default: 'Fecha:' },
+  { key: 'mod_lbl_cliente', label: 'Moderno — tratamiento del cliente', group: 'Moderno', default: 'Sr(a):' },
+  { key: 'mod_lbl_origen', label: 'Moderno — etiqueta origen', group: 'Moderno', default: 'ORIGEN' },
+  { key: 'mod_lbl_destino', label: 'Moderno — etiqueta destino', group: 'Moderno', default: 'DESTINO' },
+  {
+    key: 'mod_intro',
+    label: 'Moderno — frase de introducción',
+    group: 'Moderno',
+    default: '{{saludo}}, tengo el agrado de cotizar para Ud. lo siguiente:',
+  },
+  { key: 'mod_th_num', label: 'Moderno — columna N°', group: 'Moderno', default: '#' },
+  { key: 'mod_th_desc', label: 'Moderno — columna descripción', group: 'Moderno', default: 'DESCRIPCIÓN DEL SERVICIO' },
+  { key: 'mod_item_equipo', label: 'Moderno — título fila equipo', group: 'Moderno', default: 'Equipo y personal' },
+  {
+    key: 'mod_item_equipo_detalle',
+    label: 'Moderno — detalle fila equipo',
+    group: 'Moderno',
+    default:
+      '{{camion}} × {{camiones}} · {{choferes}} chofer(es) · {{personas}} personas operativas',
+  },
+  { key: 'mod_item_materiales', label: 'Moderno — glosa materiales', group: 'Moderno', default: 'Materiales incluidos:' },
+  {
+    key: 'mod_item_inventario',
+    label: 'Moderno — título fila inventario',
+    group: 'Moderno',
+    default: 'Inventario a trasladar — {{items}} ítems · {{m3}} m³',
+  },
+  {
+    key: 'mod_item_inventario_detalle',
+    label: 'Moderno — detalle fila inventario',
+    group: 'Moderno',
+    default: 'Detalle completo en la hoja anexa de inventario.',
+  },
+  { key: 'mod_total', label: 'Moderno — etiqueta total', group: 'Moderno', default: 'TOTAL A PAGAR' },
+  { key: 'mod_iva', label: 'Moderno — nota IVA', group: 'Moderno', default: '(no incluye IVA)' },
+  { key: 'mod_h_acciones', label: 'Moderno — título acciones', group: 'Moderno', default: 'LO QUE HAREMOS' },
+  { key: 'mod_h_pago', label: 'Moderno — título forma de pago', group: 'Moderno', default: 'FORMA DE PAGO' },
+  { key: 'mod_h_obs', label: 'Moderno — título observaciones', group: 'Moderno', default: 'OBSERVACIONES' },
+  { key: 'mod_h_transferencia', label: 'Moderno — título transferencia', group: 'Moderno', default: 'Datos de transferencia' },
+  { key: 'mod_h_contacto', label: 'Moderno — título contacto', group: 'Moderno', default: 'Contacto' },
+  { key: 'mod_akikb', label: 'Moderno — línea mini bodegas', group: 'Moderno', default: 'Mini bodegas akikb' },
 ];
+
+/** Secciones del formato Moderno que se pueden mostrar u ocultar. */
+export const SECCIONES_MODERNO = [
+  { key: 'encabezado_contacto', label: 'Contacto en el encabezado' },
+  { key: 'cliente', label: 'Datos del cliente' },
+  { key: 'ruta', label: 'Origen y destino' },
+  { key: 'intro', label: 'Frase de introducción' },
+  { key: 'item_servicio', label: 'Fila 1 — servicio' },
+  { key: 'item_equipo', label: 'Fila 2 — equipo y personal' },
+  { key: 'item_inventario', label: 'Fila 3 — inventario' },
+  { key: 'total', label: 'Total a pagar' },
+  { key: 'acciones', label: 'Lo que haremos' },
+  { key: 'pago', label: 'Forma de pago' },
+  { key: 'observaciones', label: 'Observaciones' },
+  { key: 'pie_transferencia', label: 'Pie — datos de transferencia' },
+  { key: 'pie_contacto', label: 'Pie — contacto' },
+  { key: 'anexo_inventario', label: 'Hoja anexa de inventario' },
+] as const;
 
 export const DEFAULT_TEXTOS: Record<string, string> = Object.fromEntries(
   TEXTO_DEFS.map((t) => [t.key, t.default])

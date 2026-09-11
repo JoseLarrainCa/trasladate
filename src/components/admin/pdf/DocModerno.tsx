@@ -5,11 +5,12 @@ import {
   precioFinal,
   tipoCorto,
   txt,
+  verSeccion,
   type DocConfig,
   type DocState,
 } from '@/lib/quote/document';
 import { tipoServicioLabel } from '@/lib/quote/defaults';
-import { camionLabel, formatCLP, m3ToBodegaM2, totalM3 } from '@/lib/quote/pricing';
+import { formatCLP, m3ToBodegaM2, totalM3 } from '@/lib/quote/pricing';
 import DocInventario from './DocInventario';
 
 interface Props {
@@ -23,12 +24,14 @@ const DocModerno = ({ doc, cfg }: Props) => {
   const m3 = totalM3(doc.inventario);
   const m2 = m3ToBodegaM2(m3);
   const precio = precioFinal(doc);
+  const t = (k: string) => txt(doc, cfg, k, vars);
+  const ver = (k: string) => verSeccion(doc, k);
 
-  const materiales = doc.materiales.map((k) => txt(doc, cfg, k, vars)).filter(Boolean);
+  const materiales = doc.materiales.map((k) => t(k)).filter(Boolean);
   const acciones = accionesVisibles(doc)
-    .map((k) => txt(doc, cfg, k, vars))
+    .map((k) => t(k))
     .filter(Boolean);
-  const observaciones = doc.observaciones.map((k) => txt(doc, cfg, k, vars)).filter(Boolean);
+  const observaciones = doc.observaciones.map((k) => t(k)).filter(Boolean);
   const destinoEsBodega = doc.cliente.destinoTipo === 'bodega';
   const servicio = tipoServicioLabel(doc.tipo_servicio);
   const detalleServicio = (doc.textos?.['detalle_servicio'] || '').trim();
@@ -42,141 +45,172 @@ const DocModerno = ({ doc, cfg }: Props) => {
           <div className="name">
             TRASLAD<span className="a-org">A</span>RTE
           </div>
-          <div className="tag">LA GRAN AVENTURA DE MUDARTE</div>
-          <div className="meta">
-            WhatsApp {e.wsp1} · {e.web}
-            <br />
-            {e.correo}
-          </div>
+          {t('mod_tagline') && <div className="tag">{t('mod_tagline')}</div>}
+          {ver('encabezado_contacto') && (
+            <div className="meta">
+              WhatsApp {e.wsp1} · {e.web}
+              <br />
+              {e.correo}
+            </div>
+          )}
         </div>
         <div className="m-title">
-          <div className="t">COTIZACIÓN</div>
+          <div className="t">{t('mod_titulo')}</div>
           <div className="s">
-            N° Servicio: <b>{doc.folio}</b>
+            {t('mod_lbl_folio')} <b>{doc.folio}</b>
           </div>
           <div className="s">
-            Fecha: <b>{formatFechaCL(doc.fecha_servicio) || '—'}</b>
+            {t('mod_lbl_fecha')} <b>{formatFechaCL(doc.fecha_servicio) || '—'}</b>
           </div>
         </div>
       </div>
 
       <hr className="m-rule" />
 
-      <div className="m-client">
-        <b>Sr(a): {String(vars.nombre)}</b>
-        <div className="sub">
-          {[doc.cliente.email, doc.cliente.telefono].filter(Boolean).join(' · ')}
-        </div>
-      </div>
-
-      <div className="m-ruta">
-        <div className="card">
-          <div className="lbl">ORIGEN — {tipoCorto(doc.cliente.origenTipo).toUpperCase()}</div>
-          <div className="dir">{doc.cliente.origenDir}</div>
+      {ver('cliente') && (
+        <div className="m-client">
+          <b>
+            {t('mod_lbl_cliente')} {String(vars.nombre)}
+          </b>
           <div className="sub">
-            {[
-              doc.cliente.origenComuna,
-              doc.cliente.origenPiso ? `piso ${doc.cliente.origenPiso}` : '',
-              doc.cliente.origenAscensor ? 'con ascensor' : 'sin ascensor',
-            ]
-              .filter(Boolean)
-              .join(' · ')}
+            {[doc.cliente.email, doc.cliente.telefono].filter(Boolean).join(' · ')}
           </div>
         </div>
-        <div className="card">
-          <div className="lbl">DESTINO — {tipoCorto(doc.cliente.destinoTipo).toUpperCase()}</div>
-          <div className="dir">{doc.cliente.destinoDir}</div>
-          <div className="sub">
-            {[
-              doc.cliente.destinoComuna,
-              doc.cliente.destinoPiso ? `piso ${doc.cliente.destinoPiso}` : '',
-              doc.cliente.destinoAscensor ? 'con ascensor' : 'sin ascensor',
-            ]
-              .filter(Boolean)
-              .join(' · ')}
+      )}
+
+      {ver('ruta') && (
+        <div className="m-ruta">
+          <div className="card">
+            <div className="lbl">
+              {t('mod_lbl_origen')} — {tipoCorto(doc.cliente.origenTipo).toUpperCase()}
+            </div>
+            <div className="dir">{doc.cliente.origenDir}</div>
+            <div className="sub">
+              {[
+                doc.cliente.origenComuna,
+                doc.cliente.origenPiso ? `piso ${doc.cliente.origenPiso}` : '',
+                doc.cliente.origenAscensor ? 'con ascensor' : 'sin ascensor',
+              ]
+                .filter(Boolean)
+                .join(' · ')}
+            </div>
+          </div>
+          <div className="card">
+            <div className="lbl">
+              {t('mod_lbl_destino')} — {tipoCorto(doc.cliente.destinoTipo).toUpperCase()}
+            </div>
+            <div className="dir">{doc.cliente.destinoDir}</div>
+            <div className="sub">
+              {[
+                doc.cliente.destinoComuna,
+                doc.cliente.destinoPiso ? `piso ${doc.cliente.destinoPiso}` : '',
+                doc.cliente.destinoAscensor ? 'con ascensor' : 'sin ascensor',
+              ]
+                .filter(Boolean)
+                .join(' · ')}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
-      <p className="m-intro">{doc.saludo}, tengo el agrado de cotizar para Ud. lo siguiente:</p>
+      {ver('intro') && t('mod_intro') && <p className="m-intro">{t('mod_intro')}</p>}
 
       <table className="m-tbl">
         <thead>
           <tr>
-            <th className="n">#</th>
-            <th>DESCRIPCIÓN DEL SERVICIO</th>
+            <th className="n">{t('mod_th_num')}</th>
+            <th>{t('mod_th_desc')}</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td className="n">1</td>
-            <td>
-              <div className="t">
-                {servicio ? `${servicio} — ` : ''}
-                {String(vars.tipoOrigenCorto)} a {String(vars.tipoDestinoCorto)}
-              </div>
-              {detalleServicio && <div className="d" style={{ whiteSpace: "pre-line" }}>{detalleServicio}</div>}
-              <div className="d">{txt(doc, cfg, 'personal_calificado', vars)}</div>
-            </td>
-          </tr>
-          <tr>
-            <td className="n">2</td>
-            <td>
-              <div className="t">Equipo y personal</div>
-              <div className="d">
-                {camionLabel(doc.camion)} × {doc.camion_qty} · {doc.camion_qty}{' '}
-                {doc.camion_qty === 1 ? 'chofer' : 'choferes'} · {doc.personas} personas operativas
-                {doc.con_embalaje && materiales.length > 0 && (
-                  <> · Materiales incluidos: {materiales.join(', ')}</>
-                )}
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td className="n">3</td>
-            <td>
-              <div className="t">
-                Inventario a trasladar — {String(vars.items)} ítems · {m3.toFixed(1)} m³
-                {destinoEsBodega && <> ≈ {m2.toFixed(1)} m² de bodega</>}
-              </div>
-              <div className="d">Detalle completo en la hoja anexa de inventario.</div>
-            </td>
-          </tr>
-
+          {(() => {
+            const filas: JSX.Element[] = [];
+            if (ver('item_servicio'))
+              filas.push(
+                <td key="s">
+                  <div className="t">
+                    {servicio ? `${servicio} — ` : ''}
+                    {String(vars.tipoOrigenCorto)} a {String(vars.tipoDestinoCorto)}
+                  </div>
+                  {detalleServicio && (
+                    <div className="d" style={{ whiteSpace: 'pre-line' }}>
+                      {detalleServicio}
+                    </div>
+                  )}
+                  {t('personal_calificado') && <div className="d">{t('personal_calificado')}</div>}
+                </td>
+              );
+            if (ver('item_equipo'))
+              filas.push(
+                <td key="e">
+                  <div className="t">{t('mod_item_equipo')}</div>
+                  <div className="d">
+                    {t('mod_item_equipo_detalle')}
+                    {doc.con_embalaje && materiales.length > 0 && (
+                      <> · {t('mod_item_materiales')} {materiales.join(', ')}</>
+                    )}
+                  </div>
+                </td>
+              );
+            if (ver('item_inventario'))
+              filas.push(
+                <td key="i">
+                  <div className="t">
+                    {t('mod_item_inventario')}
+                    {destinoEsBodega && <> ≈ {m2.toFixed(1)} m² de bodega</>}
+                  </div>
+                  {t('mod_item_inventario_detalle') && (
+                    <div className="d">{t('mod_item_inventario_detalle')}</div>
+                  )}
+                </td>
+              );
+            return filas.map((celda, i) => (
+              <tr key={i}>
+                <td className="n">{i + 1}</td>
+                {celda}
+              </tr>
+            ));
+          })()}
         </tbody>
       </table>
 
-      <div className="m-total">
-        <span>TOTAL A PAGAR</span>
-        <span>
-          {formatCLP(precio)} {doc.sin_iva && <span className="iva">(no incluye IVA)</span>}
-        </span>
-      </div>
+      {ver('total') && (
+        <div className="m-total">
+          <span>{t('mod_total')}</span>
+          <span>
+            {formatCLP(precio)} {doc.sin_iva && <span className="iva">{t('mod_iva')}</span>}
+          </span>
+        </div>
+      )}
 
       <div className="m-cols">
-        <div className="m-sec">
-          <h4>LO QUE HAREMOS</h4>
-          <ul>
-            {acciones.map((a, i) => (
-              <li key={i}>{a}</li>
-            ))}
-          </ul>
-        </div>
-        <div className="m-sec">
-          <h4>FORMA DE PAGO</h4>
-          <p>
-            <b>{doc.cuota1}%</b> {txt(doc, cfg, 'pago_cuota1_label', vars)} — {String(vars.montoCuota1)}
-          </p>
-          <p>
-            <b>{doc.cuota2}%</b> {txt(doc, cfg, 'pago_cuota2_label', vars)} — {String(vars.montoCuota2)}
-          </p>
-          <p className="muted">{txt(doc, cfg, 'pago_saldo', vars)}</p>
-        </div>
+        {ver('acciones') && acciones.length > 0 && (
+          <div className="m-sec">
+            <h4>{t('mod_h_acciones')}</h4>
+            <ul>
+              {acciones.map((a, i) => (
+                <li key={i}>{a}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {ver('pago') && (
+          <div className="m-sec">
+            <h4>{t('mod_h_pago')}</h4>
+            <p>
+              <b>{doc.cuota1}%</b> {t('pago_cuota1_label')} — {String(vars.montoCuota1)}
+            </p>
+            <p>
+              <b>{doc.cuota2}%</b> {t('pago_cuota2_label')} — {String(vars.montoCuota2)}
+            </p>
+            {t('pago_saldo') && <p className="muted">{t('pago_saldo')}</p>}
+          </div>
+        )}
       </div>
 
-      {observaciones.length > 0 && (
+      {ver('observaciones') && observaciones.length > 0 && (
         <div className="m-sec" style={{ marginTop: '5mm' }}>
-          <h4>OBSERVACIONES</h4>
+          <h4>{t('mod_h_obs')}</h4>
           <ul>
             {observaciones.map((o, i) => (
               <li key={i}>{o}</li>
@@ -185,29 +219,39 @@ const DocModerno = ({ doc, cfg }: Props) => {
         </div>
       )}
 
-      <div className="m-foot">
-        <div>
-          <b>Datos de transferencia</b>
-          <br />
-          {e.titular} · Rut {e.rut}
-          <br />
-          Banco {e.banco} · Cuenta {e.cuenta} N° {e.numero}
-          <br />
-          {e.correo}
+      {(ver('pie_transferencia') || ver('pie_contacto')) && (
+        <div className="m-foot">
+          {ver('pie_transferencia') && (
+            <div>
+              <b>{t('mod_h_transferencia')}</b>
+              <br />
+              {e.titular} · Rut {e.rut}
+              <br />
+              Banco {e.banco} · Cuenta {e.cuenta} N° {e.numero}
+              <br />
+              {e.correo}
+            </div>
+          )}
+          {ver('pie_contacto') && (
+            <div>
+              <b>{t('mod_h_contacto')}</b>
+              <br />
+              WhatsApp {e.wsp1} · {e.wsp2}
+              <br />
+              {e.web}
+              {t('mod_akikb') && (
+                <>
+                  <br />
+                  <b>{t('mod_akikb')}</b> — {e.akikb_correo} · {e.akikb_wsp} · Oficina {e.akikb_oficina}
+                </>
+              )}
+            </div>
+          )}
         </div>
-        <div>
-          <b>Contacto</b>
-          <br />
-          WhatsApp {e.wsp1} · {e.wsp2}
-          <br />
-          {e.web}
-          <br />
-          <b>Mini bodegas akikb</b> — {e.akikb_correo} · {e.akikb_wsp} · Oficina {e.akikb_oficina}
-        </div>
-      </div>
+      )}
       </div>
 
-      <DocInventario doc={doc} variant="moderno" />
+      {ver('anexo_inventario') && <DocInventario doc={doc} variant="moderno" />}
     </>
   );
 
