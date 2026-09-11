@@ -164,6 +164,8 @@ export function buildVars(doc: DocState, cfg: DocConfig): TplVars {
     akikbCorreo: cfg.empresa.akikb_correo,
     akikbWsp: cfg.empresa.akikb_wsp,
     akikbOficina: cfg.empresa.akikb_oficina,
+    servicio: tipoServicioLabel(doc.tipo_servicio) ? `${tipoServicioLabel(doc.tipo_servicio)} — ` : '',
+    servicioNombre: tipoServicioLabel(doc.tipo_servicio),
   };
 }
 
