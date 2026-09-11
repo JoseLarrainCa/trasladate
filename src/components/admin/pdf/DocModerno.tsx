@@ -24,7 +24,7 @@ const DocModerno = ({ doc, cfg }: Props) => {
   const precio = precioFinal(doc);
   const t = (k: string) => txt(doc, cfg, k, vars);
   const ver = (k: string) => verSeccion(doc, k);
-  totalM3(doc.inventario);
+
 
   const materiales = doc.materiales.map((k) => t(k)).filter(Boolean);
   const acciones = accionesVisibles(doc)
