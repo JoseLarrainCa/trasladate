@@ -433,7 +433,7 @@ const GenerarCotizacion = () => {
     );
   }
 
-  const grupos = ['Frases', 'Materiales', 'Acciones', 'Observaciones', 'Pago', 'Tabla'] as const;
+  const grupos = ['Frases', 'Materiales', 'Acciones', 'Observaciones', 'Pago', 'Tabla', 'Moderno'] as const;
 
   return (
     <AdminLayout>
