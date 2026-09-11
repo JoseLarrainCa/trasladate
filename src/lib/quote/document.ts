@@ -1,4 +1,11 @@
-import { DEFAULT_EMPRESA, DEFAULT_TEXTOS, type Empresa, type Tarifas, DEFAULT_TARIFAS } from './defaults';
+import {
+  DEFAULT_EMPRESA,
+  DEFAULT_TEXTOS,
+  tipoServicioLabel,
+  type Empresa,
+  type Tarifas,
+  DEFAULT_TARIFAS,
+} from './defaults';
 import { camionLabel, formatCLP, m3ToBodegaM2, totalItems, totalM3, type LineaInventario } from './pricing';
 import { dosDigitos, renderTemplate, resolveTexto, type TplVars } from './templates';
 
@@ -144,6 +151,21 @@ export function buildVars(doc: DocState, cfg: DocConfig): TplVars {
     listaMateriales: materiales,
     embalaje: doc.con_embalaje,
     armadoCamas: doc.armado_camas,
+    // Datos de la empresa (para textos editables del pie y encabezado)
+    titular: cfg.empresa.titular,
+    rut: cfg.empresa.rut,
+    banco: cfg.empresa.banco,
+    cuenta: cfg.empresa.cuenta,
+    numeroCuenta: cfg.empresa.numero,
+    correo: cfg.empresa.correo,
+    wsp1: cfg.empresa.wsp1,
+    wsp2: cfg.empresa.wsp2,
+    web: cfg.empresa.web,
+    akikbCorreo: cfg.empresa.akikb_correo,
+    akikbWsp: cfg.empresa.akikb_wsp,
+    akikbOficina: cfg.empresa.akikb_oficina,
+    servicio: tipoServicioLabel(doc.tipo_servicio) ? `${tipoServicioLabel(doc.tipo_servicio)} — ` : '',
+    servicioNombre: tipoServicioLabel(doc.tipo_servicio),
   };
 }
 

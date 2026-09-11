@@ -23,7 +23,19 @@ export function renderTemplate(tpl: string, vars: TplVars): string {
     return v === undefined || v === null ? '' : String(v);
   });
 
-  return out.replace(/\s{2,}/g, ' ').trim();
+  // Colapsa espacios sobrantes y separadores vacíos, conservando los saltos de línea
+  return out
+    .split('\n')
+    .map((l) =>
+      l
+        .replace(/[ \t]{2,}/g, ' ')
+        .replace(/(\s*·\s*){2,}/g, ' · ')
+        .replace(/^\s*·\s*|\s*·\s*$/g, '')
+        .trim()
+    )
+    .filter((l) => l !== '')
+    .join('\n')
+    .trim();
 }
 
 /** Devuelve el texto de una key: override de la cotización ?? default de empresa, interpolado. */
