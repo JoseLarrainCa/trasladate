@@ -23,11 +23,17 @@ export function renderTemplate(tpl: string, vars: TplVars): string {
     return v === undefined || v === null ? '' : String(v);
   });
 
-  // Colapsa espacios sobrantes pero conserva los saltos de línea del texto
+  // Colapsa espacios sobrantes y separadores vacíos, conservando los saltos de línea
   return out
     .split('\n')
-    .map((l) => l.replace(/[ \t]{2,}/g, ' ').trim())
-    .filter((l, i, arr) => l !== '' || (i > 0 && i < arr.length - 1 && arr[i - 1] !== ''))
+    .map((l) =>
+      l
+        .replace(/[ \t]{2,}/g, ' ')
+        .replace(/(\s*·\s*){2,}/g, ' · ')
+        .replace(/^\s*·\s*|\s*·\s*$/g, '')
+        .trim()
+    )
+    .filter((l) => l !== '')
     .join('\n')
     .trim();
 }
