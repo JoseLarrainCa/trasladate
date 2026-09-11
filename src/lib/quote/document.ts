@@ -1,4 +1,11 @@
-import { DEFAULT_EMPRESA, DEFAULT_TEXTOS, type Empresa, type Tarifas, DEFAULT_TARIFAS } from './defaults';
+import {
+  DEFAULT_EMPRESA,
+  DEFAULT_TEXTOS,
+  tipoServicioLabel,
+  type Empresa,
+  type Tarifas,
+  DEFAULT_TARIFAS,
+} from './defaults';
 import { camionLabel, formatCLP, m3ToBodegaM2, totalItems, totalM3, type LineaInventario } from './pricing';
 import { dosDigitos, renderTemplate, resolveTexto, type TplVars } from './templates';
 
