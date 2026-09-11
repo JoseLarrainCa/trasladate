@@ -23,7 +23,13 @@ export function renderTemplate(tpl: string, vars: TplVars): string {
     return v === undefined || v === null ? '' : String(v);
   });
 
-  return out.replace(/\s{2,}/g, ' ').trim();
+  // Colapsa espacios sobrantes pero conserva los saltos de línea del texto
+  return out
+    .split('\n')
+    .map((l) => l.replace(/[ \t]{2,}/g, ' ').trim())
+    .filter((l, i, arr) => l !== '' || (i > 0 && i < arr.length - 1 && arr[i - 1] !== ''))
+    .join('\n')
+    .trim();
 }
 
 /** Devuelve el texto de una key: override de la cotización ?? default de empresa, interpolado. */
