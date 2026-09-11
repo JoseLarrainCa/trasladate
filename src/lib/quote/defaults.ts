@@ -244,6 +244,73 @@ export const TEXTO_DEFS: TextoDef[] = [
   { key: 'mod_h_transferencia', label: 'Moderno — título transferencia', group: 'Moderno', default: 'Datos de transferencia' },
   { key: 'mod_h_contacto', label: 'Moderno — título contacto', group: 'Moderno', default: 'Contacto' },
   { key: 'mod_akikb', label: 'Moderno — línea mini bodegas', group: 'Moderno', default: 'Mini bodegas akikb' },
+  { key: 'mod_marca', label: 'Moderno — nombre de la marca', group: 'Moderno', default: 'TRASLADARTE' },
+  {
+    key: 'mod_encabezado_contacto',
+    label: 'Moderno — contacto del encabezado',
+    group: 'Moderno',
+    default: 'WhatsApp {{wsp1}} · {{web}}\n{{correo}}',
+  },
+  {
+    key: 'mod_cliente_sub',
+    label: 'Moderno — datos bajo el nombre del cliente',
+    group: 'Moderno',
+    default: '{{email}} · {{telefono}}',
+  },
+  {
+    key: 'mod_ruta_origen',
+    label: 'Moderno — detalle del origen',
+    group: 'Moderno',
+    default: '{{origenComuna}} · {{origenAscensor}}',
+  },
+  {
+    key: 'mod_ruta_destino',
+    label: 'Moderno — detalle del destino',
+    group: 'Moderno',
+    default: '{{destinoComuna}} · {{destinoAscensor}}',
+  },
+  {
+    key: 'mod_item_servicio',
+    label: 'Moderno — título fila servicio',
+    group: 'Moderno',
+    default: '{{servicio}}{{tipoOrigenCorto}} a {{tipoDestinoCorto}}',
+  },
+  {
+    key: 'mod_item_bodega',
+    label: 'Moderno — equivalencia en bodega',
+    group: 'Moderno',
+    default: '≈ {{m2}} m² de bodega',
+  },
+  {
+    key: 'mod_pago_linea1',
+    label: 'Moderno — línea cuota 1',
+    group: 'Moderno',
+    default: '{{cuota1}}% Aceptación del Presupuesto — {{montoCuota1}}',
+  },
+  {
+    key: 'mod_pago_linea2',
+    label: 'Moderno — línea cuota 2',
+    group: 'Moderno',
+    default: '{{cuota2}}% Al momento de iniciar la descarga — {{montoCuota2}}',
+  },
+  {
+    key: 'mod_transferencia_detalle',
+    label: 'Moderno — datos de transferencia',
+    group: 'Moderno',
+    default: '{{titular}} · Rut {{rut}}\nBanco {{banco}} · Cuenta {{cuenta}} N° {{numeroCuenta}}\n{{correo}}',
+  },
+  {
+    key: 'mod_contacto_detalle',
+    label: 'Moderno — datos de contacto del pie',
+    group: 'Moderno',
+    default: 'WhatsApp {{wsp1}} · {{wsp2}}\n{{web}}',
+  },
+  {
+    key: 'mod_akikb_detalle',
+    label: 'Moderno — datos akikb',
+    group: 'Moderno',
+    default: '{{akikbCorreo}} · {{akikbWsp}} · Oficina {{akikbOficina}}',
+  },
 ];
 
 /** Secciones del formato Moderno que se pueden mostrar u ocultar. */
