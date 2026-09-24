@@ -568,6 +568,30 @@ const GenerarCotizacion = () => {
                   )}
                 </div>
 
+                <div className="space-y-1">
+                  <Label className="text-xs">Frase de personal (fila 1)</Label>
+                  <Textarea
+                    rows={3}
+                    value={doc.textos['personal_calificado'] ?? cfg.textosDefault['personal_calificado'] ?? ''}
+                    onChange={(e) => setTexto('personal_calificado', e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">Déjala vacía para ocultarla del documento.</p>
+                  <Button
+                    type="button"
+                    variant="link"
+                    size="sm"
+                    className="h-auto px-0 text-xs"
+                    onClick={() =>
+                      setDoc((d) => {
+                        const { personal_calificado, ...rest } = d.textos;
+                        return { ...d, textos: rest };
+                      })
+                    }
+                  >
+                    Restaurar frase original
+                  </Button>
+                </div>
+
                 <div className="grid grid-cols-2 gap-3">
                   <div className="col-span-2">
                     <Label>Cliente</Label>
