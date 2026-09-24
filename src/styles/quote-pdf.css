@@ -302,6 +302,13 @@
 .m-tbl tbody tr:nth-child(even) { background: #f6f8fb; }
 .m-tbl .t { font-weight: 700; }
 .m-tbl .d { color: #5a6472; margin-top: 0.8mm; }
+.m-tbl .m-detail-list {
+  margin: 1mm 0 0;
+  padding-left: 5mm;
+  color: #5a6472;
+}
+.m-tbl .m-detail-list li { margin: 0 0 0.6mm; }
+.m-tbl .m-detail-list li:last-child { margin-bottom: 0; }
 
 .m-total {
   background: #1e3a6a;

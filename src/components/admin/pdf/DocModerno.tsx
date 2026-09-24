@@ -51,12 +51,20 @@ const DocModerno = ({ doc, cfg }: Props) => {
     filas.push(
       <td key="e">
         {t('mod_item_equipo') && <div className="t">{t('mod_item_equipo')}</div>}
-        <div className="d" style={pre}>
-          {t('mod_item_equipo_detalle')}
-          {doc.con_embalaje && materiales.length > 0 && (
-            <> · {t('mod_item_materiales')} {materiales.join(', ')}</>
-          )}
-        </div>
+        <ul className="m-detail-list">
+          {[t('mod_equipo_camion'), t('mod_equipo_choferes'), t('mod_equipo_personas')]
+            .filter(Boolean)
+            .map((detalle, i) => <li key={i}>{detalle}</li>)}
+        </ul>
+      </td>
+    );
+  if (ver('item_materiales') && doc.con_embalaje && materiales.length > 0)
+    filas.push(
+      <td key="m">
+        {t('mod_item_materiales') && <div className="t">{t('mod_item_materiales')}</div>}
+        <ul className="m-detail-list">
+          {materiales.map((material, i) => <li key={i}>{material}</li>)}
+        </ul>
       </td>
     );
   if (ver('item_inventario'))
