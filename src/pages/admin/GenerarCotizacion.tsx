@@ -592,6 +592,61 @@ const GenerarCotizacion = () => {
                   </Button>
                 </div>
 
+                {doc.formato === 'moderno' && (
+                  <div className="space-y-4 border-t border-border pt-4">
+                    <h3 className="text-sm font-semibold text-foreground">Contenido de las filas del formato Moderno</h3>
+
+                    <div className="space-y-2">
+                      <Label>Materiales — título</Label>
+                      <Input
+                        value={doc.textos['mod_item_materiales'] ?? cfg.textosDefault['mod_item_materiales'] ?? ''}
+                        onChange={(e) => setTexto('mod_item_materiales', e.target.value)}
+                      />
+                      {TEXTO_DEFS.filter((t) => t.group === 'Materiales').map((t) => (
+                        <div key={t.key} className="flex items-start gap-2">
+                          <Checkbox
+                            className="mt-2.5"
+                            checked={doc.materiales.includes(t.key)}
+                            onCheckedChange={() => toggleList('materiales', t.key)}
+                          />
+                          <Textarea
+                            rows={2}
+                            aria-label={t.label}
+                            value={doc.textos[t.key] ?? cfg.textosDefault[t.key] ?? ''}
+                            onChange={(e) => setTexto(t.key, e.target.value)}
+                          />
+                        </div>
+                      ))}
+                      <p className="text-xs text-muted-foreground">
+                        Marca los materiales que aparecerán y cambia cada frase directamente aquí.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Inventario — título</Label>
+                      <Textarea
+                        rows={2}
+                        value={doc.textos['mod_item_inventario'] ?? cfg.textosDefault['mod_item_inventario'] ?? ''}
+                        onChange={(e) => setTexto('mod_item_inventario', e.target.value)}
+                      />
+                      <Label>Inventario — texto inferior</Label>
+                      <Textarea
+                        rows={2}
+                        value={doc.textos['mod_item_inventario_detalle'] ?? cfg.textosDefault['mod_item_inventario_detalle'] ?? ''}
+                        onChange={(e) => setTexto('mod_item_inventario_detalle', e.target.value)}
+                      />
+                      <Label>Inventario — equivalencia de bodega</Label>
+                      <Input
+                        value={doc.textos['mod_item_bodega'] ?? cfg.textosDefault['mod_item_bodega'] ?? ''}
+                        onChange={(e) => setTexto('mod_item_bodega', e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Puedes usar las variables automáticas {'{{items}}'}, {'{{m3}}'} y {'{{m2}}'}.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-2 gap-3">
                   <div className="col-span-2">
                     <Label>Cliente</Label>
