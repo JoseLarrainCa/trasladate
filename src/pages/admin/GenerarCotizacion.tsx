@@ -278,7 +278,9 @@ const GenerarCotizacion = () => {
           recargo_otro: d.recargo_otro,
           precio_calculado: d.precio_calculado,
           precio_final: d.precio_final,
-          textos: d.textos || {},
+          textos: Object.fromEntries(
+            Object.entries(d.textos || {}).filter(([k]) => !OBSOLETE_KEYS.includes(k))
+          ) as Record<string, string>,
           materiales: d.materiales?.length ? d.materiales : next.materiales,
           observaciones: d.observaciones?.length ? d.observaciones : next.observaciones,
           acciones: d.acciones?.length ? d.acciones : next.acciones,
@@ -436,6 +438,13 @@ const GenerarCotizacion = () => {
 
   const grupos = ['Frases', 'Materiales', 'Acciones', 'Observaciones', 'Pago', 'Tabla', 'Moderno'] as const;
 
+  const onPreviewClick = (e: React.MouseEvent) => {
+    const el = (e.target as HTMLElement).closest('[data-edit]') as HTMLElement | null;
+    if (!el) return;
+    const [seccion, ...keys] = (el.dataset.edit || '').split(',');
+    setEditando({ seccion, keys, titulo: el.dataset.editLabel || 'Editar' });
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-5">
@@ -461,13 +470,14 @@ const GenerarCotizacion = () => {
         <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,420px)_1fr] gap-6">
           {/* -------------------------------- Editor -------------------------------- */}
           <div className="space-y-4">
-            <Tabs defaultValue="general">
-              <TabsList className="grid grid-cols-5 w-full">
-                <TabsTrigger value="general">General</TabsTrigger>
-                <TabsTrigger value="servicio">Servicio</TabsTrigger>
-                <TabsTrigger value="inventario">Inventario</TabsTrigger>
-                <TabsTrigger value="textos">Textos</TabsTrigger>
-                <TabsTrigger value="secciones">Secciones</TabsTrigger>
+            <p className="text-xs text-muted-foreground">
+              Completa los 3 pasos. Para cambiar cualquier texto, haz clic sobre él en la vista previa.
+            </p>
+            <Tabs value={paso} onValueChange={setPaso}>
+              <TabsList className="grid grid-cols-3 w-full">
+                <TabsTrigger value="general">1. Cliente y ruta</TabsTrigger>
+                <TabsTrigger value="inventario">2. Inventario</TabsTrigger>
+                <TabsTrigger value="servicio">3. Servicio y precio</TabsTrigger>
               </TabsList>
 
               {/* General */}
