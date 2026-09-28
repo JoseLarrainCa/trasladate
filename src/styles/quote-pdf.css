@@ -403,3 +403,9 @@
 .anx-note { margin-top: 3mm; font-size: 8pt; color: #5a6472; font-style: italic; }
 .anx-moderno { page-break-before: always; }
 .page .anx-box { min-height: 0; }
+
+/* Edición directa en la vista previa (solo pantalla) */
+@media screen {
+  .doc-editable [data-edit] { cursor: pointer; transition: outline-color .15s; outline: 1.5px dashed transparent; outline-offset: 2px; }
+  .doc-editable [data-edit]:hover { outline-color: hsl(var(--primary)); }
+}

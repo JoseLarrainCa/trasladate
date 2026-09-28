@@ -11,6 +11,9 @@ import {
 } from '@/lib/quote/document';
 import { formatCLP } from '@/lib/quote/pricing';
 import DocInventario from './DocInventario';
+import { MATERIALES_BODEGA, MATERIALES_DOMICILIO } from '@/lib/quote/defaults';
+
+const MATS = Array.from(new Set([...MATERIALES_DOMICILIO, ...MATERIALES_BODEGA]));
 
 interface Props {
   doc: DocState;
@@ -37,7 +40,7 @@ const DocModerno = ({ doc, cfg }: Props) => {
   const filas: JSX.Element[] = [];
   if (ver('item_servicio'))
     filas.push(
-      <td key="s">
+      <td key="s" data-edit="item_servicio,mod_item_servicio,detalle_servicio,personal_calificado" data-edit-label="Servicio">
         <div className="t">{t('mod_item_servicio')}</div>
         {detalleServicio && (
           <div className="d" style={pre}>
@@ -49,7 +52,7 @@ const DocModerno = ({ doc, cfg }: Props) => {
     );
   if (ver('item_equipo'))
     filas.push(
-      <td key="e">
+      <td key="e" data-edit="item_equipo,mod_item_equipo,mod_equipo_camion,mod_equipo_choferes,mod_equipo_personas" data-edit-label="Equipo y personal">
         {t('mod_item_equipo') && <div className="t">{t('mod_item_equipo')}</div>}
         <ul className="m-detail-list">
           {[t('mod_equipo_camion'), t('mod_equipo_choferes'), t('mod_equipo_personas')]
@@ -60,7 +63,7 @@ const DocModerno = ({ doc, cfg }: Props) => {
     );
   if (ver('item_materiales') && doc.con_embalaje && materiales.length > 0)
     filas.push(
-      <td key="m">
+      <td key="m" data-edit={`item_materiales,mod_item_materiales,${MATS.join(",")}`} data-edit-label="Materiales">
         {t('mod_item_materiales') && <div className="t">{t('mod_item_materiales')}</div>}
         <ul className="m-detail-list">
           {materiales.map((material, i) => <li key={i}>{material}</li>)}
@@ -69,7 +72,7 @@ const DocModerno = ({ doc, cfg }: Props) => {
     );
   if (ver('item_inventario'))
     filas.push(
-      <td key="i">
+      <td key="i" data-edit="item_inventario,mod_item_inventario,mod_item_inventario_detalle,mod_item_bodega" data-edit-label="Inventario">
         <div className="t">
           {t('mod_item_inventario')}
           {destinoEsBodega && t('mod_item_bodega') && <> {t('mod_item_bodega')}</>}
@@ -85,7 +88,7 @@ const DocModerno = ({ doc, cfg }: Props) => {
   return (
     <>
       <div className="m-page">
-        <div className="m-head">
+        <div className="m-head" data-edit="encabezado_contacto,mod_marca,mod_tagline,mod_encabezado_contacto,mod_titulo,mod_lbl_folio,mod_lbl_fecha" data-edit-label="Encabezado">
           <div className="m-brand">
             <div className="name">{t('mod_marca')}</div>
             {t('mod_tagline') && <div className="tag">{t('mod_tagline')}</div>}
@@ -113,7 +116,7 @@ const DocModerno = ({ doc, cfg }: Props) => {
         <hr className="m-rule" />
 
         {ver('cliente') && (
-          <div className="m-client">
+          <div className="m-client" data-edit="cliente,mod_lbl_cliente,mod_cliente_sub" data-edit-label="Cliente">
             <b>
               {t('mod_lbl_cliente')} {String(vars.nombre)}
             </b>
@@ -122,7 +125,7 @@ const DocModerno = ({ doc, cfg }: Props) => {
         )}
 
         {ver('ruta') && (
-          <div className="m-ruta">
+          <div className="m-ruta" data-edit="ruta,mod_lbl_origen,mod_ruta_origen,mod_lbl_destino,mod_ruta_destino" data-edit-label="Origen y destino">
             <div className="card">
               <div className="lbl">
                 {t('mod_lbl_origen')} — {tipoCorto(doc.cliente.origenTipo).toUpperCase()}
@@ -149,7 +152,7 @@ const DocModerno = ({ doc, cfg }: Props) => {
         )}
 
         {ver('intro') && t('mod_intro') && (
-          <p className="m-intro" style={pre}>
+          <p className="m-intro" style={pre} data-edit="intro,mod_intro" data-edit-label="Introducción">
             {t('mod_intro')}
           </p>
         )}
@@ -174,7 +177,7 @@ const DocModerno = ({ doc, cfg }: Props) => {
         )}
 
         {ver('total') && (
-          <div className="m-total">
+          <div className="m-total" data-edit="total,mod_total,mod_iva" data-edit-label="Total">
             <span>{t('mod_total')}</span>
             <span>
               {formatCLP(precio)} {doc.sin_iva && <span className="iva">{t('mod_iva')}</span>}
@@ -184,7 +187,7 @@ const DocModerno = ({ doc, cfg }: Props) => {
 
         <div className="m-cols">
           {ver('acciones') && acciones.length > 0 && (
-            <div className="m-sec">
+            <div className="m-sec" data-edit={`acciones,mod_h_acciones,${doc.acciones.join(",")}`} data-edit-label="Acciones">
               {t('mod_h_acciones') && <h4>{t('mod_h_acciones')}</h4>}
               <ul>
                 {acciones.map((a, i) => (
@@ -194,7 +197,7 @@ const DocModerno = ({ doc, cfg }: Props) => {
             </div>
           )}
           {ver('pago') && (
-            <div className="m-sec">
+            <div className="m-sec" data-edit="pago,mod_h_pago,mod_pago_linea1,mod_pago_linea2,pago_saldo" data-edit-label="Forma de pago">
               {t('mod_h_pago') && <h4>{t('mod_h_pago')}</h4>}
               {t('mod_pago_linea1') && <p style={pre}>{t('mod_pago_linea1')}</p>}
               {t('mod_pago_linea2') && <p style={pre}>{t('mod_pago_linea2')}</p>}
@@ -208,7 +211,7 @@ const DocModerno = ({ doc, cfg }: Props) => {
         </div>
 
         {ver('observaciones') && observaciones.length > 0 && (
-          <div className="m-sec" style={{ marginTop: '5mm' }}>
+          <div className="m-sec" style={{ marginTop: '5mm' }} data-edit={`observaciones,mod_h_obs,${doc.observaciones.join(",")}`} data-edit-label="Observaciones">
             {t('mod_h_obs') && <h4>{t('mod_h_obs')}</h4>}
             <ul>
               {observaciones.map((o, i) => (
@@ -219,7 +222,7 @@ const DocModerno = ({ doc, cfg }: Props) => {
         )}
 
         {(ver('pie_transferencia') || ver('pie_contacto')) && (
-          <div className="m-foot">
+          <div className="m-foot" data-edit=",mod_h_transferencia,mod_transferencia_detalle,mod_h_contacto,mod_contacto_detalle,mod_akikb,mod_akikb_detalle" data-edit-label="Pie de página">
             {ver('pie_transferencia') && (
               <div style={pre}>
                 <b>{t('mod_h_transferencia')}</b>
