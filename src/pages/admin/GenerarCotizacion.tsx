@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Loader2, Printer, Save, RefreshCw, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Loader2, Printer, Save, RefreshCw, Plus, Trash2, ChevronDown } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+
+const OBSOLETE_KEYS = ['mod_item_equipo_detalle'];
 import AdminLayout from '@/components/admin/AdminLayout';
 import DocMarco from '@/components/admin/pdf/DocMarco';
 import DocModerno from '@/components/admin/pdf/DocModerno';
@@ -145,6 +149,8 @@ const GenerarCotizacion = () => {
   });
   const [nuevoItem, setNuevoItem] = useState('');
   const [zoom, setZoom] = useState(0.62);
+  const [paso, setPaso] = useState('general');
+  const [editando, setEditando] = useState<{ seccion: string; keys: string[]; titulo: string } | null>(null);
   const [servicios, setServicios] = useState<ServicioDetalles>(DEFAULT_SERVICIO_DETALLES);
 
   // Textos de servicio (editables en Configuración → Servicios web).
@@ -278,7 +284,9 @@ const GenerarCotizacion = () => {
           recargo_otro: d.recargo_otro,
           precio_calculado: d.precio_calculado,
           precio_final: d.precio_final,
-          textos: d.textos || {},
+          textos: Object.fromEntries(
+            Object.entries(d.textos || {}).filter(([k]) => !OBSOLETE_KEYS.includes(k))
+          ) as Record<string, string>,
           materiales: d.materiales?.length ? d.materiales : next.materiales,
           observaciones: d.observaciones?.length ? d.observaciones : next.observaciones,
           acciones: d.acciones?.length ? d.acciones : next.acciones,
@@ -436,6 +444,13 @@ const GenerarCotizacion = () => {
 
   const grupos = ['Frases', 'Materiales', 'Acciones', 'Observaciones', 'Pago', 'Tabla', 'Moderno'] as const;
 
+  const onPreviewClick = (e: React.MouseEvent) => {
+    const el = (e.target as HTMLElement).closest('[data-edit]') as HTMLElement | null;
+    if (!el) return;
+    const [seccion, ...keys] = (el.dataset.edit || '').split(',');
+    setEditando({ seccion, keys, titulo: el.dataset.editLabel || 'Editar' });
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-5">
@@ -461,13 +476,14 @@ const GenerarCotizacion = () => {
         <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,420px)_1fr] gap-6">
           {/* -------------------------------- Editor -------------------------------- */}
           <div className="space-y-4">
-            <Tabs defaultValue="general">
-              <TabsList className="grid grid-cols-5 w-full">
-                <TabsTrigger value="general">General</TabsTrigger>
-                <TabsTrigger value="servicio">Servicio</TabsTrigger>
-                <TabsTrigger value="inventario">Inventario</TabsTrigger>
-                <TabsTrigger value="textos">Textos</TabsTrigger>
-                <TabsTrigger value="secciones">Secciones</TabsTrigger>
+            <p className="text-xs text-muted-foreground">
+              Completa los 3 pasos. Para cambiar cualquier texto, haz clic sobre él en la vista previa.
+            </p>
+            <Tabs value={paso} onValueChange={setPaso}>
+              <TabsList className="grid grid-cols-3 w-full">
+                <TabsTrigger value="general">1. Cliente y ruta</TabsTrigger>
+                <TabsTrigger value="inventario">2. Inventario</TabsTrigger>
+                <TabsTrigger value="servicio">3. Servicio y precio</TabsTrigger>
               </TabsList>
 
               {/* General */}
@@ -855,7 +871,31 @@ const GenerarCotizacion = () => {
                   ))}
                 </div>
               </TabsContent>
+            </Tabs>
 
+            <div className="flex justify-between">
+              <Button variant="outline" size="sm" disabled={paso === 'general'}
+                onClick={() => setPaso(paso === 'servicio' ? 'inventario' : 'general')}>Anterior</Button>
+              {paso !== 'servicio' ? (
+                <Button size="sm" onClick={() => setPaso(paso === 'general' ? 'inventario' : 'servicio')}>Siguiente</Button>
+              ) : (
+                <Button size="sm" onClick={() => imprimirDocumento(docRef.current, `Cotizacion-${doc.folio}`)}>
+                  <Printer className="w-4 h-4 mr-1" /> Descargar PDF
+                </Button>
+              )}
+            </div>
+
+            <Collapsible className="rounded-xl border border-border">
+              <CollapsibleTrigger className="flex w-full items-center justify-between p-3 text-sm font-medium">
+                Opciones avanzadas (todos los textos y secciones)
+                <ChevronDown className="w-4 h-4" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="px-3 pb-3">
+            <Tabs defaultValue="textos">
+              <TabsList className="grid grid-cols-2 w-full">
+                <TabsTrigger value="textos">Textos</TabsTrigger>
+                <TabsTrigger value="secciones">Secciones</TabsTrigger>
+              </TabsList>
               {/* Textos */}
               <TabsContent value="textos" className="space-y-5 pt-4">
                 {grupos.map((g) => {
@@ -920,6 +960,8 @@ const GenerarCotizacion = () => {
                 ))}
               </TabsContent>
             </Tabs>
+            </CollapsibleContent>
+            </Collapsible>
           </div>
 
           {/* ------------------------------- Vista previa ------------------------------- */}
@@ -938,14 +980,79 @@ const GenerarCotizacion = () => {
                 <div
                   id="doc"
                   ref={docRef}
+                  className="doc-editable"
+                  onClick={onPreviewClick}
                   style={{ zoom, width: '210mm' }}
                 >
                   {doc.formato === 'marco' ? <DocMarco doc={doc} cfg={cfg} /> : <DocModerno doc={doc} cfg={cfg} />}
                 </div>
               </div>
-
             </div>
           </div>
+
+          <Dialog open={!!editando} onOpenChange={(o) => !o && setEditando(null)}>
+            <DialogContent className="max-w-lg">
+              <DialogHeader>
+                <DialogTitle>{editando?.titulo}</DialogTitle>
+              </DialogHeader>
+              {editando && (
+                <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
+                  {editando.seccion && (
+                    <label className="flex items-center gap-3 text-sm">
+                      <Switch
+                        checked={doc.textos[`ver_${editando.seccion}`] !== '0'}
+                        onCheckedChange={(v) => setTexto(`ver_${editando.seccion}`, v ? '1' : '0')}
+                      />
+                      Mostrar esta sección en el documento
+                    </label>
+                  )}
+                  {editando.keys.map((k) => {
+                    const def = TEXTO_DEFS.find((t) => t.key === k);
+                    const esMaterial = k.startsWith('mat_');
+                    return (
+                      <div key={k} className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          {esMaterial && (
+                            <Checkbox
+                              checked={doc.materiales.includes(k)}
+                              onCheckedChange={() => toggleList('materiales', k)}
+                            />
+                          )}
+                          <Label className="text-xs text-muted-foreground">
+                            {k === 'detalle_servicio' ? 'Detalle del servicio' : def?.label || k}
+                          </Label>
+                          {doc.textos[k] !== undefined && k !== 'detalle_servicio' && (
+                            <Button
+                              type="button" variant="link" size="sm" className="ml-auto h-auto px-0 text-xs"
+                              onClick={() =>
+                                setDoc((d) => {
+                                  const { [k]: _omit, ...rest } = d.textos;
+                                  return { ...d, textos: rest };
+                                })
+                              }
+                            >
+                              Restaurar
+                            </Button>
+                          )}
+                        </div>
+                        <Textarea
+                          rows={2}
+                          value={doc.textos[k] ?? cfg.textosDefault[k] ?? ''}
+                          onChange={(e) => setTexto(k, e.target.value)}
+                        />
+                      </div>
+                    );
+                  })}
+                  <p className="text-xs text-muted-foreground">
+                    Deja un texto vacío para ocultar esa línea. Puedes usar variables como {'{{m3}}'} o {'{{personas}}'}.
+                  </p>
+                </div>
+              )}
+              <DialogFooter>
+                <Button onClick={() => setEditando(null)}>Listo</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </AdminLayout>
