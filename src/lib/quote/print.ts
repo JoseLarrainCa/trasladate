@@ -29,6 +29,16 @@ html,body{margin:0;padding:0;background:#fff;}
   doc.close();
 
   const run = () => {
+    // Cada hoja debe caber en UNA página (A4 o Carta): si el contenido es más alto, se reduce.
+    const mm = 96 / 25.4;
+    const maxH = 277 * mm; // alto útil seguro para Carta (279mm) y A4 (297mm)
+    doc.querySelectorAll<HTMLElement>('.m-page, .page').forEach((p, i, all) => {
+      p.style.minHeight = '0';
+      const h = p.scrollHeight;
+      if (h > maxH) (p.style as CSSStyleDeclaration & { zoom: string }).zoom = String(maxH / h);
+      p.style.breakAfter = i < all.length - 1 ? 'page' : 'auto';
+      p.style.breakInside = 'avoid';
+    });
     iframe.contentWindow?.focus();
     iframe.contentWindow?.print();
     window.setTimeout(() => {
