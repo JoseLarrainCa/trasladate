@@ -483,8 +483,8 @@
 .m-photo-card::after {
   content: "";
   position: absolute;
-  inset: 45% 0 0;
-  background: linear-gradient(to bottom, transparent, rgb(21 36 71 / .82));
+  inset: 50% 0 0;
+  background: linear-gradient(to bottom, transparent, rgb(122 54 18 / .26) 42%, rgb(56 26 11 / .58));
 }
 .m-photo-card figcaption {
   position: absolute;
