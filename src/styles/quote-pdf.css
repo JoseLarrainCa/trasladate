@@ -483,8 +483,9 @@
 .m-photo-card::after {
   content: "";
   position: absolute;
-  inset: 50% 0 0;
-  background: linear-gradient(to bottom, transparent, rgb(176 76 22 / .34) 40%, rgb(80 35 12 / .60));
+  inset: auto 0 0;
+  height: 32%;
+  background: linear-gradient(to bottom, rgba(243, 106, 33, 0), rgba(243, 106, 33, 0.5) 55%, rgba(200, 80, 20, 0.7));
 }
 .m-photo-card figcaption {
   position: absolute;
@@ -498,7 +499,7 @@
   color: var(--photo-paper);
 }
 .m-photo-number {
-  color: var(--photo-accent);
+  color: var(--photo-paper);
   font-family: Sora, Montserrat, system-ui, sans-serif;
   font-size: 7pt;
   font-weight: 800;
