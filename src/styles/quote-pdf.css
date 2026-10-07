@@ -499,7 +499,7 @@
   color: var(--photo-paper);
 }
 .m-photo-number {
-  color: var(--photo-accent);
+  color: var(--photo-paper);
   font-family: Sora, Montserrat, system-ui, sans-serif;
   font-size: 7pt;
   font-weight: 800;
