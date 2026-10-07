@@ -11,6 +11,7 @@ import {
 } from '@/lib/quote/document';
 import { formatCLP } from '@/lib/quote/pricing';
 import DocInventario from './DocInventario';
+import DocFotos from './DocFotos';
 import { MATERIALES_BODEGA, MATERIALES_DOMICILIO } from '@/lib/quote/defaults';
 
 const MATS = Array.from(new Set([...MATERIALES_DOMICILIO, ...MATERIALES_BODEGA]));
@@ -248,6 +249,7 @@ const DocModerno = ({ doc, cfg }: Props) => {
       </div>
 
       {ver('anexo_inventario') && <DocInventario doc={doc} variant="moderno" />}
+      {doc.con_galeria && <DocFotos doc={doc} marca={t('mod_marca')} tagline={t('mod_tagline')} />}
     </>
   );
 };
