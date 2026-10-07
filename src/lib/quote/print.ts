@@ -28,7 +28,16 @@ html,body{margin:0;padding:0;background:#fff;}
 </style></head><body>${node.outerHTML}</body></html>`);
   doc.close();
 
-  const run = () => {
+  const run = async () => {
+    // Las fotografías deben estar listas antes de medir las hojas o abrir la impresión.
+    await Promise.all(Array.from(doc.images).map((image) => {
+      if (image.complete) return Promise.resolve();
+      return new Promise<void>((resolve) => {
+        image.addEventListener('load', () => resolve(), { once: true });
+        image.addEventListener('error', () => resolve(), { once: true });
+      });
+    }));
+    await doc.fonts.ready;
     // Cada hoja debe caber en UNA página (A4 o Carta): si el contenido es más alto, se reduce.
     const mm = 96 / 25.4;
     const maxH = 277 * mm; // alto útil seguro para Carta (279mm) y A4 (297mm)

@@ -404,6 +404,27 @@
 .anx-moderno { page-break-before: always; }
 .page .anx-box { min-height: 0; }
 
+/* Hoja fotográfica del formato moderno: dimensiones estables para impresión. */
+.m-photo-page {
+  --photo-ink: #16233c;
+  --photo-muted: #5a6472;
+  --photo-accent: #e8621d;
+  --photo-surface: #f6f8fb;
+  --photo-border: #dbe2ea;
+  break-before: page;
+}
+.m-photo-heading { margin: 6mm 0 7mm; }
+.m-photo-eyebrow { color: var(--photo-accent); font-size: 7pt; font-weight: 800; }
+.m-photo-heading h2 { margin: 1.5mm 0 0; font-size: 23pt; line-height: 1.2; color: var(--photo-ink); }
+.m-photo-section { margin-bottom: 7mm; break-inside: avoid; }
+.m-photo-section h3 { display: flex; align-items: center; gap: 3mm; margin: 0 0 3mm; font-size: 12pt; font-weight: 700; color: var(--photo-ink); }
+.m-photo-section h3 span { color: var(--photo-accent); font-size: 9pt; }
+.m-photo-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3mm; }
+.m-photo-grid figure { margin: 0; min-width: 0; }
+.m-photo-grid img { display: block; width: 100%; height: 73mm; object-fit: contain; background: var(--photo-surface); border-radius: 1mm; }
+.m-photo-grid figcaption { font-size: 8pt; color: var(--photo-muted); margin-top: 2mm; line-height: 1.35; }
+.m-photo-footer { border-top: 1px solid var(--photo-border); padding-top: 3mm; font-size: 8pt; color: var(--photo-muted); }
+
 /* Edición directa en la vista previa (solo pantalla) */
 @media screen {
   .doc-editable [data-edit] { cursor: pointer; transition: outline-color .15s; outline: 1.5px dashed transparent; outline-offset: 2px; }
