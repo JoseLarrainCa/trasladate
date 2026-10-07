@@ -538,6 +538,24 @@
 
 /* Edición directa en la vista previa (solo pantalla) */
 @media screen {
+  .doc-paginated-preview > .page,
+  .doc-paginated-preview > .m-page {
+    position: relative;
+    overflow: visible;
+    margin-top: 10mm;
+    margin-bottom: 10mm;
+    outline: 1px solid hsl(var(--border));
+    box-shadow: 0 2px 8px hsl(var(--foreground) / .12);
+  }
+  .doc-paginated-preview > [data-preview-page]::before {
+    content: attr(data-preview-page);
+    position: absolute;
+    top: -7mm;
+    left: 0;
+    color: hsl(var(--muted-foreground));
+    font: 600 10pt system-ui, sans-serif;
+    letter-spacing: 0;
+  }
   .doc-editable [data-edit] { cursor: pointer; transition: outline-color .15s; outline: 1.5px dashed transparent; outline-offset: 2px; }
   .doc-editable [data-edit]:hover { outline-color: hsl(var(--primary)); }
 }
