@@ -149,9 +149,19 @@ const GenerarCotizacion = () => {
   });
   const [nuevoItem, setNuevoItem] = useState('');
   const [zoom, setZoom] = useState(0.62);
+  const [previewPages, setPreviewPages] = useState(0);
   const [paso, setPaso] = useState('general');
   const [editando, setEditando] = useState<{ seccion: string; keys: string[]; titulo: string } | null>(null);
   const [servicios, setServicios] = useState<ServicioDetalles>(DEFAULT_SERVICIO_DETALLES);
+
+  useEffect(() => {
+    const pages = docRef.current?.querySelectorAll<HTMLElement>('.m-page, .page');
+    if (!pages) return;
+    setPreviewPages(pages.length);
+    pages.forEach((page, index) => {
+      page.dataset.previewPage = `Página ${index + 1} de ${pages.length}`;
+    });
+  }, [doc, cfg, loading]);
 
   // Textos de servicio (editables en Configuración → Servicios web).
   useEffect(() => {
@@ -967,7 +977,7 @@ const GenerarCotizacion = () => {
           {/* ------------------------------- Vista previa ------------------------------- */}
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>Vista previa</span>
+              <span>Vista previa · {previewPages} {previewPages === 1 ? 'página' : 'páginas'}</span>
               <input
                 type="range" min={40} max={100} value={zoom * 100}
                 onChange={(e) => setZoom(Number(e.target.value) / 100)}
@@ -980,7 +990,7 @@ const GenerarCotizacion = () => {
                 <div
                   id="doc"
                   ref={docRef}
-                  className="doc-editable"
+                  className="doc-editable doc-paginated-preview"
                   onClick={onPreviewClick}
                   style={{ zoom, width: '210mm' }}
                 >
