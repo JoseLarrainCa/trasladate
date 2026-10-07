@@ -484,7 +484,7 @@
   content: "";
   position: absolute;
   inset: 50% 0 0;
-  background: linear-gradient(to bottom, transparent, rgb(122 54 18 / .26) 42%, rgb(56 26 11 / .58));
+  background: linear-gradient(to bottom, transparent, rgb(176 76 22 / .34) 40%, rgb(80 35 12 / .60));
 }
 .m-photo-card figcaption {
   position: absolute;
