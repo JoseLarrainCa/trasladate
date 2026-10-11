@@ -406,3 +406,18 @@ describe("video de la galería en iPhone", () => {
     expect(entero.status).toBe(200);
   });
 });
+
+describe("clave heredada de Supabase (bcrypt)", () => {
+  it("entra con la clave de siempre y queda pasada a PBKDF2; una clave mala no entra", async () => {
+    const bcrypt = (await import("bcryptjs")).default;
+    await m.env.DB.prepare("INSERT INTO users (id, email, password_hash, role) VALUES ('u-marco', 'marco@trasladarte.test', ?, 'admin')")
+      .bind(bcrypt.hashSync("clave-de-supabase", 10))
+      .run();
+    expect((await m.llamar("/api/auth/login", { cuerpo: { email: "marco@trasladarte.test", password: "otra-clave" } })).status).toBe(401);
+    const r = await m.llamar("/api/auth/login", { cuerpo: { email: "marco@trasladarte.test", password: "clave-de-supabase" } });
+    expect(r.status).toBe(200);
+    const fila = await m.env.DB.prepare("SELECT password_hash FROM users WHERE id = 'u-marco'").first<{ password_hash: string }>();
+    expect(fila!.password_hash.startsWith("pbkdf2$")).toBe(true);
+    expect((await m.llamar("/api/auth/login", { cuerpo: { email: "marco@trasladarte.test", password: "clave-de-supabase" } })).status).toBe(200);
+  });
+});

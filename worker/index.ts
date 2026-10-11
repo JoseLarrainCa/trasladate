@@ -14,7 +14,7 @@
 
 import { Hono } from "hono";
 import type { Context } from "hono";
-import { gastarTiempoDeVerificacion, hashearClave, verificarClave } from "./clave";
+import { esClaveHeredada, gastarTiempoDeVerificacion, hashearClave, verificarClave } from "./clave";
 import { crearCotizacion } from "./cotizacion";
 import { ErrorConsulta, PeticionSchema, ejecutar } from "./consulta";
 import { respuestaCanonica } from "../src/lib/host-canonico";
@@ -174,6 +174,12 @@ app.post("/api/auth/login", async (c) => {
   }
 
   await c.env.DB.prepare("DELETE FROM login_attempts WHERE email = ?").bind(email).run();
+  // La clave que venía de Supabase (bcrypt) se pasa a PBKDF2 ahora que la tenemos en la mano.
+  if (esClaveHeredada(usuario.password_hash)) {
+    await c.env.DB.prepare("UPDATE users SET password_hash = ? WHERE id = ?")
+      .bind(await hashearClave(password), usuario.id)
+      .run();
+  }
   const token = await crearToken(c.env.SESSION_SECRET, usuario.id);
   c.header("Set-Cookie", cookieSesion(token));
   return c.json({ user: { id: usuario.id, email: usuario.email, role: usuario.role } });

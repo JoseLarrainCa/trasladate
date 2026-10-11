@@ -2,12 +2,18 @@
 //
 // PBKDF2-SHA256 con sal propia, guardada como `pbkdf2$<vueltas>$<sal>$<hash>`.
 //
+// También acepta las claves que venían de Supabase Auth (bcrypt, `$2a$10$...`): así Marco
+// entra con la misma clave de siempre después de la migración. Al primer login bueno, el
+// Worker la reemplaza por una PBKDF2 (ver `esClaveHeredada` en worker/index.ts).
+//
 // 🔴 100.000 vueltas es el TECHO del runtime de Workers: por encima, el login
 // responde 500 (NotSupportedError). Node no tiene ese tope, así que un script de
 // alta que hasheara con más vueltas guardaría la clave sin quejarse y recién
 // fallaría en producción. Por eso este módulo es el ÚNICO lugar donde viven las
 // vueltas, y el script scripts/crear-usuario.mts importa `hashearClave` de acá en
 // vez de tener su propia copia (y un test fija el número).
+
+import bcrypt from "bcryptjs";
 
 export const VUELTAS = 100_000;
 
@@ -47,7 +53,13 @@ export async function hashearClave(clave: string): Promise<string> {
   return `pbkdf2$${VUELTAS}$${aHex(sal)}$${aHex(hash)}`;
 }
 
+/** Una clave que vino de Supabase (bcrypt). Se reemplaza por PBKDF2 al primer login bueno. */
+export function esClaveHeredada(guardada: string): boolean {
+  return /^\$2[aby]\$\d{2}\$/.test(guardada);
+}
+
 export async function verificarClave(clave: string, guardada: string): Promise<boolean> {
+  if (esClaveHeredada(guardada)) return bcrypt.compare(clave, guardada);
   const partes = guardada.split("$");
   if (partes.length !== 4 || partes[0] !== "pbkdf2") return false;
   const vueltas = Number(partes[1]);

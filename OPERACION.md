@@ -11,18 +11,20 @@ Repo `JoseLarrainCa/trasladate` (cuenta personal de José), disco `~/dev/traslad
 - Probado en vivo sobre workers.dev: portada, cotizador público (guarda en D1 + leads-flota + aviso
   `delivered` en Resend), login, dashboard, formularios, detalle (estado y notas), cotización PDF
   (guardar sube el folio), configuración (perfil, tarifas, contraseña) y video con 206.
-- Hay UNA cotización de prueba ("Prueba Omnis QA Migracion") y un PDF folio 3286 de prueba en la D1.
-  Se borran al importar los datos reales.
+- **Datos reales cargados el 2026-10-11** desde el respaldo de Supabase
+  (`Downloads/moving-magic-maker_261011.backup`, pg_dump custom con zstd): 51 cotizaciones, 627 ítems
+  (1.565 unidades, cuadra con el original), 3 PDF, ajustes (próximo folio 3316) y textos de servicios.
+  La cotización de prueba se borró. Se leyó sin pg_restore con un lector propio (`leer-dump.cjs` en el
+  scratchpad de esa sesión) porque Docker no levantaba.
+- **Marco entra con `marco@gmail.com` y SU MISMA clave de Lovable**: el Worker acepta la clave bcrypt
+  de Supabase y la pasa a PBKDF2 en su primer login (probado con prueba, sin verificar en vivo: no
+  sabemos su clave). `admin@trasladate.cl` no se migró: no tenía rol admin.
 
 ## Falta, en orden
 
-1. **Datos reales.** José pide a Lovable el export en Excel de las 7 tablas (`quotes`, `quote_items`,
-   `quote_documents`, `quote_settings`, `web_service_texts`, `profiles`, `user_roles`) con el conteo
-   por tabla. Se cargan por partes (un archivo grande da `D1_RESET_DO`) conservando los ids.
-   Hasta entonces el panel nuevo está vacío y Marco sigue en el de Lovable.
-2. **Usuario de Marco.** Las claves de Supabase no se migran:
-   `CLAVE_USUARIO='…' npx vite-node scripts/crear-usuario.mts -- <correo> --remote`.
-   Hoy solo entra `jose@try-omnis.cl`.
+1. **Ponerse al día justo antes del cambio de dominio.** Lovable sigue recibiendo cotizaciones hasta
+   que el dominio se mueva: pedir un respaldo nuevo ese día y cargar solo lo que no esté (por id).
+2. **Que Marco pruebe su login** en la copia antes del cambio.
 3. **Aviso por correo.** El cotizador avisa por Resend a `jose@try-omnis.cl` (secret `MAIL_TO` para
    sumar la casilla de Marco) y además sigue mandando por **Formspree** (`mkoygbva`), que es lo que
    le llega hoy a Marco. No se sabe a qué casilla entrega Formspree: confirmarlo antes de apagarlo.
