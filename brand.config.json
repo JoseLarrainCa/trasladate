@@ -1,0 +1,46 @@
+{
+  "marcaVersion": "1.0.0",
+  "nombre": "Trasladarte",
+  "descripcion": "Mudanzas de hogar, oficinas y traslados especiales en Santiago, con embalaje y cobertura de Arica a Punta Arenas. Cotiza tu mudanza en línea.",
+  "dominioCanonico": "https://trasladarte.com",
+  "urlRespaldo": "https://trasladarte.omnis-apps.workers.dev",
+  "redirigirHosts": [
+    "www.trasladarte.com",
+    "trasladarte.cl",
+    "www.trasladarte.cl"
+  ],
+  "logoPath": "public/logo.png",
+  "colorMarca": "#F2690D",
+  "rutasPublicas": [
+    "/"
+  ],
+  "tagline": "La gran aventura de mudarte",
+  "rubro": "Mudanzas",
+  "ciudad": "Santiago",
+  "locale": "es-CL",
+  "logoIncluyeNombre": true,
+  "icono": {
+    "recorte": [
+      433,
+      31,
+      120,
+      120
+    ],
+    "margen": 0.08,
+    "fondo": "#FFFFFF"
+  },
+  "negocio": {
+    "ciudad": "Santiago",
+    "region": "Región Metropolitana",
+    "pais": "CL",
+    "telefono": "+56 9 9004 0399",
+    "whatsapp": "+56 9 9004 0399"
+  },
+  "rutasExcluidas": [
+    "/admin",
+    "/login"
+  ],
+  "omitir": [],
+  "ogLogoAlto": 0.55,
+  "colorFondoOg": "#FFFFFF"
+}

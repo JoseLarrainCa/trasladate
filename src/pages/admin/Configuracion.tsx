@@ -7,11 +7,11 @@ import { Label } from '@/components/ui/label';
 import AdminLayout from '@/components/admin/AdminLayout';
 import QuoteSettingsPanel from '@/components/admin/QuoteSettingsPanel';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { db } from '@/integrations/db';
 import { useToast } from '@/hooks/use-toast';
 
 const Configuracion = () => {
-  const { user, profile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
   const { toast } = useToast();
 
   const [fullName, setFullName] = useState(profile?.full_name || '');
@@ -25,10 +25,8 @@ const Configuracion = () => {
     if (!user) return;
 
     setIsSavingProfile(true);
-    const { error } = await (supabase as any)
-      .from('profiles')
-      .update({ full_name: fullName })
-      .eq('id', user.id);
+    const { error } = await db.from('profiles').update({ full_name: fullName }).eq('id', user.id);
+    if (!error) await refreshProfile();
 
     if (error) {
       toast({
@@ -65,9 +63,14 @@ const Configuracion = () => {
     }
 
     setIsSavingPassword(true);
-    const { error } = await supabase.auth.updateUser({
-      password: newPassword,
-    });
+    const res = await fetch('/api/auth/clave', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ actual: currentPassword, nueva: newPassword }),
+    }).catch(() => null);
+    const cuerpo = res ? await res.json().catch(() => null) : null;
+    const error = res?.ok ? null : { message: (cuerpo?.error as string) ?? 'No se pudo cambiar la contraseña' };
 
     if (error) {
       toast({
@@ -164,6 +167,18 @@ const Configuracion = () => {
 
           <div className="space-y-4">
             <div>
+              <Label htmlFor="currentPassword">Contraseña actual</Label>
+              <Input
+                id="currentPassword"
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="••••••••"
+                className="mt-1"
+              />
+            </div>
+
+            <div>
               <Label htmlFor="newPassword">Nueva contraseña</Label>
               <Input
                 id="newPassword"
@@ -189,7 +204,7 @@ const Configuracion = () => {
 
             <Button
               onClick={handleUpdatePassword}
-              disabled={isSavingPassword || !newPassword}
+              disabled={isSavingPassword || !newPassword || !currentPassword}
               variant="outline"
               className="gap-2"
             >

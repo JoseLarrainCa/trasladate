@@ -35,13 +35,7 @@ const Login = () => {
     const { error } = await signIn(email.trim(), password);
     
     if (error) {
-      // Mostrar el mensaje real de Supabase para depurar (400 puede ser credenciales, URL/key, o formato)
-      const message =
-        error.message ||
-        (error.status === 400
-          ? 'Revisa email/contraseña y que las variables VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY estén correctas.'
-          : 'Email o contraseña incorrectos.');
-      console.error('[Login] Supabase error:', { status: (error as { status?: number }).status, message: error.message });
+      const message = error.message || 'Correo o contraseña incorrectos.';
       toast({
         title: 'Error de autenticación',
         description: message,

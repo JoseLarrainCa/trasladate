@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { enviarLead } from '@/lib/aviso-lead';
 
 const mudanzaHogarPlans = [
   {
@@ -241,6 +242,18 @@ const OfficeExpandable = () => {
       return;
     }
     setSending(true);
+    // Se guarda y avisa por correo ANTES de abrir WhatsApp: la persona puede no mandar el mensaje.
+    void enviarLead(
+      {
+        nombre: form.nombre,
+        telefono: form.celular,
+        correo: form.correo,
+        servicio: 'Mudanza de oficina',
+        direccion: form.direccion,
+        mensaje: form.mensaje,
+      },
+      'Consulta mudanza de oficina (WhatsApp)',
+    );
     const msg = encodeURIComponent(
       `*Consulta Mudanza de Oficina*\n\nNombre: ${form.nombre}\nCelular: ${form.celular}\nCorreo: ${form.correo}\nDirección: ${form.direccion}\nMensaje: ${form.mensaje}`
     );

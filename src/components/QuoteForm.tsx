@@ -29,7 +29,6 @@ import {
 } from '@/components/ui/select';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { sendToFormspree } from '@/lib/formspree';
 import { INVENTORY_CATEGORIES, VIVIENDA_OPTIONS, MUDANZA_OPTIONS } from '@/lib/constants';
 import { calculateTotalM3, m3ToM2, getInventoryItem } from '@/lib/constants/inventory';
@@ -133,13 +132,12 @@ const QuoteForm = () => {
 
   // Carga los textos de servicio editados desde el panel de administración.
   useEffect(() => {
-    (supabase as any)
-      .from('web_service_texts')
-      .select('servicios')
-      .maybeSingle()
-      .then(({ data }: any) => {
+    fetch('/api/servicios')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
         if (data?.servicios) setServicioDetalles(mergeServicioDetalles(data.servicios));
-      });
+      })
+      .catch(() => {});
   }, []);
 
   const updateField = (field: keyof FormData, value: string | boolean) => {
@@ -160,12 +158,16 @@ const QuoteForm = () => {
     const required = [
       formData.clienteNombre,
       formData.telefono,
+      formData.email,
       formData.origenDireccion,
       formData.origenComuna,
       formData.destinoDireccion,
       formData.destinoComuna,
     ];
-    return required.every((field) => field.trim() !== '');
+    return (
+      required.every((field) => field.trim() !== '') &&
+      /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(formData.email.trim())
+    );
   };
 
   const nextStep = () => {
@@ -216,9 +218,8 @@ const QuoteForm = () => {
 
       const allItems = [...inventoryItems, ...customInventoryItems];
 
-      // Try to save to database (optional — don't block if it fails)
-      try {
-        const quoteData: QuoteInsert = {
+      // Se guarda junto con el aviso por correo, más abajo, una vez armado el resumen.
+      const quoteData: QuoteInsert = {
           id: quoteId,
           cliente_nombre: formData.clienteNombre,
           cliente_apellido: formData.clienteApellido || null,
@@ -247,27 +248,6 @@ const QuoteForm = () => {
             .filter(Boolean)
             .join(' | ') || null,
         };
-
-        const { error: quoteError } = await (supabase as any)
-          .from('quotes')
-          .insert(quoteData);
-
-        if (!quoteError) {
-          savedInDatabase = true;
-        }
-
-        if (!quoteError && allItems.length > 0) {
-          const { error: itemsError } = await (supabase as any).from('quote_items').insert(allItems);
-          if (itemsError) {
-            console.warn('Quote items save skipped:', itemsError.message);
-          }
-        }
-        if (quoteError) {
-          console.warn('DB save skipped:', quoteError.message);
-        }
-      } catch (dbErr) {
-        console.warn('DB save failed, continuing with email notification:', dbErr);
-      }
 
       // Build inventory grouped by category, in the canonical order of INVENTORY_CATEGORIES,
       // showing only quantities (no m³), to match the legacy email format the admin team prefers.
@@ -348,6 +328,30 @@ Cantidad de cajas: ${totalCajas}
 
 ${inventarioFormateado}`;
 
+      // Guarda la cotización en el panel (y deja el respaldo y el aviso de la flota).
+      let savedId: string | null = null;
+      try {
+        const { id: _id, ...quoteSinId } = quoteData;
+        const res = await fetch('/api/cotizacion', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            quote: quoteSinId,
+            items: allItems.map(({ quote_id: _q, ...it }) => it),
+            resumen: mensajeLegacy,
+          }),
+        });
+        const cuerpo = await res.json().catch(() => null);
+        if (res.ok && cuerpo?.ok) {
+          savedInDatabase = true;
+          savedId = cuerpo.id ?? null;
+        } else {
+          console.warn('No se guardó en el panel:', cuerpo?.motivo ?? res.status);
+        }
+      } catch (dbErr) {
+        console.warn('No se guardó en el panel, sigue el aviso por correo:', dbErr);
+      }
+
       const emailOk = await sendToFormspree({
         _subject: `COTIZACION DE CLIENTE - PAGINA WEB`,
         message: mensajeLegacy,
@@ -361,7 +365,7 @@ ${inventarioFormateado}`;
         console.warn('Formspree notification failed, but quote was saved in the database');
       }
 
-      setSubmittedId(quoteId);
+      setSubmittedId(savedId ?? quoteId);
       setIsSubmitted(true);
     } catch (error) {
       console.error('Error submitting quote:', error);
@@ -555,7 +559,7 @@ ${inventarioFormateado}`;
                         />
                       </div>
                       <div className="md:col-span-2">
-                        <Label htmlFor="email">Correo electrónico</Label>
+                        <Label htmlFor="email">Correo electrónico *</Label>
                         <Input
                           id="email"
                           type="email"

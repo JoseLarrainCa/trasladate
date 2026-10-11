@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { sendToFormspree } from '@/lib/formspree';
+import { enviarLead } from '@/lib/aviso-lead';
 
 const WhatsAppContactForm = () => {
   const { toast } = useToast();
@@ -24,27 +25,34 @@ const WhatsAppContactForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!data.nombre.trim() || !data.email.trim() || !data.mensaje.trim()) {
+    if (!data.nombre.trim() || !data.email.trim() || !data.telefono.trim() || !data.mensaje.trim()) {
       toast({
         title: 'Campos requeridos',
-        description: 'Completa nombre, correo y mensaje.',
+        description: 'Completa nombre, correo, teléfono y mensaje.',
         variant: 'destructive',
       });
       return;
     }
 
     setIsSubmitting(true);
-    const ok = await sendToFormspree({
+    // Se guarda en la base de leads y avisa por correo; Formspree sigue avisándole a Trasladarte.
+    const [guardado, ok] = await Promise.all([
+      enviarLead(
+        { nombre: data.nombre, correo: data.email, telefono: data.telefono, mensaje: data.mensaje },
+        'Consulta rápida (sección WhatsApp)',
+      ),
+      sendToFormspree({
       _subject: `Nuevo contacto desde la web — ${data.nombre}`,
       tipo: 'Consulta rápida (sección WhatsApp)',
       nombre: data.nombre,
       email: data.email,
       telefono: data.telefono,
       mensaje: data.mensaje,
-    });
+      }),
+    ]);
     setIsSubmitting(false);
 
-    if (ok) {
+    if (ok || guardado) {
       setIsSent(true);
       toast({
         title: '¡Mensaje enviado!',
@@ -93,7 +101,7 @@ const WhatsAppContactForm = () => {
           />
         </div>
         <div>
-          <Label htmlFor="wa-telefono">Teléfono</Label>
+          <Label htmlFor="wa-telefono">Teléfono *</Label>
           <Input
             id="wa-telefono"
             type="tel"

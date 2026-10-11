@@ -1,122 +1,108 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User, Session, AuthError } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+// Sesión del panel. Antes era Supabase Auth; ahora es la cookie que pone el Worker
+// (POST /api/auth/login) y que el navegador manda sola en cada consulta. Las pantallas
+// siguen usando `user`, `profile`, `signIn` y `signOut` con la misma forma de antes.
+import { createContext, useCallback, useContext, useEffect, useRef, useState, ReactNode } from 'react';
+import { db, EVENTO_SESION_VENCIDA } from '@/integrations/db';
 import type { Profile } from '@/types/database';
 
+export interface Usuario {
+  id: string;
+  email: string;
+  role: string;
+}
+
+interface ErrorEntrada {
+  message: string;
+  status?: number;
+}
+
 interface AuthContextType {
-  user: User | null;
+  user: Usuario | null;
   profile: Profile | null;
-  session: Session | null;
   isLoading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: ErrorEntrada | null }>;
   signOut: () => Promise<void>;
+  /** Vuelve a leer el perfil (después de cambiar el nombre en Configuración). */
+  refreshProfile: () => Promise<void>;
+  /** Consulta la sesión al servidor (una sola vez). La llaman las rutas del panel. */
+  verificarSesion: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+async function leerPerfil(userId: string): Promise<Profile | null> {
+  const { data, error } = await db.from('profiles').select('*').eq('id', userId).maybeSingle();
+  if (error) {
+    console.error('Error al leer el perfil:', error);
+    return null;
+  }
+  return data;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<Usuario | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const revisada = useRef(false);
 
-  // Fetch user profile
-  const fetchProfile = async (userId: string) => {
-    const { data, error } = await (supabase as any)
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-
-    if (error) {
-      console.error('Error fetching profile:', error);
-      return null;
-    }
-
-    return data;
-  };
-
-  useEffect(() => {
-    let mounted = true;
-
-    // Listen for auth changes FIRST (sync callback — never await inside)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        if (!mounted) return;
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          fetchProfile(session.user.id).then((p) => mounted && setProfile(p));
-        } else {
-          setProfile(null);
-        }
-        setIsLoading(false);
-      }
-    );
-
-    // Then get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!mounted) return;
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id).then((p) => mounted && setProfile(p));
-      }
-      setIsLoading(false);
-    });
-
-    // Safety net: never stay loading more than 5s
-    const timeout = setTimeout(() => mounted && setIsLoading(false), 5000);
-
-    return () => {
-      mounted = false;
-      clearTimeout(timeout);
-      subscription.unsubscribe();
-    };
+  // La página pública no consulta la sesión: solo las rutas del panel la piden.
+  const verificarSesion = useCallback(() => {
+    if (revisada.current) return;
+    revisada.current = true;
+    fetch('/api/auth/me', { credentials: 'same-origin' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        const u: Usuario | null = d?.user ?? null;
+        setUser(u);
+        if (u) leerPerfil(u.id).then(setProfile);
+      })
+      .catch(() => setUser(null))
+      .finally(() => setIsLoading(false));
   }, []);
 
-  const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (!error && data?.session) {
-      setSession(data.session);
-      setUser(data.user);
-      setIsLoading(false);
-      fetchProfile(data.user.id).then(setProfile);
-    }
-    return { error };
-  };
-
-  const signOut = async () => {
-    try {
-      await supabase.auth.signOut({ scope: 'local' });
-    } catch (error) {
-      console.error('Error signing out:', error);
-    } finally {
-      try {
-        Object.keys(localStorage)
-          .filter((k) => k.startsWith('sb-') && k.endsWith('-auth-token'))
-          .forEach((k) => localStorage.removeItem(k));
-      } catch {}
+  // Si el servidor deja de reconocer la cookie en medio de una consulta, se vuelve al login.
+  useEffect(() => {
+    const alVencer = () => {
       setUser(null);
       setProfile(null);
-      setSession(null);
+    };
+    window.addEventListener(EVENTO_SESION_VENCIDA, alVencer);
+    return () => window.removeEventListener(EVENTO_SESION_VENCIDA, alVencer);
+  }, []);
+
+  const signIn = useCallback(async (email: string, password: string) => {
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const cuerpo = await res.json().catch(() => null);
+      if (!res.ok) {
+        return { error: { message: (cuerpo?.error as string) ?? 'No se pudo entrar', status: res.status } };
+      }
+      setUser(cuerpo.user);
+      setIsLoading(false);
+      leerPerfil(cuerpo.user.id).then(setProfile);
+      return { error: null };
+    } catch {
+      return { error: { message: 'No se pudo conectar. Revisa tu internet.' } };
     }
-  };
+  }, []);
+
+  const signOut = useCallback(async () => {
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' }).catch(() => {});
+    setUser(null);
+    setProfile(null);
+  }, []);
+
+  const refreshProfile = useCallback(async () => {
+    if (user) setProfile(await leerPerfil(user.id));
+  }, [user]);
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        profile,
-        session,
-        isLoading,
-        signIn,
-        signOut,
-      }}
-    >
+    <AuthContext.Provider value={{ user, profile, isLoading, signIn, signOut, refreshProfile, verificarSesion }}>
       {children}
     </AuthContext.Provider>
   );

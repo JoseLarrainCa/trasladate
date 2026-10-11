@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { supabase } from '@/integrations/supabase/client';
+import { db } from '@/integrations/db';
 import type { Quote, QuoteStatus } from '@/types/database';
 
 const statusConfig: Record<QuoteStatus, { label: string; color: string; icon: React.ElementType }> = {
@@ -47,18 +47,9 @@ const Formularios = () => {
   useEffect(() => {
     fetchQuotes();
 
-    const channel = supabase
-      .channel('formularios-quotes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'quotes' },
-        () => fetchQuotes()
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    // Antes llegaba en tiempo real desde Supabase; ahora se vuelve a leer cada 30 segundos.
+    const intervalo = window.setInterval(() => fetchQuotes(), 30_000);
+    return () => window.clearInterval(intervalo);
   }, []);
 
   useEffect(() => {
@@ -66,7 +57,7 @@ const Formularios = () => {
   }, [quotes, searchTerm, statusFilter, typeFilter]);
 
   const fetchQuotes = async () => {
-    const { data, error } = await (supabase as any)
+    const { data, error } = await db
       .from('quotes')
       .select('*')
       .order('created_at', { ascending: false });

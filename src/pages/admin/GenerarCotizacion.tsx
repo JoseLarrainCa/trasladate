@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { supabase } from '@/integrations/supabase/client';
+import { db } from '@/integrations/db';
 import { useToast } from '@/hooks/use-toast';
 import { ALL_INVENTORY_ITEMS, getInventoryItem } from '@/lib/constants/inventory';
 import {
@@ -165,7 +165,7 @@ const GenerarCotizacion = () => {
 
   // Textos de servicio (editables en Configuración → Servicios web).
   useEffect(() => {
-    (supabase as any)
+    db
       .from('web_service_texts')
       .select('servicios')
       .maybeSingle()
@@ -210,7 +210,7 @@ const GenerarCotizacion = () => {
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      const sb = supabase as any;
+      const sb = db;
 
       const [{ data: settings }, existing] = await Promise.all([
         sb.from('quote_settings').select('*').maybeSingle(),
@@ -377,7 +377,7 @@ const GenerarCotizacion = () => {
   /* --------------------------------- guardar -------------------------------- */
   const guardar = async () => {
     setSaving(true);
-    const sb = supabase as any;
+    const sb = db;
     const payload = {
       quote_id: doc.quote_id ?? id ?? null,
       folio: doc.folio,

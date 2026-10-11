@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { supabase } from '@/integrations/supabase/client';
+import { db } from '@/integrations/db';
 import { useToast } from '@/hooks/use-toast';
 import {
   DEFAULT_EMPRESA,
@@ -53,7 +53,7 @@ const QuoteSettingsPanel = () => {
 
   useEffect(() => {
     const load = async () => {
-      const sb = supabase as any;
+      const sb = db;
       const [{ data }, { data: sv }] = await Promise.all([
         sb.from('quote_settings').select('*').maybeSingle(),
         sb.from('web_service_texts').select('*').maybeSingle(),
@@ -86,7 +86,7 @@ const QuoteSettingsPanel = () => {
 
   const guardar = async () => {
     setSaving(true);
-    const sb = supabase as any;
+    const sb = db;
     const payload = { tarifas, empresa, textos, siguiente_folio: folio, updated_at: new Date().toISOString() };
     const { error } = rowId
       ? await sb.from('quote_settings').update(payload).eq('id', rowId)

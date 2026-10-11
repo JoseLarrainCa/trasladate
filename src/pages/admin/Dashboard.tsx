@@ -23,7 +23,7 @@ import {
   Cell,
 } from 'recharts';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { supabase } from '@/integrations/supabase/client';
+import { db } from '@/integrations/db';
 import type { Quote, QuoteItem } from '@/types/database';
 import { getInventoryItem, m3ToM2 } from '@/lib/constants/inventory';
 
@@ -65,30 +65,15 @@ const Dashboard = () => {
   useEffect(() => {
     fetchAll();
 
-    // Realtime: refresh on any change to quotes or quote_items
-    const channel = supabase
-      .channel('dashboard-quotes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'quotes' },
-        () => fetchAll()
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'quote_items' },
-        () => fetchAll()
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    // Antes llegaba en tiempo real desde Supabase; ahora se vuelve a leer cada 30 segundos.
+    const intervalo = window.setInterval(() => fetchAll(), 30_000);
+    return () => window.clearInterval(intervalo);
   }, []);
 
   const fetchAll = async () => {
     const [{ data: qData, error: qErr }, { data: iData, error: iErr }] = await Promise.all([
-      (supabase as any).from('quotes').select('*').order('created_at', { ascending: false }),
-      (supabase as any).from('quote_items').select('*'),
+      db.from('quotes').select('*').order('created_at', { ascending: false }),
+      db.from('quote_items').select('*'),
     ]);
 
     if (qErr) console.error('Error fetching quotes:', qErr);

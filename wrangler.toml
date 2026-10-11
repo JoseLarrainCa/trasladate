@@ -1,0 +1,37 @@
+# Cloudflare Workers — Trasladarte (página + panel de cotizaciones sobre D1)
+# Deploy:  npm run cf:deploy     (build de la SPA + wrangler deploy)
+# Cuenta Cloudflare "Omnis" (jose@try-omnis.cl) — la de la flota.
+# OJO: conviene prefijar  CLOUDFLARE_ACCOUNT_ID=4348d418d61283075685bc8bd4caeaae
+# o cae en otra cuenta y el deploy muere con "Authentication error [code: 10000]".
+
+name = "trasladarte"
+main = "worker/index.ts"
+compatibility_date = "2025-01-01"
+account_id = "4348d418d61283075685bc8bd4caeaae"
+
+# trasladarte.omnis-apps.workers.dev es el respaldo del cliente: se mantiene prendido.
+# Los dominios propios (trasladarte.com / .cl) se agregan acá como [[routes]] con
+# custom_domain = true SOLO cuando sus zonas estén en Cloudflare (ver OPERACION.md).
+workers_dev = true
+
+# Sirve la SPA compilada por Vite. Cualquier ruta que no sea un archivo devuelve
+# index.html para que React Router la resuelva en el navegador.
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+# El Worker corre ANTES del asset store: sin esto /api/* y el redirect del host
+# canónico nunca se ejecutan para la portada (medido en Railen, 2026-09-17).
+run_worker_first = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "trasladarte"
+database_id = "9b915837-4ac5-4f44-8a8d-79291333af77"
+
+# Base compartida de leads de toda la flota: los formularios guardan ahí ANTES de mandar el
+# correo, y el monitor de los lunes revisa que los correos hayan salido.
+[[d1_databases]]
+binding = "leads_flota"
+database_name = "leads-flota"
+database_id = "1ed01ff8-7de1-4b86-8784-3dd6657528ed"
