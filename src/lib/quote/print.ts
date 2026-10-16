@@ -23,6 +23,7 @@ export function imprimirDocumento(node: HTMLElement | null, titulo = 'Cotizacion
   doc.write(`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>${titulo}</title>
 <style>${pdfCss}
 html,body{margin:0;padding:0;background:#fff;}
+*,*::before,*::after{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color-adjust:exact !important;}
 #doc{transform:none !important;zoom:1 !important;width:210mm;margin:0;}
 .doc-scale-wrap{overflow:visible !important;height:auto !important;}
 </style></head><body>${node.outerHTML}</body></html>`);
