@@ -97,7 +97,7 @@ const emptyDoc = (folio: number): DocState => ({
   con_embalaje: true,
   armado_camas: true,
   sin_iva: true,
-  con_galeria: false,
+  con_galeria: true,
   cuota1: 50,
   cuota2: 50,
   recargo_escala: 0,
