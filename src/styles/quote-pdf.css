@@ -559,3 +559,9 @@
   .doc-editable [data-edit] { cursor: pointer; transition: outline-color .15s; outline: 1.5px dashed transparent; outline-offset: 2px; }
   .doc-editable [data-edit]:hover { outline-color: hsl(var(--primary)); }
 }
+
+/* Mantener al imprimir los mismos colores de fondo que en la vista previa. */
+#doc, #doc *, #doc *::before, #doc *::after {
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
