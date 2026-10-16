@@ -42,10 +42,20 @@ html,body{margin:0;padding:0;background:#fff;}
     // Cada hoja debe caber en UNA página (A4 o Carta): si el contenido es más alto, se reduce.
     const mm = 96 / 25.4;
     const maxH = 277 * mm; // alto útil seguro para Carta (279mm) y A4 (297mm)
+    const maxW = 210 * mm;
     doc.querySelectorAll<HTMLElement>('.m-page, .page').forEach((p, i, all) => {
+      const st = p.style as CSSStyleDeclaration & { zoom: string };
       p.style.minHeight = '0';
-      const h = p.scrollHeight;
-      if (h > maxH) (p.style as CSSStyleDeclaration & { zoom: string }).zoom = String(maxH / h);
+      let z = 1;
+      // Al reducir, se ensancha la hoja en proporción para que siga ocupando todo el ancho del papel.
+      for (let n = 0; n < 6; n++) {
+        p.style.width = `${maxW / z}px`;
+        const h = p.scrollHeight;
+        if (h * z <= maxH + 1) break;
+        z = Math.max(0.4, maxH / h);
+      }
+      if (z < 1) st.zoom = String(z);
+      else p.style.width = '';
       p.style.breakAfter = i < all.length - 1 ? 'page' : 'auto';
       p.style.breakInside = 'avoid';
     });
