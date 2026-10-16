@@ -142,6 +142,10 @@ export const TEXTO_DEFS: TextoDef[] = [
     default:
       'Ubicación de los muebles de tal manera que quede todo ordenado en {{tipoDestino}} destino ({{destinoComuna}}).',
   },
+  { key: 'accion_cocina', label: 'Acción — embalaje cocina', group: 'Acciones', default: 'Embalaje del servicio de cocina, en {{tipoOrigen}} origen ({{origenComuna}}).' },
+  { key: 'accion_adornos', label: 'Acción — embalaje adornos', group: 'Acciones', default: 'Embalaje de adornos, en {{tipoOrigen}} origen ({{origenComuna}}).' },
+  { key: 'accion_libros', label: 'Acción — embalaje libros', group: 'Acciones', default: 'Embalaje de libros, en {{tipoOrigen}} origen ({{origenComuna}}).' },
+  { key: 'accion_juguetes', label: 'Acción — embalaje juguetes', group: 'Acciones', default: 'Embalaje de juguetes, en {{tipoOrigen}} origen ({{origenComuna}}).' },
   {
     key: 'obs_a',
     label: 'Observación A',
@@ -372,6 +376,9 @@ export const ACCION_KEYS = [
  */
 export const ACCIONES_DOMICILIO = [...ACCION_KEYS];
 export const ACCIONES_BODEGA = ['accion_embalar', 'accion_cargar', 'accion_descargar', 'accion_ordenar'];
+
+/** Acciones opcionales que se marcan caso a caso (no vienen activadas). */
+export const ACCIONES_EXTRA = ['accion_cocina', 'accion_adornos', 'accion_libros', 'accion_juguetes'];
 
 export const TITULO_OPTIONS = [
   'TRASLADO + EMBALAJE',

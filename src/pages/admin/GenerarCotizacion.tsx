@@ -817,6 +817,29 @@ const GenerarCotizacion = () => {
                   ))}
                 </div>
 
+                <div className="space-y-2 rounded-lg border border-border p-3">
+                  <Label className="text-sm font-semibold">Acciones extra («Lo que haremos»)</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {ACCIONES_EXTRA.map((k) => (
+                      <label key={k} className="flex items-center gap-2 text-sm">
+                        <Checkbox checked={doc.acciones.includes(k)} onCheckedChange={() => toggleList('acciones', k)} />
+                        {(cfg.textosDefault[k] || '').replace(/,? en \{\{.*$/, '')}
+                      </label>
+                    ))}
+                  </div>
+                  {doc.acciones.filter((k) => k.startsWith('accion_custom_')).map((k) => (
+                    <div key={k} className="flex items-center gap-2">
+                      <Input value={doc.textos[k] ?? ''} onChange={(e) => setTexto(k, e.target.value)} />
+                      <Button type="button" variant="ghost" size="sm" onClick={() => toggleList('acciones', k)}>Quitar</Button>
+                    </div>
+                  ))}
+                  <Button type="button" variant="outline" size="sm" onClick={() => {
+                    const k = `accion_custom_${Date.now()}`;
+                    setTexto(k, '');
+                    toggleList('acciones', k);
+                  }}>+ Agregar otra acción</Button>
+                </div>
+
                 <div className="grid grid-cols-2 gap-3">
                   {([
                     ['recargo_escala', 'Recargo escala'],
