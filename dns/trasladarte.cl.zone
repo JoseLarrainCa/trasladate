@@ -1,0 +1,42 @@
+; trasladarte.cl — copia de la zona del hosting (ns*.miwebdns.net), leida del DNS publico el 2026-10-19.
+; Se importa en Cloudflare TAL CUAL (todo en gris, sin proxy): el cambio de servidores de nombre no cambia nada.
+$ORIGIN trasladarte.cl.
+$TTL 300
+trasladarte.cl.	300	IN	A	185.158.133.1
+trasladarte.cl.	300	IN	MX	0 mail.trasladarte.cl.
+trasladarte.cl.	300	IN	TXT	"v=spf1  a  mx  ip4:186.64.119.15  ip4:186.64.119.16  ip4:186.64.119.17  ip4:186.64.119.18  ip4:186.64.119.19  ip6:2803:2800:c1c2::/48 ~all"
+www.trasladarte.cl.	300	IN	A	185.158.133.1
+mail.trasladarte.cl.	300	IN	A	186.64.119.15
+cpanel.trasladarte.cl.	300	IN	A	186.64.119.15
+whm.trasladarte.cl.	300	IN	A	186.64.119.15
+webmail.trasladarte.cl.	300	IN	A	186.64.119.15
+webdisk.trasladarte.cl.	300	IN	A	186.64.119.15
+autodiscover.trasladarte.cl.	300	IN	A	186.64.119.15
+autoconfig.trasladarte.cl.	300	IN	A	186.64.119.15
+ftp.trasladarte.cl.	300	IN	CNAME	trasladarte.cl.
+cpcalendars.trasladarte.cl.	300	IN	A	186.64.119.15
+cpcontacts.trasladarte.cl.	300	IN	A	186.64.119.15
+_lovable.trasladarte.cl.	300	IN	TXT	"lovable_verify=9ca522ce85a4f746cdddfec72722d6d07fff94f167ada2fe4f0b9efb31844bae"
+_lovable.www.trasladarte.cl.	300	IN	TXT	"lovable_verify=a4ac4b6216f3ada6aeec4bf8747a9a6a290f9056276900eff10a98a4a1c947ff"
+default._domainkey.trasladarte.cl.	300	IN	TXT	"v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQD6M0FYTkLgEdcEpAyHda9TYAe0jL+Qofo8dR84ypzZTawKNHbQisFBNB4hGeJnJ5pgswezEMpjhHlK7N/oQzREONpA6aDhUAtmyXqc72bJ1R7HYqFxgDTaXr2+COD8P4HRo9SU0NSc95zIc3tf4oULQUaSqq/wsDx8NQg3h9ZMLQIDAQAB;"
+cotizar.trasladarte.cl.	300	IN	TXT	"v=spf1 +a +mx +ip4:186.64.119.15 ~all"
+cpanel.cotizar.trasladarte.cl.	300	IN	A	186.64.119.15
+webmail.cotizar.trasladarte.cl.	300	IN	A	186.64.119.15
+webdisk.cotizar.trasladarte.cl.	300	IN	A	186.64.119.15
+autodiscover.cotizar.trasladarte.cl.	300	IN	A	186.64.119.15
+autoconfig.cotizar.trasladarte.cl.	300	IN	A	186.64.119.15
+cpcalendars.cotizar.trasladarte.cl.	300	IN	A	186.64.119.15
+cpcontacts.cotizar.trasladarte.cl.	300	IN	A	186.64.119.15
+default._domainkey.cotizar.trasladarte.cl.	300	IN	TXT	"v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxoVRcvy9W3iN4KiydDgHs96u4K8SfUUOB9w0kC/9hKZkuiEyU1XsGwCs4SAvOucQMGqXI9CWH7M8q55r+4vSZj56keeecXVVZ6WyB9/MvXHGu2C3gUClF1n3HnpnXBAAMRI9tCpi3lXNsordDiAMT95GjT9bfMKOLmplbiL+I/FqiEhvL1O9o8MEy2hRKnE0I" "1+SHtsQxCRjGfhGmamAq4eAJYWfYvq7e8bWMsza1/ZnnJNlIm/fNyRCULgm23TWdku8plSrU6172Qn+QZD2rE7sh1wiswYD62GWdqYArhQPLi4P5KfrUNmwLXobxgbVx4ETNJ47U1uu3CMOrM/E/wIDAQAB;"
+_autodiscover._tcp.trasladarte.cl.	300	IN	SRV	0 0 443 rack23.miwebdns.net.
+_caldav._tcp.trasladarte.cl.	300	IN	TXT	"path=/"
+_caldav._tcp.trasladarte.cl.	300	IN	SRV	0 0 2079 rack23.miwebdns.net.
+_caldavs._tcp.trasladarte.cl.	300	IN	TXT	"path=/"
+_caldavs._tcp.trasladarte.cl.	300	IN	SRV	0 0 2080 rack23.miwebdns.net.
+_carddav._tcp.trasladarte.cl.	300	IN	TXT	"path=/"
+_carddav._tcp.trasladarte.cl.	300	IN	SRV	0 0 2079 rack23.miwebdns.net.
+_carddavs._tcp.trasladarte.cl.	300	IN	TXT	"path=/"
+_carddavs._tcp.trasladarte.cl.	300	IN	SRV	0 0 2080 rack23.miwebdns.net.
+_autodiscover._tcp.cotizar.trasladarte.cl.	300	IN	SRV	0 0 443 rack23.miwebdns.net.
+_cpanel-dcv-test-record.trasladarte.cl.	300	IN	TXT	"_cpanel-dcv-test-record=0EOW_hpN0vjpTXxCG35mcCBXTH9MT6JvdTuanoeyfOeRzuPT15VXDsHAdD9AhrkD"
+_acme-challenge.trasladarte.cl.	300	IN	TXT	"vitqYtqOxjTaK0O_28hN6nJiPX22G1g8CVH4vVC0P-A"
