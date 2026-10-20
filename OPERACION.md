@@ -39,6 +39,11 @@ Repo `JoseLarrainCa/trasladate` (cuenta personal de José), disco `~/dev/traslad
   `administracion@trasladarte.com`). El `.cl` tiene `mail.trasladarte.cl`.
 - Registros A actuales de la web (vuelta atrás): `trasladarte.com A 185.158.133.1` y
   `trasladarte.cl A 185.158.133.1` (Lovable), `www` CNAME al dominio.
+- **2026-10-20: el `.cl` ya está en Cloudflare** (zona `7c8ed15a976c0e1ddf36090c7fd07917`, NS
+  `kallie`/`randall.ns.cloudflare.com`, cambiados por José en NIC). Sus 40 registros están en gris, con
+  las mismas respuestas que daba el hosting (copia en `dns/trasladarte.cl.zone`). Para volver atrás,
+  basta con poner de nuevo `ns1/ns2/ns3.miwebdns.net` en NIC. Falta el `.com`, que se cambia en el
+  hosting.
 - Receta (la misma de Pinturas Las Américas, 2026-10-08):
   1. Crear las zonas `trasladarte.com` y `trasladarte.cl` en la cuenta Omnis de Cloudflare y copiar
      TODOS los registros de la zona del cPanel (MX, `mail`, `cpanel`, `webmail`, SPF, DKIM), con
