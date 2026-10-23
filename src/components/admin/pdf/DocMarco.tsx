@@ -1,7 +1,11 @@
+import { Fragment } from 'react';
 import {
   accionesVisibles,
   agruparInventario,
   buildVars,
+  diasEmbalaje,
+  nombreDia,
+  personasEmbalaje,
   precioFinal,
   txt,
   LETRAS,
@@ -73,6 +77,30 @@ const DocMarco = ({ doc, cfg }: Props) => {
   const personalCalificado = txt(doc, cfg, 'personal_calificado', vars);
   const seTrasladara = txt(doc, cfg, 'se_trasladara', vars);
   const precio = precioFinal(doc);
+  const diasPrevios = diasEmbalaje(doc);
+  const personasPrevias = personasEmbalaje(doc);
+
+  const Banda = ({ n }: { n: number }) => (
+    <tr className="d-day">
+      <td colSpan={3}>{espaciar(nombreDia(n))}</td>
+    </tr>
+  );
+
+  const filaEmbalaje = (
+    <tr>
+      <td className="c">01</td>
+      <td>
+        <div>{txt(doc, cfg, 'fila_embalaje', vars)}</div>
+        <div>{txt(doc, cfg, 'fila_embalaje_incluye', vars)}</div>
+        <div className="d-emb">
+          {materiales.map((m, i) => (
+            <span key={i}>{m}</span>
+          ))}
+        </div>
+      </td>
+      <td className="v" />
+    </tr>
+  );
 
   return (
     <>
@@ -155,6 +183,18 @@ const DocMarco = ({ doc, cfg }: Props) => {
             </tr>
           </thead>
           <tbody>
+            {Array.from({ length: diasPrevios }, (_, d) => (
+              <Fragment key={d}>
+                <Banda n={d} />
+                <tr>
+                  <td className="c">{dosDigitos(personasPrevias)}</td>
+                  <td>{`Personas operativas para EMBALAR en ${vars.tipoOrigen} origen`}</td>
+                  <td className="v" />
+                </tr>
+                {d === 0 && filaEmbalaje}
+              </Fragment>
+            ))}
+            {diasPrevios > 0 && <Banda n={diasPrevios} />}
             <tr>
               <td className="c">{dosDigitos(doc.camion_qty)}</td>
               <td>{camionLabel(doc.camion)}</td>
@@ -170,21 +210,7 @@ const DocMarco = ({ doc, cfg }: Props) => {
               <td>{txt(doc, cfg, 'fila_personas', vars)}</td>
               <td className="v" />
             </tr>
-            {doc.con_embalaje && (
-              <tr>
-                <td className="c">01</td>
-                <td>
-                  <div>{txt(doc, cfg, 'fila_embalaje', vars)}</div>
-                  <div>{txt(doc, cfg, 'fila_embalaje_incluye', vars)}</div>
-                  <div className="d-emb">
-                    {materiales.map((m, i) => (
-                      <span key={i}>{m}</span>
-                    ))}
-                  </div>
-                </td>
-                <td className="v" />
-              </tr>
-            )}
+            {doc.con_embalaje && diasPrevios === 0 && filaEmbalaje}
             <tr className="d-total">
               <td className="c" />
               <td>TOTAL</td>

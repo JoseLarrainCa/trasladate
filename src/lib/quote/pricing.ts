@@ -43,6 +43,10 @@ export interface CalcInput {
   camionQty: number;
   personas: number;
   conEmbalaje: boolean;
+  /** Días de embalaje ANTES del día de la mudanza (0 = todo el mismo día). */
+  diasEmbalaje?: number;
+  /** Personas que embalan cada uno de esos días. */
+  personasEmbalaje?: number;
   recargos?: { escala?: number; rampa?: number; estac?: number; otro?: number };
   tarifas?: Tarifas;
 }
@@ -63,10 +67,18 @@ export function calcularPrecio(input: CalcInput): CalcResult {
   const choferes = t.chofer * input.camionQty;
   const personas = t.persona * input.personas;
   const embalaje = input.conEmbalaje ? Math.round(t.embalajeM3 * input.m3) : 0;
+  const dias = Math.max(0, Math.floor(input.diasEmbalaje ?? 0));
+  const personasDiaEmbalaje = dias > 0 ? t.persona * Math.max(1, input.personasEmbalaje ?? input.personas) * dias : 0;
 
   desglose.push({ label: `Camión × ${input.camionQty}`, valor: camiones });
   desglose.push({ label: `Chofer × ${input.camionQty}`, valor: choferes });
   desglose.push({ label: `Personal operativo × ${input.personas}`, valor: personas });
+  if (personasDiaEmbalaje) {
+    desglose.push({
+      label: `Embalaje previo: ${input.personasEmbalaje ?? input.personas} personas × ${dias} día${dias === 1 ? '' : 's'}`,
+      valor: personasDiaEmbalaje,
+    });
+  }
   if (embalaje) desglose.push({ label: `Embalaje (${input.m3.toFixed(1)} m³)`, valor: embalaje });
   if (r.escala) desglose.push({ label: 'Recargo escala', valor: r.escala });
   if (r.rampa) desglose.push({ label: 'Recargo rampa', valor: r.rampa });
@@ -74,7 +86,7 @@ export function calcularPrecio(input: CalcInput): CalcResult {
   if (r.otro) desglose.push({ label: 'Otro recargo', valor: r.otro });
 
   const subtotal =
-    camiones + choferes + personas + embalaje + (r.escala || 0) + (r.rampa || 0) + (r.estac || 0) + (r.otro || 0);
+    camiones + choferes + personas + personasDiaEmbalaje + embalaje + (r.escala || 0) + (r.rampa || 0) + (r.estac || 0) + (r.otro || 0);
 
   return { subtotal, precioCalculado: Math.max(subtotal, t.minimo), desglose };
 }

@@ -100,6 +100,25 @@ export const formatFechaCL = (iso?: string) => {
   return `${d}-${m}-${y}`;
 };
 
+/**
+ * Mudanza de varios días: los días de embalaje ANTES de la mudanza y las personas que embalan cada
+ * uno. Viven en `textos` (claves `dias_embalaje` y `personas_embalaje`) para no tocar la tabla.
+ * 0 días = todo el mismo día, que es como se cotizaba hasta ahora.
+ */
+export const diasEmbalaje = (doc: DocState) => {
+  if (!doc.con_embalaje) return 0;
+  const n = Math.floor(Number((doc.textos || {}).dias_embalaje));
+  return Number.isFinite(n) && n > 0 ? Math.min(n, 6) : 0;
+};
+
+export const personasEmbalaje = (doc: DocState) => {
+  const n = Math.floor(Number((doc.textos || {}).personas_embalaje));
+  return Number.isFinite(n) && n > 0 ? n : doc.personas;
+};
+
+const ORDINALES = ['PRIMER', 'SEGUNDO', 'TERCER', 'CUARTO', 'QUINTO', 'SEXTO', 'SÉPTIMO'];
+export const nombreDia = (i: number) => `${ORDINALES[i] ?? `DÍA ${i + 1}`}${i < ORDINALES.length ? ' DÍA' : ''}`;
+
 export const precioFinal = (doc: DocState) =>
   doc.precio_final !== null && doc.precio_final !== undefined ? doc.precio_final : doc.precio_calculado;
 

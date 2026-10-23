@@ -62,6 +62,7 @@ import {
 } from '@/lib/quote/pricing';
 import { imprimirDocumento } from '@/lib/quote/print';
 import type { DocConfig, DocState } from '@/lib/quote/document';
+import { diasEmbalaje, personasEmbalaje } from '@/lib/quote/document';
 import '@/styles/quote-pdf.css';
 
 const hoy = () => new Date().toISOString().slice(0, 10);
@@ -329,6 +330,8 @@ const GenerarCotizacion = () => {
         camionQty: doc.camion_qty,
         personas: doc.personas,
         conEmbalaje: doc.con_embalaje,
+        diasEmbalaje: diasEmbalaje(doc),
+        personasEmbalaje: personasEmbalaje(doc),
         recargos: {
           escala: doc.recargo_escala,
           rampa: doc.recargo_rampa,
@@ -337,7 +340,7 @@ const GenerarCotizacion = () => {
         },
         tarifas: cfg.tarifas,
       }),
-    [m3, doc.camion, doc.camion_qty, doc.personas, doc.con_embalaje, doc.recargo_escala, doc.recargo_rampa, doc.recargo_estac, doc.recargo_otro, cfg.tarifas]
+    [m3, doc.camion, doc.camion_qty, doc.personas, doc.con_embalaje, doc.textos.dias_embalaje, doc.textos.personas_embalaje, doc.recargo_escala, doc.recargo_rampa, doc.recargo_estac, doc.recargo_otro, cfg.tarifas]
   );
 
   useEffect(() => {
@@ -776,6 +779,24 @@ const GenerarCotizacion = () => {
                       onChange={(e) => set('personas', Math.max(1, Number(e.target.value) || 1))} />
                   </div>
                 </div>
+
+                {doc.con_embalaje && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label>Días de embalaje antes de la mudanza</Label>
+                      <Input type="number" min={0} max={6} className="mt-1" value={diasEmbalaje(doc)}
+                        onChange={(e) => setDoc((d) => ({ ...d, textos: { ...d.textos, dias_embalaje: String(Math.max(0, Number(e.target.value) || 0)) } }))} />
+                      <p className="mt-1 text-xs text-muted-foreground">0 = todo el mismo día. 1 = embalan un día y mudan al siguiente.</p>
+                    </div>
+                    {diasEmbalaje(doc) > 0 && (
+                      <div>
+                        <Label>Personas que embalan cada día</Label>
+                        <Input type="number" min={1} className="mt-1" value={personasEmbalaje(doc)}
+                          onChange={(e) => setDoc((d) => ({ ...d, textos: { ...d.textos, personas_embalaje: String(Math.max(1, Number(e.target.value) || 1)) } }))} />
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div className="grid grid-cols-2 gap-3">
                   {([

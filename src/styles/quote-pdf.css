@@ -178,6 +178,16 @@
 }
 .d-tbl td.c { text-align: center; width: 22mm; }
 .d-tbl td.v { width: 34mm; text-align: right; }
+.d-tbl tr.d-day td {
+  background: #17179c;
+  color: #fff;
+  text-align: center;
+  white-space: pre;
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 1.4mm 2mm;
+}
 .d-emb { display: flex; flex-wrap: wrap; gap: 2mm 8mm; margin-top: 1mm; }
 .d-emb span { color: #1e46c8; font-style: italic; font-weight: 700; }
 .d-total td {
