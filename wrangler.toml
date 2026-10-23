@@ -14,6 +14,16 @@ account_id = "4348d418d61283075685bc8bd4caeaae"
 # custom_domain = true SOLO cuando sus zonas estén en Cloudflare (ver OPERACION.md).
 workers_dev = true
 
+# trasladarte.cl (zona en Cloudflare desde 2026-10-20). El .com sigue en Lovable hasta que su
+# zona pase a Cloudflare: cuando pase, se agrega acá y se decide cuál queda de canónico.
+[[routes]]
+pattern = "trasladarte.cl"
+custom_domain = true
+
+[[routes]]
+pattern = "www.trasladarte.cl"
+custom_domain = true
+
 # Sirve la SPA compilada por Vite. Cualquier ruta que no sea un archivo devuelve
 # index.html para que React Router la resuelva en el navegador.
 [assets]

@@ -45,11 +45,10 @@ export const brand: BrandConfig = {
   "marcaVersion": "1.0.0",
   "nombre": "Trasladarte",
   "descripcion": "Mudanzas de hogar, oficinas y traslados especiales en Santiago, con embalaje y cobertura de Arica a Punta Arenas. Cotiza tu mudanza en línea.",
-  "dominioCanonico": "https://trasladarte.com",
+  "dominioCanonico": "https://trasladarte.cl",
   "urlRespaldo": "https://trasladarte.omnis-apps.workers.dev",
   "redirigirHosts": [
     "www.trasladarte.com",
-    "trasladarte.cl",
     "www.trasladarte.cl"
   ],
   "logoPath": "public/logo.png",
@@ -86,5 +85,5 @@ export const brand: BrandConfig = {
   "omitir": [],
   "ogLogoAlto": 0.55,
   "colorFondoOg": "#FFFFFF",
-  "assetsHash": "6b105f1f3d59"
+  "assetsHash": "1c1ad9402b82"
 };

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://trasladarte.com/sitemap.xml
+Sitemap: https://trasladarte.cl/sitemap.xml
