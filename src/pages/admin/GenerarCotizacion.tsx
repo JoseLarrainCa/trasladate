@@ -10,6 +10,7 @@ import DocMarco from '@/components/admin/pdf/DocMarco';
 import DocModerno from '@/components/admin/pdf/DocModerno';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import NumeroInput from '@/components/admin/NumeroInput';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
@@ -514,12 +515,8 @@ const GenerarCotizacion = () => {
                   </div>
                   <div>
                     <Label>N° Servicio</Label>
-                    <Input
-                      type="number"
-                      className="mt-1"
-                      value={doc.folio}
-                      onChange={(e) => set('folio', Number(e.target.value) || 0)}
-                    />
+                    <NumeroInput className="mt-1" value={doc.folio} vacioComo={0}
+                      onCommit={(n) => set('folio', n)} />
                   </div>
                   <div>
                     <Label>Fecha de servicio</Label>
@@ -770,13 +767,13 @@ const GenerarCotizacion = () => {
                   </div>
                   <div>
                     <Label>Cantidad</Label>
-                    <Input type="number" min={1} className="mt-1" value={doc.camion_qty}
-                      onChange={(e) => set('camion_qty', Math.max(1, Number(e.target.value) || 1))} />
+                    <NumeroInput min={1} className="mt-1" value={doc.camion_qty}
+                      onCommit={(n) => set('camion_qty', n)} />
                   </div>
                   <div>
                     <Label>Personas</Label>
-                    <Input type="number" min={1} className="mt-1" value={doc.personas}
-                      onChange={(e) => set('personas', Math.max(1, Number(e.target.value) || 1))} />
+                    <NumeroInput min={1} className="mt-1" value={doc.personas}
+                      onCommit={(n) => set('personas', n)} />
                   </div>
                 </div>
 
@@ -799,8 +796,8 @@ const GenerarCotizacion = () => {
                     {diasEmbalaje(doc) > 0 && (
                       <div>
                         <Label>Personas que embalan cada día</Label>
-                        <Input type="number" min={1} className="mt-1" value={doc.textos.personas_embalaje ?? String(doc.personas)}
-                          onChange={(e) => setDoc((d) => ({ ...d, textos: { ...d.textos, personas_embalaje: e.target.value } }))} />
+                        <NumeroInput min={1} className="mt-1" value={personasEmbalaje(doc)}
+                          onCommit={(n) => setDoc((d) => ({ ...d, textos: { ...d.textos, personas_embalaje: String(n) } }))} />
                       </div>
                     )}
                   </div>
@@ -829,8 +826,8 @@ const GenerarCotizacion = () => {
                   ] as const).map(([k, label]) => (
                     <div key={k}>
                       <Label>{label}</Label>
-                      <Input type="number" className="mt-1" value={doc[k] as number}
-                        onChange={(e) => set(k, (Number(e.target.value) || 0) as never)} />
+                      <NumeroInput className="mt-1" value={doc[k] as number} vacioComo={0}
+                        onCommit={(n) => set(k, n as never)} />
                     </div>
                   ))}
                 </div>
@@ -859,11 +856,8 @@ const GenerarCotizacion = () => {
                   </div>
                   <div>
                     <Label>% Cuota 1</Label>
-                    <Input type="number" className="mt-1" value={doc.cuota1}
-                      onChange={(e) => {
-                        const v = Number(e.target.value) || 0;
-                        setDoc((d) => ({ ...d, cuota1: v, cuota2: 100 - v }));
-                      }} />
+                    <NumeroInput className="mt-1" value={doc.cuota1} vacioComo={0}
+                      onCommit={(v) => setDoc((d) => ({ ...d, cuota1: v, cuota2: 100 - v }))} />
                   </div>
                   <div>
                     <Label>% Cuota 2</Label>
@@ -896,13 +890,8 @@ const GenerarCotizacion = () => {
                     <div key={l.item_key} className="flex items-center gap-2 text-sm">
                       <span className="flex-1 truncate">{l.name}</span>
                       <span className="text-xs text-muted-foreground w-14 text-right">{(l.m3 * l.qty).toFixed(1)} m³</span>
-                      <Input
-                        type="number"
-                        min={0}
-                        className="w-16 h-8"
-                        value={l.qty}
-                        onChange={(e) => setQty(l.item_key, Number(e.target.value) || 0)}
-                      />
+                      <NumeroInput min={0} className="w-16 h-8" value={l.qty} vacioComo={0}
+                        onCommit={(n) => setQty(l.item_key, n)} />
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => quitar(l.item_key)}>
                         <Trash2 className="w-4 h-4 text-destructive" />
                       </Button>

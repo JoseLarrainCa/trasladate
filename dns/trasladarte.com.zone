@@ -1,0 +1,32 @@
+; Copia de la zona de trasladarte.com leída del cPanel (rack23.miwebdns.net) el 2026-10-24,
+; ANTES de pasarla a Cloudflare. Solo lectura: no se cambió nada en el hosting.
+; Vuelta atrás: poner de nuevo ns1/ns2/ns3.miwebdns.net en el registrador.
+trasladarte.com.	14400	IN	A	185.158.133.1
+trasladarte.com.	14400	IN	MX	0 mail.trasladarte.com.
+www.trasladarte.com.	14400	IN	CNAME	trasladarte.com.
+ftp.trasladarte.com.	14400	IN	A	186.64.119.15
+cpanel.trasladarte.com.	14400	IN	A	186.64.119.15
+webdisk.trasladarte.com.	14400	IN	A	186.64.119.15
+whm.trasladarte.com.	14400	IN	A	186.64.119.15
+webmail.trasladarte.com.	14400	IN	A	186.64.119.15
+autoconfig.trasladarte.com.	14400	IN	A	186.64.119.15
+autodiscover.trasladarte.com.	14400	IN	A	186.64.119.15
+mail.trasladarte.com.	14400	IN	A	186.64.119.15
+cpcalendars.trasladarte.com.	14400	IN	A	186.64.119.15
+cpcontacts.trasladarte.com.	14400	IN	A	186.64.119.15
+_autodiscover._tcp.trasladarte.com.	14400	IN	SRV	0 0 443 rack23.miwebdns.net.
+_caldav._tcp.trasladarte.com.	14400	IN	SRV	0 0 2079 rack23.miwebdns.net.
+_caldavs._tcp.trasladarte.com.	14400	IN	SRV	0 0 2080 rack23.miwebdns.net.
+_carddav._tcp.trasladarte.com.	14400	IN	SRV	0 0 2079 rack23.miwebdns.net.
+_carddavs._tcp.trasladarte.com.	14400	IN	SRV	0 0 2080 rack23.miwebdns.net.
+_caldav._tcp.trasladarte.com.	14400	IN	TXT	"path=/"
+_caldavs._tcp.trasladarte.com.	14400	IN	TXT	"path=/"
+_carddav._tcp.trasladarte.com.	14400	IN	TXT	"path=/"
+_carddavs._tcp.trasladarte.com.	14400	IN	TXT	"path=/"
+default._domainkey.trasladarte.com.	14400	IN	TXT	"v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDD+rHNU3CCpeQNAYVG47ZeVlyNKqvYlsaTKqD8dhM2oFa1iO3LIByvL+0vgBrBcDecIEvHutkb1Adq2bkUNpI9eV1vZmrJmw+aI8YNbX9XvNQCtLZoKwMw7Tpy3Sy4ClSe9NxMyyxyZXOQlRjkXSobv+vlR7k3gdZzdZFJRGr3iQIDAQAB;"
+trasladarte.com.	14400	IN	TXT	"v=spf1  a  mx  ip4:186.64.119.15  ip4:186.64.119.16  ip4:186.64.119.17  ip4:186.64.119.18  ip4:186.64.119.19  ip4:186.64.114.25  ip4:186.64.115.240  ip4:186.64.115.241  ip4:186.64.115.242  ip6:2803:2800:c1c2::/48 ~all"
+trasladarte.com.	14400	IN	TXT	"google-site-verification=83XnpmAgnbmbenGcpuV-bskL6Jp16jjQmZywYoRUwKc"
+_dmarc.trasladarte.com.	14400	IN	TXT	"v=DMARC1; p=none; rua=mailto:postmaster@trasladarte.com"
+_lovable.trasladarte.com.	14400	IN	TXT	"lovable_verify=7f678eaec1ab1ea8601a8b6152e55a1d5ea641f59ae43141367a8232d5855efd"
+_lovable.www.trasladarte.com.	14400	IN	TXT	"lovable_verify=3e4b2346e86769160b8fbe1fc8429e5eafacadf36b9bb9671a19cba804ea98d6"
+; (los _acme-challenge y _cpanel-dcv-test-record son de la renovación del certificado del hosting: no se copian)
