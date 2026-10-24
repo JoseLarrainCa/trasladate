@@ -784,15 +784,23 @@ const GenerarCotizacion = () => {
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <Label>Días de embalaje antes de la mudanza</Label>
-                      <Input type="number" min={0} max={6} className="mt-1" value={diasEmbalaje(doc)}
-                        onChange={(e) => setDoc((d) => ({ ...d, textos: { ...d.textos, dias_embalaje: String(Math.max(0, Number(e.target.value) || 0)) } }))} />
-                      <p className="mt-1 text-xs text-muted-foreground">0 = todo el mismo día. 1 = embalan un día y mudan al siguiente.</p>
+                      <Select value={String(diasEmbalaje(doc))}
+                        onValueChange={(v) => setDoc((d) => ({ ...d, textos: { ...d.textos, dias_embalaje: v } }))}>
+                        <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="0">Todo el mismo día</SelectItem>
+                          {[1, 2, 3, 4, 5, 6].map((n) => (
+                            <SelectItem key={n} value={String(n)}>{n} día{n === 1 ? '' : 's'} antes</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className="mt-1 text-xs text-muted-foreground">Ej.: 1 día antes = embalan un día y mudan al siguiente.</p>
                     </div>
                     {diasEmbalaje(doc) > 0 && (
                       <div>
                         <Label>Personas que embalan cada día</Label>
-                        <Input type="number" min={1} className="mt-1" value={personasEmbalaje(doc)}
-                          onChange={(e) => setDoc((d) => ({ ...d, textos: { ...d.textos, personas_embalaje: String(Math.max(1, Number(e.target.value) || 1)) } }))} />
+                        <Input type="number" min={1} className="mt-1" value={doc.textos.personas_embalaje ?? String(doc.personas)}
+                          onChange={(e) => setDoc((d) => ({ ...d, textos: { ...d.textos, personas_embalaje: e.target.value } }))} />
                       </div>
                     )}
                   </div>
