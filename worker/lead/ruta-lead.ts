@@ -22,6 +22,19 @@ const SITIO_LEAD = "trasladarte";
 
 
 
+async function guardarEnPanel(entorno: Record<string, unknown>, d: DatosLead, origen: string): Promise<void> {
+  const db = entorno.DB as D1Database | undefined;
+  if (!db) return;
+  try {
+    await db
+      .prepare("INSERT INTO contactos (nombre, telefono, email, servicio, comuna, mensaje, origen) VALUES (?, ?, ?, ?, ?, ?, ?)")
+      .bind(d.nombre.trim(), d.telefono.trim(), d.correo?.trim() || null, d.servicio ?? null, d.comuna ?? null, d.mensaje ?? null, origen || null)
+      .run();
+  } catch (e) {
+    console.error("[lead] no se pudo guardar en el panel", e);
+  }
+}
+
 function json(cuerpo: unknown, status: number): Response {
   return new Response(JSON.stringify(cuerpo), {
     status,
@@ -74,6 +87,10 @@ export async function atenderAvisoDeLead(
   // lugar que las vars. Con el `env` crudo, guardarLead degradaba en silencio y no guardaba nada.
   const entorno = leerEntorno(env);
   const guardado = await guardarLead(entorno, SITIO_LEAD, String(cuerpo.origen ?? ""), datos as unknown as Record<string, unknown>);
+
+  // El panel de Marco ve estos contactos igual que las cotizaciones. Si falla, el lead ya está
+  // a salvo en la base de la flota y el aviso por correo sale igual.
+  await guardarEnPanel(entorno, datos, String(cuerpo.origen ?? ""));
 
   const resultado = await enviarAviso(entorno as EntornoCorreo, datos, String(cuerpo.origen ?? ""));
 

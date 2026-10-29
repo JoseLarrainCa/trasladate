@@ -49,7 +49,7 @@ class Sentencia {
   }
 }
 
-export function crearD1(migraciones = ["db/migrations/0001_esquema.sql"], semillas: string[] = []) {
+export function crearD1(migraciones = ["db/migrations/0001_esquema.sql", "db/migrations/0002_contactos.sql"], semillas: string[] = []) {
   const db = new DatabaseSync(":memory:");
   db.exec("PRAGMA foreign_keys = ON");
   for (const ruta of [...migraciones, ...semillas]) {

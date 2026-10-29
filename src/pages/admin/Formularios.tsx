@@ -36,7 +36,21 @@ const statusConfig: Record<QuoteStatus, { label: string; color: string; icon: Re
   cancelado: { label: 'Cancelado', color: 'bg-red-100 text-red-800', icon: XCircle },
 };
 
+interface Contacto {
+  id: string;
+  nombre: string;
+  telefono: string;
+  email: string | null;
+  servicio: string | null;
+  comuna: string | null;
+  mensaje: string | null;
+  origen: string | null;
+  atendido: boolean;
+  created_at: string;
+}
+
 const Formularios = () => {
+  const [contactos, setContactos] = useState<Contacto[]>([]);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [filteredQuotes, setFilteredQuotes] = useState<Quote[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -46,9 +60,13 @@ const Formularios = () => {
 
   useEffect(() => {
     fetchQuotes();
+    fetchContactos();
 
     // Antes llegaba en tiempo real desde Supabase; ahora se vuelve a leer cada 30 segundos.
-    const intervalo = window.setInterval(() => fetchQuotes(), 30_000);
+    const intervalo = window.setInterval(() => {
+      fetchQuotes();
+      fetchContactos();
+    }, 30_000);
     return () => window.clearInterval(intervalo);
   }, []);
 
@@ -68,6 +86,18 @@ const Formularios = () => {
       setQuotes(data || []);
     }
     setIsLoading(false);
+  };
+
+  const fetchContactos = async () => {
+    const { data, error } = await db.from('contactos').select('*').order('created_at', { ascending: false });
+    if (error) console.error('Error fetching contactos:', error);
+    else setContactos((data as Contacto[]) || []);
+  };
+
+  const marcarAtendido = async (c: Contacto) => {
+    setContactos((prev) => prev.map((x) => (x.id === c.id ? { ...x, atendido: !c.atendido } : x)));
+    const { error } = await db.from('contactos').update({ atendido: !c.atendido }).eq('id', c.id);
+    if (error) fetchContactos();
   };
 
   const filterQuotes = () => {
@@ -175,6 +205,41 @@ const Formularios = () => {
             </div>
           </div>
         </div>
+
+        {/* Consultas de los formularios cortos de la página */}
+        {contactos.length > 0 && (
+          <div className="space-y-3">
+            <h2 className="text-lg font-heading font-semibold text-foreground">
+              Consultas de la página ({contactos.filter((c) => !c.atendido).length} sin atender)
+            </h2>
+            {contactos.map((c) => (
+              <div
+                key={c.id}
+                className={`bg-card rounded-2xl p-4 shadow-sm border border-border ${c.atendido ? 'opacity-60' : ''}`}
+              >
+                <div className="flex items-start gap-4">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-foreground truncate">{c.nombre}</h3>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
+                      <a href={`https://wa.me/${c.telefono.replace(/\D/g, '')}`} className="hover:text-primary">{c.telefono}</a>
+                      {c.email && <a href={`mailto:${c.email}`} className="hover:text-primary">{c.email}</a>}
+                      {c.servicio && <span>{c.servicio}</span>}
+                      {c.comuna && <span>{c.comuna}</span>}
+                    </div>
+                    {c.mensaje && <p className="text-sm text-foreground mt-2 whitespace-pre-wrap">{c.mensaje}</p>}
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {format(new Date(c.created_at), "d 'de' MMMM, yyyy 'a las' HH:mm", { locale: es })}
+                      {c.origen ? ` · ${c.origen}` : ''}
+                    </p>
+                  </div>
+                  <Button variant={c.atendido ? 'outline' : 'default'} size="sm" onClick={() => marcarAtendido(c)}>
+                    {c.atendido ? 'Desmarcar' : 'Marcar atendido'}
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Quotes List */}
         <div className="space-y-3">

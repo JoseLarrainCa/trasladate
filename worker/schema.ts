@@ -60,6 +60,20 @@ export const TABLAS: Record<string, Tabla> = {
       created_at: "text",
     },
   },
+  contactos: {
+    columnas: {
+      id: "text",
+      nombre: "text",
+      telefono: "text",
+      email: "text",
+      servicio: "text",
+      comuna: "text",
+      mensaje: "text",
+      origen: "text",
+      atendido: "bool",
+      created_at: "text",
+    },
+  },
   quote_settings: {
     columnas: {
       id: "text",

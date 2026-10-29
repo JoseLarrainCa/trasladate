@@ -31,6 +31,13 @@ describe("POST /api/lead", () => {
     expect(envio.reply_to).toBe("maria@ejemplo.cl");
   });
 
+  it("el contacto también queda en el panel (tabla contactos)", async () => {
+    await enviar({ datos: datosBuenos, origen: "Formulario" });
+    const filas = (await env.DB.prepare("SELECT * FROM contactos").all<any>()).results;
+    expect(filas).toHaveLength(1);
+    expect(filas[0]).toMatchObject({ nombre: "María Pérez", email: "maria@ejemplo.cl", comuna: "Temuco", atendido: 0 });
+  });
+
   it("si Resend falla, el lead queda guardado con correo_enviado=0 y la persona igual recibe ok", async () => {
     resend.mockResolvedValueOnce(new Response("boom", { status: 403 }));
     const r = await enviar({ datos: datosBuenos, origen: "F" });
