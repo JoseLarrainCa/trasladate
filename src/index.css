@@ -269,3 +269,95 @@
 .stagger-children.visible > *:nth-child(5) { transition-delay: 0.4s; opacity: 1; transform: translateY(0); }
 .stagger-children.visible > *:nth-child(6) { transition-delay: 0.5s; opacity: 1; transform: translateY(0); }
 .stagger-children.visible > *:nth-child(n+7) { transition-delay: 0.6s; opacity: 1; transform: translateY(0); }
+
+/* ── Blog (/blog/<slug>) ──────────────────────────────────────────────────────
+   Párrafos, viñetas y recuadros en Open Sans al mismo tamaño; los títulos en
+   Montserrat, como el resto del sitio. Los recuadros salen de una cita con rótulo
+   («En corto», «Ojo», «Consejo», «Ejemplo»; src/lib/blog-core.ts): uno por color,
+   naranjo de la marca, ámbar de advertencia, azul marino del sitio y gris. */
+.blog-cuerpo {
+  --blog-texto: 1.0625rem;
+  font-family: 'Open Sans', system-ui, sans-serif;
+  color: hsl(var(--foreground));
+}
+.blog-cuerpo p,
+.blog-cuerpo li {
+  font-size: var(--blog-texto);
+  line-height: 1.75;
+}
+.blog-cuerpo > p,
+.blog-cuerpo > ul,
+.blog-cuerpo > ol {
+  margin: 0 0 1.25rem;
+}
+.blog-cuerpo ul,
+.blog-cuerpo ol {
+  padding-left: 1.4em;
+}
+.blog-cuerpo ul { list-style: disc; }
+.blog-cuerpo ol { list-style: decimal; }
+.blog-cuerpo li { margin: 0.4rem 0; padding-left: 0.2em; }
+.blog-cuerpo li::marker { color: hsl(var(--primary)); font-weight: 700; }
+.blog-cuerpo h2 {
+  margin: 3rem 0 1rem;
+  font-family: 'Montserrat', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.5rem, 1.25rem + 1vw, 2rem);
+  line-height: 1.2;
+  color: hsl(var(--foreground));
+}
+.blog-cuerpo h3 {
+  margin: 2rem 0 0.75rem;
+  font-family: 'Montserrat', system-ui, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+.blog-cuerpo strong { font-weight: 700; }
+.blog-cuerpo a {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.blog-cuerpo a:hover { color: hsl(var(--secondary)); }
+.blog-cuerpo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  margin: 2.25rem 0;
+  border-radius: 1rem;
+}
+.blog-cuerpo blockquote {
+  margin: 1.75rem 0;
+  padding-left: 1.25rem;
+  border-left: 3px solid hsl(var(--border));
+}
+
+.blog-recuadro {
+  --tinta-recuadro: var(--primary);
+  --rotulo-recuadro: 24 90% 38%;
+  margin: 2rem 0;
+  padding: 1.25rem 1.5rem;
+  border-radius: 0.75rem;
+  border-left: 5px solid hsl(var(--tinta-recuadro));
+  background: hsl(var(--tinta-recuadro) / 0.07);
+}
+.blog-recuadro > :last-child { margin-bottom: 0; }
+.blog-recuadro p { margin: 0 0 0.75rem; }
+.blog-recuadro ul { margin: 0; }
+.blog-cuerpo .blog-recuadro-rotulo {
+  margin: 0 0 0.5rem;
+  font-family: 'Montserrat', system-ui, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.4;
+  color: hsl(var(--rotulo-recuadro));
+}
+.blog-recuadro-en-corto { margin-top: 0; }
+.blog-recuadro-ojo { --tinta-recuadro: 40 95% 50%; --rotulo-recuadro: 34 90% 28%; }
+.blog-recuadro-consejo { --tinta-recuadro: 215 50% 23%; --rotulo-recuadro: 215 50% 28%; }
+.blog-recuadro-ejemplo { --tinta-recuadro: 220 10% 45%; --rotulo-recuadro: 220 10% 32%; }
+.dark .blog-recuadro-consejo { --tinta-recuadro: 215 50% 60%; --rotulo-recuadro: 215 60% 75%; }

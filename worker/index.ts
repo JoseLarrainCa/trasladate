@@ -272,6 +272,24 @@ export async function conRango(peticion: Request, respuesta: Response): Promise<
   return new Response(cuerpo.slice(inicio, fin + 1), { status: 206, headers });
 }
 
+// El blog. Sus HTML los escribe el build (`src/lib/blog-prerender.ts`): `dist/blog.html`,
+// `dist/blog/<slug>.html` y `dist/blog/slugs.json`. `/blog/` con barra se va a `/blog`, y un
+// `/blog/<slug>` que no existe responde 404 (si no, el fallback de la SPA lo contestaría con 200).
+app.get("/blog/*", async (c) => {
+  const url = new URL(c.req.url);
+  if (url.pathname === "/blog/") return c.redirect(`/blog${url.search}`, 301);
+  const m = /^\/blog\/([^/]+?)\/?$/.exec(url.pathname);
+  if (!m || m[1].includes(".")) return c.env.ASSETS.fetch(c.req.raw);
+  const lista = await c.env.ASSETS.fetch(new Request(`${url.origin}/blog/slugs.json`));
+  const slugs = lista.ok ? ((await lista.json().catch(() => [])) as string[]) : [];
+  if (slugs.includes(m[1])) return c.env.ASSETS.fetch(c.req.raw);
+  const portada = await c.env.ASSETS.fetch(new Request(`${url.origin}/`, c.req.raw));
+  return new Response(portada.body, {
+    status: 404,
+    headers: { "content-type": "text/html; charset=utf-8", "x-robots-tag": "noindex" },
+  });
+});
+
 // Todo lo demás es la página.
 app.all("*", async (c) => {
   const respuesta = await c.env.ASSETS.fetch(c.req.raw);

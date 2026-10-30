@@ -52,16 +52,29 @@ const Header = () => {
     { label: 'Flota', href: '#flota' },
     { label: 'Cotización', href: '#cotizacion' },
     { label: 'Contacto', href: '#contacto' },
+    { label: 'Blog', href: '/blog' },
   ];
 
   const handleSectionClick = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
     const sectionId = href.replace('#', '');
     const element = document.getElementById(sectionId);
 
+    // «Blog» es una página aparte, no una sección: el enlace sigue de largo.
+    if (!href.startsWith('#')) {
+      setIsMobileMenuOpen(false);
+      return;
+    }
+
     event.preventDefault();
     setIsMobileMenuOpen(false);
 
     if (location.pathname !== '/') {
+      // Desde el blog se vuelve a la portada recargando: así llega con su propio
+      // <head> (título, descripción, canonical), que en esta SPA vive en index.html.
+      if (location.pathname.startsWith('/blog')) {
+        window.location.assign(`/${href}`);
+        return;
+      }
       navigate(`/${href}`);
       return;
     }
@@ -139,15 +152,15 @@ const Header = () => {
             </motion.a>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-8">
+            <nav className="hidden lg:flex items-center gap-5 xl:gap-8">
               {navItems.map((item) => {
                 const isActive = activeSection === item.href.slice(1);
                 return (
                   <motion.a
                     key={item.label}
-                    href={`/${item.href}`}
+                    href={item.href.startsWith('#') ? `/${item.href}` : item.href}
                     onClick={(event) => handleSectionClick(event, item.href)}
-                    className={`font-medium transition-colors relative group ${
+                    className={`font-medium whitespace-nowrap transition-colors relative group ${
                       isActive ? 'text-primary' : 'text-foreground hover:text-primary'
                     }`}
                     whileHover={{ y: -2 }}
@@ -210,7 +223,7 @@ const Header = () => {
                   return (
                     <a
                       key={item.label}
-                      href={`/${item.href}`}
+                      href={item.href.startsWith('#') ? `/${item.href}` : item.href}
                       className={`font-medium transition-colors py-2 ${
                         isActive ? 'text-primary' : 'text-foreground hover:text-primary'
                       }`}

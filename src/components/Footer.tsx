@@ -28,10 +28,10 @@ const Footer = () => {
           <div>
             <h4 className="font-heading font-semibold mb-4">Navegación</h4>
             <ul className="space-y-2">
-              {['Inicio', 'Servicios', 'Nosotros', 'Flota', 'Contacto'].map((item) => (
+              {['Inicio', 'Servicios', 'Nosotros', 'Flota', 'Contacto', 'Blog'].map((item) => (
                 <li key={item}>
                   <a 
-                    href={`#${item.toLowerCase()}`}
+                    href={item === 'Blog' ? '/blog' : `/#${item.toLowerCase()}`}
                     className="text-secondary-foreground/70 hover:text-primary transition-colors"
                   >
                     {item}
