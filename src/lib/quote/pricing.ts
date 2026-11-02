@@ -21,12 +21,16 @@ export const totalM3 = (lineas: LineaInventario[]) =>
 export const totalItems = (lineas: LineaInventario[]) =>
   lineas.reduce((s, l) => s + (Number(l.qty) || 0), 0);
 
-/** Primer camión cuya capacidad ≥ m³ × 1.15; si supera 45 m³, varios camiones de 45. */
+/** Camiones que se sugieren solos: la Pick Up se elige a mano. */
+const SUGERIBLES = CAMIONES.filter((c) => c.key !== 'camionPickup');
+const MAYOR = SUGERIBLES[SUGERIBLES.length - 1];
+
+/** Primer camión cuya capacidad ≥ m³ × 1.15; si supera el mayor, varios de ése. */
 export function sugerirCamion(m3: number): { camion: string; cantidad: number } {
   const necesario = m3 * HOLGURA;
-  const found = CAMIONES.find((c) => c.capacidad >= necesario);
+  const found = SUGERIBLES.find((c) => c.capacidad >= necesario);
   if (found) return { camion: found.key, cantidad: 1 };
-  return { camion: 'camion45', cantidad: Math.max(1, Math.ceil(necesario / 45)) };
+  return { camion: MAYOR.key, cantidad: Math.max(1, Math.ceil(necesario / MAYOR.capacidad)) };
 }
 
 export function sugerirPersonas(m3: number): number {

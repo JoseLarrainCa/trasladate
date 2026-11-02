@@ -1,10 +1,16 @@
 /** Configuración por defecto del generador de cotizaciones PDF Trasladarte. */
 
 export interface Tarifas {
+  camionPickup: number;
   camion15: number;
+  camion20: number;
   camion25: number;
+  camion30: number;
   camion35: number;
+  camion40: number;
   camion45: number;
+  camion50: number;
+  camion55: number;
   chofer: number;
   persona: number;
   embalajeM3: number;
@@ -12,10 +18,16 @@ export interface Tarifas {
 }
 
 export const DEFAULT_TARIFAS: Tarifas = {
+  camionPickup: 50000,
   camion15: 70000,
+  camion20: 85000,
   camion25: 95000,
+  camion30: 110000,
   camion35: 125000,
+  camion40: 140000,
   camion45: 150000,
+  camion50: 165000,
+  camion55: 180000,
   chofer: 45000,
   persona: 45000,
   embalajeM3: 5000,
@@ -23,10 +35,16 @@ export const DEFAULT_TARIFAS: Tarifas = {
 };
 
 export const TARIFA_LABELS: Record<keyof Tarifas, string> = {
+  camionPickup: 'Pick Up',
   camion15: 'Camión 15 m³',
+  camion20: 'Camión 20 m³',
   camion25: 'Camión 25 m³',
+  camion30: 'Camión 30 m³',
   camion35: 'Camión 35 m³',
+  camion40: 'Camión 40 m³',
   camion45: 'Camión 45 m³',
+  camion50: 'Camión 50 m³',
+  camion55: 'Camión 55 m³',
   chofer: 'Chofer (por camión)',
   persona: 'Persona operativa (c/u)',
   embalajeM3: 'Servicio de embalaje ($/m³)',
@@ -34,10 +52,16 @@ export const TARIFA_LABELS: Record<keyof Tarifas, string> = {
 };
 
 export const CAMIONES = [
+  { key: 'camionPickup', label: 'Pick Up', capacidad: 4 },
   { key: 'camion15', label: 'Camión 15 m³', capacidad: 15 },
+  { key: 'camion20', label: 'Camión 20 m³', capacidad: 20 },
   { key: 'camion25', label: 'Camión 25 m³', capacidad: 25 },
+  { key: 'camion30', label: 'Camión 30 m³', capacidad: 30 },
   { key: 'camion35', label: 'Camión 35 m³', capacidad: 35 },
+  { key: 'camion40', label: 'Camión 40 m³', capacidad: 40 },
   { key: 'camion45', label: 'Camión 45 m³', capacidad: 45 },
+  { key: 'camion50', label: 'Camión 50 m³', capacidad: 50 },
+  { key: 'camion55', label: 'Camión 55 m³', capacidad: 55 },
 ] as const;
 
 export interface Empresa {
