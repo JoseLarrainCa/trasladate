@@ -73,6 +73,8 @@ const emptyDoc = (folio: number): DocState => ({
   folio,
   formato: 'marco',
   fecha_servicio: hoy(),
+  hora_inicio: '',
+  hora_fin: '',
   titulo_servicio: TITULO_OPTIONS[0],
   saludo: SALUDO_OPTIONS[0],
   tipo_servicio: '',
@@ -278,6 +280,8 @@ const GenerarCotizacion = () => {
           folio: d.folio,
           formato: d.formato,
           fecha_servicio: d.fecha_servicio || next.fecha_servicio,
+          hora_inicio: d.hora_inicio ?? '',
+          hora_fin: d.hora_fin ?? '',
           titulo_servicio: d.titulo_servicio,
           saludo: d.saludo,
           tipo_servicio: d.tipo_servicio ?? next.tipo_servicio,
@@ -388,6 +392,8 @@ const GenerarCotizacion = () => {
       folio: doc.folio,
       formato: doc.formato,
       fecha_servicio: doc.fecha_servicio || null,
+      hora_inicio: doc.hora_inicio || null,
+      hora_fin: doc.hora_inicio ? doc.hora_fin || null : null,
       titulo_servicio: doc.titulo_servicio,
       saludo: doc.saludo,
       tipo_servicio: doc.tipo_servicio,
@@ -526,6 +532,26 @@ const GenerarCotizacion = () => {
                       className="mt-1"
                       value={doc.fecha_servicio}
                       onChange={(e) => set('fecha_servicio', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label>Hora de inicio (opcional)</Label>
+                    <Input
+                      type="time"
+                      className="mt-1"
+                      value={doc.hora_inicio}
+                      onChange={(e) => set('hora_inicio', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label>Hora de término (opcional)</Label>
+                    <Input
+                      type="time"
+                      className="mt-1"
+                      value={doc.hora_fin}
+                      min={doc.hora_inicio || undefined}
+                      disabled={!doc.hora_inicio}
+                      onChange={(e) => set('hora_fin', e.target.value)}
                     />
                   </div>
                   <div>

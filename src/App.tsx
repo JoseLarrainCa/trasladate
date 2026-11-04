@@ -20,6 +20,7 @@ import FormularioDetalle from "./pages/admin/FormularioDetalle";
 import Importar from "./pages/admin/Importar";
 import Configuracion from "./pages/admin/Configuracion";
 import GenerarCotizacion from "./pages/admin/GenerarCotizacion";
+import Calendario from "./pages/admin/Calendario";
 
 
 const queryClient = new QueryClient();
@@ -80,6 +81,14 @@ const App = () => (
               }
             />
 
+            <Route
+              path="/admin/calendario"
+              element={
+                <ProtectedRoute>
+                  <Calendario />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/admin/importar"
               element={

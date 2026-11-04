@@ -95,6 +95,8 @@ export const TABLAS: Record<string, Tabla> = {
       folio: "int",
       formato: "text",
       fecha_servicio: "text",
+      hora_inicio: "text",
+      hora_fin: "text",
       titulo_servicio: "text",
       saludo: "text",
       tipo_servicio: "text",

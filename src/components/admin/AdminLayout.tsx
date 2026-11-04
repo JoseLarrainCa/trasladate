@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard,
   FileText,
+  CalendarDays,
   Upload,
   Settings,
   LogOut,
@@ -31,6 +32,12 @@ const menuItems = [
     href: '/admin/formularios',
     icon: FileText,
     description: 'Cotizaciones recibidas',
+  },
+  {
+    label: 'Calendario',
+    href: '/admin/calendario',
+    icon: CalendarDays,
+    description: 'Servicios agendados',
   },
   {
     label: 'Importar',

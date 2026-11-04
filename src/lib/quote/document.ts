@@ -34,6 +34,9 @@ export interface DocState {
   folio: number;
   formato: FormatoPDF;
   fecha_servicio: string; // yyyy-mm-dd
+  /** `HH:MM`, hora de Chile; opcional. Lo muestra el calendario del panel. */
+  hora_inicio: string;
+  hora_fin: string;
   titulo_servicio: string;
   saludo: string;
   tipo_servicio: string; // 'express' | 'principal' | 'exclusivo' | ''
