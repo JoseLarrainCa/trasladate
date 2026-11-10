@@ -64,7 +64,7 @@ import {
 } from '@/lib/quote/pricing';
 import { imprimirDocumento } from '@/lib/quote/print';
 import type { DocConfig, DocState } from '@/lib/quote/document';
-import { HOJAS, LETRA_OPCIONES, diasEmbalaje, escalaLetra, estiloHoja, hojaDe, personasEmbalaje } from '@/lib/quote/document';
+import { HOJAS, LETRA_OPCIONES, buildVars, planAuto, diasEmbalaje, escalaLetra, estiloHoja, hojaDe, personasEmbalaje } from '@/lib/quote/document';
 import '@/styles/quote-pdf.css';
 
 const hoy = () => new Date().toISOString().slice(0, 10);
@@ -1117,6 +1117,10 @@ const GenerarCotizacion = () => {
                   {editando.keys.map((k) => {
                     const def = TEXTO_DEFS.find((t) => t.key === k);
                     const esMaterial = k.startsWith('mat_');
+                    const idxDia = k.startsWith('dia_') ? Number(k.slice(4)) : -1;
+                    const autoDia = idxDia >= 0
+                      ? (planAuto(doc, cfg, buildVars(doc, cfg))[idxDia]?.lineas.map((l) => l.texto).join('\n') ?? '')
+                      : '';
                     return (
                       <div key={k} className="space-y-1">
                         <div className="flex items-center gap-2">
@@ -1127,7 +1131,7 @@ const GenerarCotizacion = () => {
                             />
                           )}
                           <Label className="text-xs text-muted-foreground">
-                            {k === 'detalle_servicio' ? 'Detalle del servicio' : def?.label || k}
+                            {k === 'detalle_servicio' ? 'Detalle del servicio' : idxDia >= 0 ? 'Qué se hace ese día (una línea por punto)' : def?.label || k}
                           </Label>
                           {doc.textos[k] !== undefined && k !== 'detalle_servicio' && (
                             <Button
@@ -1144,8 +1148,8 @@ const GenerarCotizacion = () => {
                           )}
                         </div>
                         <Textarea
-                          rows={2}
-                          value={doc.textos[k] ?? cfg.textosDefault[k] ?? ''}
+                          rows={idxDia >= 0 ? 6 : 2}
+                          value={doc.textos[k] ?? (idxDia >= 0 ? autoDia : cfg.textosDefault[k] ?? '')}
                           onChange={(e) => setTexto(k, e.target.value)}
                         />
                       </div>

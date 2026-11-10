@@ -92,7 +92,7 @@ const DocMarco = ({ doc, cfg }: Props) => {
   const filaEmbalaje = (
     <tr>
       <td className="c">01</td>
-      <td>
+      <td data-edit={`,fila_embalaje,fila_embalaje_incluye,${doc.materiales.join(',')}`} data-edit-label="Fila de embalaje">
         <div>{txt(doc, cfg, 'fila_embalaje', vars)}</div>
         <div>{txt(doc, cfg, 'fila_embalaje_incluye', vars)}</div>
         <div className="d-emb">
@@ -115,19 +115,19 @@ const DocMarco = ({ doc, cfg }: Props) => {
           <p className="d-p">
             Estimado <i style={{ color: '#1e46c8', fontWeight: 700 }}>{String(vars.nombreCorto)}</i>,
           </p>
-          {saludoCuerpo && <p className="d-p indent">{saludoCuerpo}</p>}
+          {saludoCuerpo && <p className="d-p indent" data-edit=",saludo_cuerpo" data-edit-label="Saludo">{saludoCuerpo}</p>}
 
           <div className="d-title">{espaciar(doc.titulo_servicio)}</div>
 
-          {personalCalificado && <p className="d-star">* {personalCalificado}</p>}
-          {seTrasladara && <p className="d-star">* {seTrasladara}</p>}
+          {personalCalificado && <p className="d-star" data-edit=",personal_calificado" data-edit-label="Personal calificado">* {personalCalificado}</p>}
+          {seTrasladara && <p className="d-star" data-edit=",se_trasladara" data-edit-label="Qué se trasladará">* {seTrasladara}</p>}
 
           {plan.length > 0 && (
             <div className="d-plan">
               <div className="d-plan-title">PLAN DE LA MUDANZA DÍA POR DÍA</div>
               <div className="d-plan-grid" style={{ ['--plan-cols' as string]: colsPlan }}>
                 {plan.map((d, i) => (
-                  <div key={i} className={`d-plan-day${d.final ? ' final' : ''}`}>
+                  <div key={i} className={`d-plan-day${d.final ? ' final' : ''}`} data-edit={`,dia_${i}`} data-edit-label={`Qué se hace — ${d.nombre}`}>
                     <div className="h">
                       <span>{d.nombre}</span>
                       <span>{d.final ? 'MUDANZA' : 'EMBALAJE'}</span>
@@ -154,7 +154,7 @@ const DocMarco = ({ doc, cfg }: Props) => {
           {materiales.length > 0 && (
             <>
               <p className="d-star">* Materiales a utilizar:</p>
-              <div className="mat-list">
+              <div className="mat-list" data-edit={`,${doc.materiales.join(',')}`} data-edit-label="Materiales">
                 {materiales.map((m, i) => (
                   <div key={i}>{m}</div>
                 ))}
@@ -228,12 +228,12 @@ const DocMarco = ({ doc, cfg }: Props) => {
             </tr>
             <tr>
               <td className="c">{dosDigitos(doc.camion_qty)}</td>
-              <td>{txt(doc, cfg, 'fila_chofer', vars)}</td>
+              <td data-edit=",fila_chofer" data-edit-label="Fila del chofer">{txt(doc, cfg, 'fila_chofer', vars)}</td>
               <td className="v" />
             </tr>
             <tr>
               <td className="c">{dosDigitos(doc.personas)}</td>
-              <td>{txt(doc, cfg, 'fila_personas', vars)}</td>
+              <td data-edit=",fila_personas" data-edit-label="Fila de personas">{txt(doc, cfg, 'fila_personas', vars)}</td>
               <td className="v" />
             </tr>
             {doc.con_embalaje && diasPrevios === 0 && filaEmbalaje}
@@ -246,7 +246,7 @@ const DocMarco = ({ doc, cfg }: Props) => {
         </table>
 
         {acciones.length > 0 && (
-          <div className="d-do">
+          <div className="d-do" data-edit={`,${accionesKeys.join(',')}`} data-edit-label="Lo que haremos">
             <div className="d-lbl">LO QUE HAREMOS:</div>
             {acciones.map((a, i) => (
               <p key={i}>
@@ -257,7 +257,7 @@ const DocMarco = ({ doc, cfg }: Props) => {
         )}
 
         {observaciones.length > 0 && (
-          <div className="d-obs">
+          <div className="d-obs" data-edit={`,${doc.observaciones.join(',')}`} data-edit-label="Observaciones">
             <div className="d-lbl">OBSERVACIONES :</div>
             {observaciones.map((o, i) => (
               <p key={i}>
@@ -275,16 +275,16 @@ const DocMarco = ({ doc, cfg }: Props) => {
         <div className="d-pay">
           <div className="row">
             <div className="d-lbl">Forma de pago:</div>
-            {doc.sin_iva && <div style={{ fontWeight: 700 }}>{txt(doc, cfg, 'nota_iva', vars)}</div>}
+            {doc.sin_iva && <div style={{ fontWeight: 700 }} data-edit=",nota_iva" data-edit-label="Nota de IVA">{txt(doc, cfg, 'nota_iva', vars)}</div>}
           </div>
-          <div className="cuota">
+          <div className="cuota" data-edit=",pago_cuota1_label" data-edit-label="Primera cuota">
             <b>{doc.cuota1}%</b> {txt(doc, cfg, 'pago_cuota1_label', vars)} — <b>{String(vars.montoCuota1)}</b>
           </div>
-          <div className="cuota">
+          <div className="cuota" data-edit=",pago_cuota2_label" data-edit-label="Segunda cuota">
             <b>{doc.cuota2}%</b> {txt(doc, cfg, 'pago_cuota2_label', vars)} — <b>{String(vars.montoCuota2)}</b>
           </div>
 
-          <p className="d-p" style={{ marginTop: '4mm' }}>
+          <p className="d-p" style={{ marginTop: '4mm' }} data-edit=",pago_intro" data-edit-label="Intro de la transferencia">
             {txt(doc, cfg, 'pago_intro', vars)}
           </p>
 
@@ -320,9 +320,9 @@ const DocMarco = ({ doc, cfg }: Props) => {
             if (!saldo) return null;
             const marca = 'pero antes de realizar la descarga';
             const idx = saldo.indexOf(marca);
-            if (idx === -1) return <p className="d-p">{saldo}</p>;
+            if (idx === -1) return <p className="d-p" data-edit=",pago_saldo" data-edit-label="Saldo">{saldo}</p>;
             return (
-              <p className="d-p">
+              <p className="d-p" data-edit=",pago_saldo" data-edit-label="Saldo">
                 {saldo.slice(0, idx)}
                 <b>{marca}</b>
                 {saldo.slice(idx + marca.length)}

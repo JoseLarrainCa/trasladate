@@ -277,7 +277,7 @@ const ACCIONES_EMBALAJE = ['accion_embalar', 'accion_cocina', 'accion_adornos', 
  * Qué se hace cada día en una mudanza de varios días: los días previos embalan y el último carga,
  * traslada y arma. Sin días previos devuelve [] (un solo día no necesita línea de tiempo).
  */
-export function planPorDia(doc: DocState, cfg: DocConfig, vars: TplVars): DiaPlan[] {
+export function planAuto(doc: DocState, cfg: DocConfig, vars: TplVars): DiaPlan[] {
   const previos = diasEmbalaje(doc);
   if (previos === 0) return [];
   const acciones = accionesVisibles(doc);
@@ -306,4 +306,17 @@ export function planPorDia(doc: DocState, cfg: DocConfig, vars: TplVars): DiaPla
     ],
   });
   return dias;
+}
+
+/** Texto que el usuario escribió a mano para el día `i` (0 = primer día); undefined = automático. */
+export const textoDelDia = (doc: DocState, i: number): string | undefined => (doc.textos || {})[`dia_${i}`];
+
+/** Plan por día con los textos escritos a mano encima de los automáticos (una línea por punto). */
+export function planPorDia(doc: DocState, cfg: DocConfig, vars: TplVars): DiaPlan[] {
+  return planAuto(doc, cfg, vars).map((d, i) => {
+    const manual = textoDelDia(doc, i);
+    if (manual === undefined) return d;
+    const lineas = manual.split('\n').map((t) => t.trim()).filter(Boolean).map((texto, j) => ({ texto, equipo: j === 0 }));
+    return { ...d, lineas };
+  });
 }
