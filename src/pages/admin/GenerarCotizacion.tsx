@@ -64,7 +64,7 @@ import {
 } from '@/lib/quote/pricing';
 import { imprimirDocumento } from '@/lib/quote/print';
 import type { DocConfig, DocState } from '@/lib/quote/document';
-import { diasEmbalaje, personasEmbalaje } from '@/lib/quote/document';
+import { HOJAS, LETRA_OPCIONES, diasEmbalaje, escalaLetra, estiloHoja, hojaDe, personasEmbalaje } from '@/lib/quote/document';
 import '@/styles/quote-pdf.css';
 
 const hoy = () => new Date().toISOString().slice(0, 10);
@@ -488,7 +488,7 @@ const GenerarCotizacion = () => {
               {saving ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Save className="w-4 h-4 mr-1" />}
               Guardar
             </Button>
-            <Button size="sm" onClick={() => imprimirDocumento(docRef.current, `Cotizacion-${doc.folio}`)}>
+            <Button size="sm" onClick={() => imprimirDocumento(docRef.current, `Cotizacion-${doc.folio}`, HOJAS[hojaDe(doc)])}>
               <Printer className="w-4 h-4 mr-1" /> Descargar PDF
             </Button>
           </div>
@@ -844,6 +844,36 @@ const GenerarCotizacion = () => {
                   ))}
                 </div>
 
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>Tamaño de hoja al imprimir</Label>
+                    <Select value={hojaDe(doc)}
+                      onValueChange={(v) => setDoc((d) => ({ ...d, textos: { ...d.textos, hoja: v } }))}>
+                      <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {(Object.keys(HOJAS) as (keyof typeof HOJAS)[]).map((k) => (
+                          <SelectItem key={k} value={k}>{HOJAS[k].label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Tamaño de letra</Label>
+                    <Select value={String(escalaLetra(doc))}
+                      onValueChange={(v) => setDoc((d) => ({ ...d, textos: { ...d.textos, letra: v } }))}>
+                      <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {LETRA_OPCIONES.map((o) => (
+                          <SelectItem key={o.v} value={o.v}>{o.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <p className="col-span-2 -mt-1 text-xs text-muted-foreground">
+                    En el diálogo de impresión elige el mismo tamaño de papel. Con una hoja más grande cabe más y la letra se puede subir.
+                  </p>
+                </div>
+
                 <div className="space-y-2 rounded-lg border border-border p-3">
                   <Label className="text-sm font-semibold">Acciones extra («Lo que haremos»)</Label>
                   <div className="grid grid-cols-2 gap-2">
@@ -957,7 +987,7 @@ const GenerarCotizacion = () => {
               {paso !== 'servicio' ? (
                 <Button size="sm" onClick={() => setPaso(paso === 'general' ? 'inventario' : 'servicio')}>Siguiente</Button>
               ) : (
-                <Button size="sm" onClick={() => imprimirDocumento(docRef.current, `Cotizacion-${doc.folio}`)}>
+                <Button size="sm" onClick={() => imprimirDocumento(docRef.current, `Cotizacion-${doc.folio}`, HOJAS[hojaDe(doc)])}>
                   <Printer className="w-4 h-4 mr-1" /> Descargar PDF
                 </Button>
               )}
@@ -1060,7 +1090,7 @@ const GenerarCotizacion = () => {
                   ref={docRef}
                   className="doc-editable doc-paginated-preview"
                   onClick={onPreviewClick}
-                  style={{ zoom, width: '210mm' }}
+                  style={{ ...estiloHoja(doc), zoom, width: 'var(--pw, 210mm)' }}
                 >
                   {doc.formato === 'marco' ? <DocMarco doc={doc} cfg={cfg} /> : <DocModerno doc={doc} cfg={cfg} />}
                 </div>

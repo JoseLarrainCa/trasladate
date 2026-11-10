@@ -6,19 +6,19 @@
    ========================================================================== */
 
 #doc {
-  width: 210mm;
+  width: var(--pw, 210mm);
   margin: 0 auto;
   color: #000;
 }
 
 .page {
-  width: 210mm;
-  min-height: 297mm;
+  width: var(--pw, 210mm);
+  min-height: var(--ph, 297mm);
   padding: 8mm 9mm;
   background: #fff;
   box-sizing: border-box;
   font-family: Calibri, "Segoe UI", Candara, Arial, sans-serif;
-  font-size: 10.5pt;
+  font-size: calc(10.5pt * var(--fs, 1));
   line-height: 1.35;
   position: relative;
   overflow: hidden;
@@ -26,7 +26,7 @@
 
 /* ---------- Marca escrita ---------- */
 .d-brand {
-  font-size: 22pt;
+  font-size: calc(22pt * var(--fs, 1));
   font-weight: 800;
   letter-spacing: 0.06em;
   color: #1e46c8;
@@ -36,7 +36,7 @@
 }
 .d-brand .a-org { color: #d93b0f; }
 .d-sub {
-  font-size: 8.5pt;
+  font-size: calc(8.5pt * var(--fs, 1));
   font-weight: 700;
   letter-spacing: 0.22em;
   color: #1e46c8;
@@ -58,7 +58,7 @@
   font-family: Georgia, "Times New Roman", serif;
   font-style: italic;
   font-weight: 700;
-  font-size: 30pt;
+  font-size: calc(30pt * var(--fs, 1));
   color: #1e46c8;
   -webkit-text-stroke: 1.2px #d93b0f;
   line-height: 1;
@@ -67,7 +67,7 @@
   display: flex;
   gap: 10mm;
   margin: 2.5mm 0;
-  font-size: 10.5pt;
+  font-size: calc(10.5pt * var(--fs, 1));
 }
 .d-meta b { font-weight: 700; }
 .d-meta i { color: #1e46c8; font-style: italic; font-weight: 700; }
@@ -77,14 +77,14 @@
   border: 2px solid #e8621d;
   border-radius: 3px;
   padding: 4mm 5mm;
-  min-height: 225mm;
+  min-height: calc(var(--ph, 297mm) - 72mm);
   position: relative;
 }
 .d-box.auto { min-height: 0; }
 .d-lbl { font-weight: 700; text-decoration: underline; margin-bottom: 2mm; }
 .d-title {
   text-align: center;
-  font-size: 22pt;
+  font-size: calc(22pt * var(--fs, 1));
   font-weight: 800;
   color: #1e46c8;
   letter-spacing: 0.04em;
@@ -105,7 +105,7 @@
   color: #1e46c8;
   font-style: italic;
   font-weight: 700;
-  font-size: 10pt;
+  font-size: calc(10pt * var(--fs, 1));
   line-height: 1.5;
 }
 .mat-list { margin: 1mm 0 3mm 14mm; }
@@ -134,8 +134,8 @@
   text-align: center;
   font-weight: 800;
 }
-.seal .s1 { font-size: 13pt; line-height: 1; }
-.seal .s2 { font-size: 8pt; letter-spacing: 0.08em; margin-top: 1mm; }
+.seal .s1 { font-size: calc(13pt * var(--fs, 1)); line-height: 1; }
+.seal .s2 { font-size: calc(8pt * var(--fs, 1)); letter-spacing: 0.08em; margin-top: 1mm; }
 
 /* ---------- Ficha cliente ---------- */
 .d-client {
@@ -149,7 +149,7 @@
   border-right: 1px solid #e8621d;
   border-bottom: 1px solid #e8621d;
   padding: 1.4mm 2.5mm;
-  font-size: 10pt;
+  font-size: calc(10pt * var(--fs, 1));
 }
 .d-client > div:nth-child(4n) { border-right: none; }
 .d-client > div.k { font-weight: 700; }
@@ -160,12 +160,12 @@
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 3mm;
-  font-size: 9.5pt;
+  font-size: calc(9.5pt * var(--fs, 1));
 }
 .d-tbl thead th {
   background: #17179c;
   color: #fff;
-  font-size: 8pt;
+  font-size: calc(8pt * var(--fs, 1));
   letter-spacing: 0.06em;
   padding: 1.6mm 2mm;
   border: 1px solid #17179c;
@@ -183,7 +183,7 @@
   color: #fff;
   text-align: center;
   white-space: pre;
-  font-size: 8pt;
+  font-size: calc(8pt * var(--fs, 1));
   font-weight: 700;
   letter-spacing: 0.06em;
   padding: 1.4mm 2mm;
@@ -223,16 +223,16 @@
 }
 .d-contact .band.blue { background: #17179c; }
 .d-contact .band.black { background: #000; }
-.d-contact .logo { font-size: 13pt; font-weight: 800; letter-spacing: 0.06em; color: #fff; }
+.d-contact .logo { font-size: calc(13pt * var(--fs, 1)); font-weight: 800; letter-spacing: 0.06em; color: #fff; }
 .d-contact .logo.akikb { color: #e8621d; }
-.d-contact .k { color: #ffd54f; font-style: italic; font-size: 9pt; }
-.d-contact .v { color: #fff; font-style: italic; font-weight: 700; font-size: 9pt; }
+.d-contact .k { color: #ffd54f; font-style: italic; font-size: calc(9pt * var(--fs, 1)); }
+.d-contact .v { color: #fff; font-style: italic; font-weight: 700; font-size: calc(9pt * var(--fs, 1)); }
 
 /* ---------- Galería ---------- */
 .d-gallery h3 {
   color: #d32f2f;
   font-weight: 800;
-  font-size: 13pt;
+  font-size: calc(13pt * var(--fs, 1));
   text-align: center;
   margin: 4mm 0 3mm;
 }
@@ -245,26 +245,26 @@
   align-items: center;
   justify-content: center;
   color: #999;
-  font-size: 8pt;
+  font-size: calc(8pt * var(--fs, 1));
 }
 
 /* ==========================================================================
    Formato 2 — moderno
    ========================================================================== */
 .m-page {
-  width: 210mm;
-  min-height: 297mm;
+  width: var(--pw, 210mm);
+  min-height: var(--ph, 297mm);
   padding: 14mm 15mm;
   background: #fff;
   box-sizing: border-box;
   font-family: Calibri, "Segoe UI", Candara, Arial, sans-serif;
-  font-size: 9.5pt;
+  font-size: calc(9.5pt * var(--fs, 1));
   color: #16233c;
   line-height: 1.35;
 }
 .m-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10mm; }
 .m-brand .name {
-  font-size: 20pt;
+  font-size: calc(20pt * var(--fs, 1));
   font-weight: 800;
   letter-spacing: 0.05em;
   color: #1e46c8;
@@ -272,38 +272,38 @@
 }
 .m-brand .name .a-org { color: #e8621d; }
 .m-brand .tag {
-  font-size: 7pt;
+  font-size: calc(7pt * var(--fs, 1));
   font-weight: 700;
   letter-spacing: 0.2em;
   color: #e8621d;
   margin-top: 1mm;
 }
-.m-brand .meta { font-size: 8pt; color: #5a6472; margin-top: 2mm; line-height: 1.5; }
+.m-brand .meta { font-size: calc(8pt * var(--fs, 1)); color: #5a6472; margin-top: 2mm; line-height: 1.5; }
 .m-title { text-align: right; }
-.m-title .t { font-size: 17pt; font-weight: 800; color: #1e46c8; letter-spacing: 0.04em; }
-.m-title .s { font-size: 8.5pt; color: #5a6472; margin-top: 1mm; }
+.m-title .t { font-size: calc(17pt * var(--fs, 1)); font-weight: 800; color: #1e46c8; letter-spacing: 0.04em; }
+.m-title .s { font-size: calc(8.5pt * var(--fs, 1)); color: #5a6472; margin-top: 1mm; }
 .m-title .s b { color: #16233c; }
 .m-rule { border: none; border-top: 2.5px solid #e8621d; margin: 4mm 0; }
 
-.m-client { font-size: 10pt; margin-bottom: 3mm; }
+.m-client { font-size: calc(10pt * var(--fs, 1)); margin-bottom: 3mm; }
 .m-client b { font-weight: 700; }
-.m-client .sub { color: #5a6472; font-size: 8.5pt; }
+.m-client .sub { color: #5a6472; font-size: calc(8.5pt * var(--fs, 1)); }
 
 .m-ruta { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; margin-bottom: 4mm; }
 .m-ruta .card { border: 1px solid #dbe2ea; border-radius: 2mm; padding: 3mm 4mm; }
-.m-ruta .lbl { font-size: 6.5pt; font-weight: 800; letter-spacing: 0.18em; color: #e8621d; }
-.m-ruta .dir { font-size: 9.5pt; font-weight: 600; margin-top: 1mm; }
-.m-ruta .sub { font-size: 8pt; color: #5a6472; margin-top: 0.6mm; }
+.m-ruta .lbl { font-size: calc(6.5pt * var(--fs, 1)); font-weight: 800; letter-spacing: 0.18em; color: #e8621d; }
+.m-ruta .dir { font-size: calc(9.5pt * var(--fs, 1)); font-weight: 600; margin-top: 1mm; }
+.m-ruta .sub { font-size: calc(8pt * var(--fs, 1)); color: #5a6472; margin-top: 0.6mm; }
 
 .m-intro { margin-bottom: 3mm; }
 
-.m-tbl { width: 100%; border-collapse: collapse; font-size: 8.8pt; }
+.m-tbl { width: 100%; border-collapse: collapse; font-size: calc(8.8pt * var(--fs, 1)); }
 .m-tbl thead th {
   background: #1e3a6a;
   color: #fff;
   text-align: left;
   padding: 2mm 3mm;
-  font-size: 7.5pt;
+  font-size: calc(7.5pt * var(--fs, 1));
   letter-spacing: 0.12em;
 }
 .m-tbl thead th.n { width: 10mm; text-align: center; }
@@ -328,21 +328,21 @@
   align-items: baseline;
   padding: 2.6mm 3mm;
   font-weight: 800;
-  font-size: 11pt;
+  font-size: calc(11pt * var(--fs, 1));
 }
-.m-total .iva { font-size: 7.5pt; font-weight: 600; opacity: 0.85; }
+.m-total .iva { font-size: calc(7.5pt * var(--fs, 1)); font-weight: 600; opacity: 0.85; }
 
 .m-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; margin-top: 5mm; }
 .m-sec h4 {
-  font-size: 7.5pt;
+  font-size: calc(7.5pt * var(--fs, 1));
   letter-spacing: 0.16em;
   color: #e8621d;
   font-weight: 800;
   margin: 0 0 1.5mm 0;
 }
 .m-sec ul { margin: 0; padding-left: 4mm; }
-.m-sec li { margin-bottom: 1mm; font-size: 8.5pt; }
-.m-sec p { margin: 0 0 1mm 0; font-size: 8.5pt; }
+.m-sec li { margin-bottom: 1mm; font-size: calc(8.5pt * var(--fs, 1)); }
+.m-sec p { margin: 0 0 1mm 0; font-size: calc(8.5pt * var(--fs, 1)); }
 .m-sec .muted { color: #5a6472; }
 
 .m-foot {
@@ -352,7 +352,7 @@
   margin-top: 6mm;
   padding-top: 3mm;
   border-top: 1px solid #dbe2ea;
-  font-size: 8pt;
+  font-size: calc(8pt * var(--fs, 1));
   color: #5a6472;
 }
 .m-foot b { color: #16233c; }
@@ -365,7 +365,7 @@
 @media print {
   body.imprimiendo > *:not(#doc) { display: none !important; }
   body.imprimiendo { background: #fff; margin: 0; }
-  #doc { transform: none !important; width: 210mm; margin: 0; }
+  #doc { transform: none !important; width: var(--pw, 210mm); margin: 0; }
   .page { page-break-after: always; }
   .page:last-child { page-break-after: auto; }
   .m-page { page-break-after: auto; }
@@ -376,7 +376,7 @@
    Hoja anexa — Inventario del cliente
    ========================================================================== */
 .anx-title {
-  font-size: 15pt;
+  font-size: calc(15pt * var(--fs, 1));
   font-weight: 800;
   color: #1e46c8;
   letter-spacing: 0.04em;
@@ -385,7 +385,7 @@
 }
 .anx-sub {
   text-align: center;
-  font-size: 9pt;
+  font-size: calc(9pt * var(--fs, 1));
   color: #5a6472;
   margin-bottom: 4mm;
 }
@@ -399,7 +399,7 @@
   margin-bottom: 4mm;
 }
 .anx-cat-h {
-  font-size: 7.5pt;
+  font-size: calc(7.5pt * var(--fs, 1));
   font-weight: 800;
   letter-spacing: 0.14em;
   color: #e8621d;
@@ -407,10 +407,10 @@
   padding-bottom: 0.8mm;
   margin-bottom: 1.2mm;
 }
-.anx-tbl { width: 100%; border-collapse: collapse; font-size: 9pt; }
+.anx-tbl { width: 100%; border-collapse: collapse; font-size: calc(9pt * var(--fs, 1)); }
 .anx-tbl td { padding: 0.7mm 1mm; border-bottom: 1px solid #eceff3; }
 .anx-tbl td.q { width: 10mm; font-weight: 700; color: #1e46c8; text-align: right; padding-right: 2.5mm; }
-.anx-note { margin-top: 3mm; font-size: 8pt; color: #5a6472; font-style: italic; }
+.anx-note { margin-top: 3mm; font-size: calc(8pt * var(--fs, 1)); color: #5a6472; font-style: italic; }
 .anx-moderno { page-break-before: always; }
 .page .anx-box { min-height: 0; }
 
@@ -447,14 +447,14 @@
 .m-photo-eyebrow {
   color: var(--photo-accent);
   font-family: Sora, Montserrat, system-ui, sans-serif;
-  font-size: 7pt;
+  font-size: calc(7pt * var(--fs, 1));
   font-weight: 800;
   letter-spacing: .16em;
 }
 .m-photo-heading h2 {
   margin: 1.5mm 0 0;
   font-family: Sora, Montserrat, system-ui, sans-serif;
-  font-size: 23pt;
+  font-size: calc(23pt * var(--fs, 1));
   line-height: 1.05;
   letter-spacing: 0;
   color: var(--photo-ink);
@@ -464,7 +464,7 @@
   padding-left: 4mm;
   border-left: 1.2mm solid var(--photo-accent);
   color: var(--photo-muted);
-  font-size: 8pt;
+  font-size: calc(8pt * var(--fs, 1));
   line-height: 1.45;
 }
 .m-photo-story {
@@ -511,17 +511,17 @@
 .m-photo-number {
   color: var(--photo-paper);
   font-family: Sora, Montserrat, system-ui, sans-serif;
-  font-size: 7pt;
+  font-size: calc(7pt * var(--fs, 1));
   font-weight: 800;
   line-height: 1.2;
 }
 .m-photo-caption { display: flex; flex-direction: column; min-width: 0; }
 .m-photo-caption strong {
   font-family: Sora, Montserrat, system-ui, sans-serif;
-  font-size: 8pt;
+  font-size: calc(8pt * var(--fs, 1));
   line-height: 1.15;
 }
-.m-photo-caption small { margin-top: .8mm; font-size: 6.5pt; line-height: 1.25; opacity: .9; }
+.m-photo-caption small { margin-top: .8mm; font-size: calc(6.5pt * var(--fs, 1)); line-height: 1.25; opacity: .9; }
 .m-photo-feature { grid-column: 1 / 4; grid-row: 1 / 3; }
 .m-photo-feature img { object-position: 50% 48%; }
 .m-photo-pack { grid-column: 4; grid-row: 1; }
@@ -541,7 +541,7 @@
   margin-top: 5mm;
   padding-top: 3mm;
   border-top: 1px solid var(--photo-surface);
-  font-size: 7.5pt;
+  font-size: calc(7.5pt * var(--fs, 1));
   color: var(--photo-muted);
 }
 .m-photo-footer b { color: var(--photo-ink); }
@@ -575,3 +575,44 @@
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
+
+/* ==========================================================================
+   Plan por día (mudanzas de varios días): una tarjeta por día, de corrido.
+   ========================================================================== */
+.d-plan { margin: 4mm 0 3mm; }
+.d-plan-title {
+  font-weight: 800;
+  color: #1e46c8;
+  letter-spacing: 0.08em;
+  margin-bottom: 2mm;
+}
+.d-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--plan-cols, 2), 1fr);
+  gap: 3mm;
+}
+.d-plan-day {
+  border: 1.5px solid #17179c;
+  border-radius: 2px;
+  break-inside: avoid;
+  background: #fff;
+}
+.d-plan-day .h {
+  background: #17179c;
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 1.2mm 2.5mm;
+  font-size: calc(9pt * var(--fs, 1));
+  display: flex;
+  justify-content: space-between;
+  gap: 2mm;
+}
+.d-plan-day.final .h { background: #d93b0f; }
+.d-plan-day ul { margin: 0; padding: 2mm 2.5mm 2mm 6mm; }
+.d-plan-day li {
+  margin-bottom: 1mm;
+  font-size: calc(9.5pt * var(--fs, 1));
+  line-height: 1.3;
+}
+.d-plan-day li.crew { font-weight: 700; color: #1e46c8; list-style: none; margin-left: -4mm; }

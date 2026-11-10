@@ -1,7 +1,11 @@
 import pdfCss from '@/styles/quote-pdf.css?raw';
 
-/** Abre el diálogo de impresión con el documento aislado en un iframe A4. */
-export function imprimirDocumento(node: HTMLElement | null, titulo = 'Cotizacion') {
+/** Abre el diálogo de impresión con el documento aislado en un iframe del tamaño de hoja elegido (A4 por defecto). */
+export function imprimirDocumento(
+  node: HTMLElement | null,
+  titulo = 'Cotizacion',
+  hoja: { w: number; h: number } = { w: 210, h: 297 },
+) {
   if (!node) return;
 
   const iframe = document.createElement('iframe');
@@ -22,9 +26,10 @@ export function imprimirDocumento(node: HTMLElement | null, titulo = 'Cotizacion
   doc.open();
   doc.write(`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>${titulo}</title>
 <style>${pdfCss}
+@page{size:${hoja.w}mm ${hoja.h}mm;margin:0;}
 html,body{margin:0;padding:0;background:#fff;}
 *,*::before,*::after{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color-adjust:exact !important;}
-#doc{transform:none !important;zoom:1 !important;width:210mm;margin:0;}
+#doc{transform:none !important;zoom:1 !important;width:${hoja.w}mm;margin:0;}
 .doc-scale-wrap{overflow:visible !important;height:auto !important;}
 </style></head><body>${node.outerHTML}</body></html>`);
   doc.close();
@@ -39,10 +44,10 @@ html,body{margin:0;padding:0;background:#fff;}
       });
     }));
     await doc.fonts.ready;
-    // Cada hoja debe caber en UNA página (A4 o Carta): si el contenido es más alto, se reduce.
+    // Cada hoja debe caber en UNA página (del tamaño elegido): si el contenido es más alto, se reduce.
     const mm = 96 / 25.4;
-    const maxH = 277 * mm; // alto útil seguro para Carta (279mm) y A4 (297mm)
-    const maxW = 210 * mm;
+    const maxH = (hoja.h - 20) * mm; // margen de seguridad frente al alto real de la hoja
+    const maxW = hoja.w * mm;
     doc.querySelectorAll<HTMLElement>('.m-page, .page').forEach((p, i, all) => {
       const st = p.style as CSSStyleDeclaration & { zoom: string };
       p.style.minHeight = '0';

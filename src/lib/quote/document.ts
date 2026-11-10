@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import {
   DEFAULT_EMPRESA,
   DEFAULT_TEXTOS,
@@ -231,3 +232,78 @@ export function agruparInventario(lineas: LineaInventario[]) {
 }
 
 export const LETRAS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+/* ---------- Tamaño de hoja y de letra (se guardan en `textos`, sin tocar la tabla) ---------- */
+export const HOJAS = {
+  a4: { label: 'A4 (210 × 297 mm)', w: 210, h: 297 },
+  oficio: { label: 'Oficio (216 × 330 mm)', w: 216, h: 330 },
+  tabloide: { label: 'Tabloide (279 × 432 mm)', w: 279, h: 432 },
+  a3: { label: 'A3 (297 × 420 mm)', w: 297, h: 420 },
+} as const;
+export type HojaKey = keyof typeof HOJAS;
+
+export const hojaDe = (doc: DocState): HojaKey => {
+  const k = ((doc.textos || {}).hoja || '') as HojaKey;
+  return k in HOJAS ? k : 'a4';
+};
+
+export const LETRA_OPCIONES = [
+  { v: '1', label: 'Normal' },
+  { v: '1.15', label: 'Grande' },
+  { v: '1.3', label: 'Muy grande' },
+] as const;
+
+export const escalaLetra = (doc: DocState) => {
+  const n = Number((doc.textos || {}).letra);
+  return LETRA_OPCIONES.some((o) => Number(o.v) === n) ? n : 1;
+};
+
+/** Variables CSS del documento: ancho, alto de hoja y escala de letra. */
+export const estiloHoja = (doc: DocState): CSSProperties => {
+  const h = HOJAS[hojaDe(doc)];
+  return { '--pw': `${h.w}mm`, '--ph': `${h.h}mm`, '--fs': String(escalaLetra(doc)) } as CSSProperties;
+};
+
+/* ---------- Plan por día ---------- */
+export interface DiaPlan {
+  nombre: string;
+  final: boolean;
+  lineas: { texto: string; equipo?: boolean }[];
+}
+
+const ACCIONES_EMBALAJE = ['accion_embalar', 'accion_cocina', 'accion_adornos', 'accion_libros', 'accion_juguetes'];
+
+/**
+ * Qué se hace cada día en una mudanza de varios días: los días previos embalan y el último carga,
+ * traslada y arma. Sin días previos devuelve [] (un solo día no necesita línea de tiempo).
+ */
+export function planPorDia(doc: DocState, cfg: DocConfig, vars: TplVars): DiaPlan[] {
+  const previos = diasEmbalaje(doc);
+  if (previos === 0) return [];
+  const acciones = accionesVisibles(doc);
+  const resolver = (ks: string[]) => ks.map((k) => txt(doc, cfg, k, vars)).filter(Boolean);
+  const embalar = resolver(acciones.filter((k) => ACCIONES_EMBALAJE.includes(k)));
+  const mudanza = resolver(acciones.filter((k) => !ACCIONES_EMBALAJE.includes(k)));
+  const personas = personasEmbalaje(doc);
+  const dias: DiaPlan[] = [];
+  for (let d = 0; d < previos; d++) {
+    dias.push({
+      nombre: nombreDia(d),
+      final: false,
+      lineas: [
+        { texto: `${dosDigitos(personas)} personas operativas`, equipo: true },
+        ...(embalar.length ? embalar : [`Embalaje en ${vars.tipoOrigen} origen (${vars.origenComuna}).`]).map((t) => ({ texto: t })),
+        ...(d === 0 && doc.materiales.length ? [{ texto: 'Incluye materiales de embalaje.' }] : []),
+      ],
+    });
+  }
+  dias.push({
+    nombre: nombreDia(previos),
+    final: true,
+    lineas: [
+      { texto: `${dosDigitos(doc.camion_qty)} ${camionLabel(doc.camion)} · ${dosDigitos(doc.camion_qty)} chofer · ${dosDigitos(doc.personas)} personas operativas`, equipo: true },
+      ...mudanza.map((t) => ({ texto: t })),
+    ],
+  });
+  return dias;
+}

@@ -6,6 +6,7 @@ import {
   diasEmbalaje,
   nombreDia,
   personasEmbalaje,
+  planPorDia,
   precioFinal,
   txt,
   LETRAS,
@@ -79,6 +80,8 @@ const DocMarco = ({ doc, cfg }: Props) => {
   const precio = precioFinal(doc);
   const diasPrevios = diasEmbalaje(doc);
   const personasPrevias = personasEmbalaje(doc);
+  const plan = planPorDia(doc, cfg, vars);
+  const colsPlan = plan.length <= 3 ? plan.length : plan.length === 4 ? 2 : 3;
 
   const Banda = ({ n }: { n: number }) => (
     <tr className="d-day">
@@ -118,6 +121,29 @@ const DocMarco = ({ doc, cfg }: Props) => {
 
           {personalCalificado && <p className="d-star">* {personalCalificado}</p>}
           {seTrasladara && <p className="d-star">* {seTrasladara}</p>}
+
+          {plan.length > 0 && (
+            <div className="d-plan">
+              <div className="d-plan-title">PLAN DE LA MUDANZA DÍA POR DÍA</div>
+              <div className="d-plan-grid" style={{ ['--plan-cols' as string]: colsPlan }}>
+                {plan.map((d, i) => (
+                  <div key={i} className={`d-plan-day${d.final ? ' final' : ''}`}>
+                    <div className="h">
+                      <span>{d.nombre}</span>
+                      <span>{d.final ? 'MUDANZA' : 'EMBALAJE'}</span>
+                    </div>
+                    <ul>
+                      {d.lineas.map((l, j) => (
+                        <li key={j} className={l.equipo ? 'crew' : ''}>
+                          {l.texto}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <p className="d-p indent">
             El detalle completo del inventario declarado por el cliente ({doc.inventario.length} líneas) se
