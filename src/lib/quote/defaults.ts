@@ -224,6 +224,13 @@ export const TEXTO_DEFS: TextoDef[] = [
     default:
       'Personas operativas para cargar en {{tipoOrigen}} origen; descargar, {{#embalaje}}desembalar y {{/embalaje}}ordenar muebles en {{tipoDestino}} destino',
   },
+  { key: 'fila_embalar', label: 'Fila tabla — embalar (cada día previo)', group: 'Tabla', default: 'Personas operativas para EMBALAR en {{tipoOrigen}} origen' },
+  { key: 'fila_camion', label: 'Fila tabla — camión', group: 'Tabla', default: '{{camion}}' },
+  { key: 'tabla_th_cant', label: 'Tabla — título columna cantidad', group: 'Tabla', default: 'CANTIDAD' },
+  { key: 'tabla_th_desc', label: 'Tabla — título columna descripción', group: 'Tabla', default: 'PERSONAL + MATERIALES' },
+  { key: 'tabla_th_valor', label: 'Tabla — título columna valor', group: 'Tabla', default: 'VALOR' },
+  { key: 'tabla_total', label: 'Tabla — etiqueta del total', group: 'Tabla', default: 'TOTAL' },
+  { key: 'nota_inventario', label: 'Nota del inventario anexo', group: 'Tabla', default: 'El detalle completo del inventario declarado por el cliente ({{lineasInventario}} líneas) se adjunta en la hoja anexa al final de esta cotización.' },
   { key: 'fila_embalaje', label: 'Fila tabla — embalaje', group: 'Tabla', default: 'Servicio de embalaje:' },
   { key: 'fila_embalaje_incluye', label: 'Fila tabla — materiales', group: 'Tabla', default: 'Incluye Materiales:' },
 

@@ -161,6 +161,7 @@ export function buildVars(doc: DocState, cfg: DocConfig): TplVars {
     m3: m3.toFixed(1),
     m2: m2.toFixed(1),
     items: totalItems(doc.inventario),
+    lineasInventario: doc.inventario.length,
     camion: camionLabel(doc.camion),
     camiones: doc.camion_qty,
     choferes: doc.camion_qty,
@@ -195,6 +196,30 @@ export function buildVars(doc: DocState, cfg: DocConfig): TplVars {
 /** Texto resuelto (override ?? default) e interpolado. */
 export function txt(doc: DocState, cfg: DocConfig, key: string, vars: TplVars): string {
   return resolveTexto(key, doc.textos || {}, cfg.textosDefault, vars);
+}
+
+/**
+ * Texto por defecto de una clave, incluidas las dinámicas de la tabla por día:
+ * `banda_N` (título del día N) y `fila_embalar_N` (fila de embalaje del día N, cae en `fila_embalar`).
+ */
+export function textoPorDefecto(cfg: DocConfig, key: string): string {
+  const b = /^banda_(\d+)$/.exec(key);
+  if (b) return nombreDia(Number(b[1]));
+  if (/^fila_embalar_\d+$/.test(key)) return cfg.textosDefault.fila_embalar ?? '';
+  return cfg.textosDefault[key] ?? '';
+}
+
+/** Título de la banda del día `n` (0 = primer día), con el texto escrito a mano si lo hay. */
+export const textoBanda = (doc: DocState, n: number) => {
+  const manual = (doc.textos || {})[`banda_${n}`];
+  return manual !== undefined ? manual : nombreDia(n);
+};
+
+/** Fila "Personas operativas para EMBALAR…" del día `d`: propia, o la general, o la de fábrica. */
+export function textoFilaEmbalar(doc: DocState, cfg: DocConfig, d: number, vars: TplVars): string {
+  const t = doc.textos || {};
+  const key = t[`fila_embalar_${d}`] !== undefined ? `fila_embalar_${d}` : 'fila_embalar';
+  return txt(doc, cfg, key, vars);
 }
 
 export { renderTemplate };

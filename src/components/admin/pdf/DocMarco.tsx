@@ -7,6 +7,8 @@ import {
   nombreDia,
   personasEmbalaje,
   planPorDia,
+  textoBanda,
+  textoFilaEmbalar,
   precioFinal,
   txt,
   LETRAS,
@@ -15,7 +17,7 @@ import {
   type DocState,
 } from '@/lib/quote/document';
 import { tipoServicioLabel } from '@/lib/quote/defaults';
-import { camionLabel, formatCLP, totalM3 } from '@/lib/quote/pricing';
+import { formatCLP, totalM3 } from '@/lib/quote/pricing';
 import { dosDigitos, espaciar, espaciarDigitos } from '@/lib/quote/templates';
 import DocInventario from './DocInventario';
 
@@ -84,8 +86,8 @@ const DocMarco = ({ doc, cfg }: Props) => {
   const colsPlan = plan.length <= 3 ? plan.length : plan.length === 4 ? 2 : 3;
 
   const Banda = ({ n }: { n: number }) => (
-    <tr className="d-day">
-      <td colSpan={3}>{espaciar(nombreDia(n))}</td>
+    <tr className="d-day" data-edit={`,banda_${n}`} data-edit-label={`Título del día — ${nombreDia(n)}`}>
+      <td colSpan={3}>{espaciar(textoBanda(doc, n))}</td>
     </tr>
   );
 
@@ -145,9 +147,20 @@ const DocMarco = ({ doc, cfg }: Props) => {
             </div>
           )}
 
-          <p className="d-p indent">
-            El detalle completo del inventario declarado por el cliente ({doc.inventario.length} líneas) se
-            adjunta en la <b>hoja anexa</b> al final de esta cotización.
+          <p className="d-p indent" data-edit=",nota_inventario" data-edit-label="Nota del inventario anexo">
+            {(() => {
+              const nota = txt(doc, cfg, 'nota_inventario', vars);
+              const marca = 'hoja anexa';
+              const idx = nota.indexOf(marca);
+              if (idx === -1) return nota;
+              return (
+                <>
+                  {nota.slice(0, idx)}
+                  <b>{marca}</b>
+                  {nota.slice(idx + marca.length)}
+                </>
+              );
+            })()}
           </p>
 
 
@@ -185,7 +198,7 @@ const DocMarco = ({ doc, cfg }: Props) => {
           {(doc.textos?.['detalle_servicio'] || '').trim() && (
             <>
               <div className="k">Detalle del Servicio:</div>
-              <div className="v" style={{ whiteSpace: "pre-line" }}>{doc.textos['detalle_servicio'].trim()}</div>
+              <div className="v" style={{ whiteSpace: "pre-line" }} data-edit=",detalle_servicio" data-edit-label="Detalle del servicio">{doc.textos['detalle_servicio'].trim()}</div>
             </>
           )}
           <div className="k">Email:</div>
@@ -203,9 +216,9 @@ const DocMarco = ({ doc, cfg }: Props) => {
         <table className="d-tbl">
           <thead>
             <tr>
-              <th style={{ width: '22mm' }}>CANTIDAD</th>
-              <th>PERSONAL + MATERIALES</th>
-              <th style={{ width: '34mm' }}>VALOR</th>
+              <th style={{ width: '22mm' }} data-edit=",tabla_th_cant" data-edit-label="Título de la columna">{txt(doc, cfg, 'tabla_th_cant', vars)}</th>
+              <th data-edit=",tabla_th_desc" data-edit-label="Título de la columna">{txt(doc, cfg, 'tabla_th_desc', vars)}</th>
+              <th style={{ width: '34mm' }} data-edit=",tabla_th_valor" data-edit-label="Título de la columna">{txt(doc, cfg, 'tabla_th_valor', vars)}</th>
             </tr>
           </thead>
           <tbody>
@@ -214,7 +227,7 @@ const DocMarco = ({ doc, cfg }: Props) => {
                 <Banda n={d} />
                 <tr>
                   <td className="c">{dosDigitos(personasPrevias)}</td>
-                  <td>{`Personas operativas para EMBALAR en ${vars.tipoOrigen} origen`}</td>
+                  <td data-edit={`,fila_embalar_${d}`} data-edit-label={`Fila de embalaje — ${nombreDia(d)}`}>{textoFilaEmbalar(doc, cfg, d, vars)}</td>
                   <td className="v" />
                 </tr>
                 {d === 0 && filaEmbalaje}
@@ -223,7 +236,7 @@ const DocMarco = ({ doc, cfg }: Props) => {
             {diasPrevios > 0 && <Banda n={diasPrevios} />}
             <tr>
               <td className="c">{dosDigitos(doc.camion_qty)}</td>
-              <td>{camionLabel(doc.camion)}</td>
+              <td data-edit=",fila_camion" data-edit-label="Fila del camión">{txt(doc, cfg, 'fila_camion', vars)}</td>
               <td className="v" />
             </tr>
             <tr>
@@ -239,7 +252,7 @@ const DocMarco = ({ doc, cfg }: Props) => {
             {doc.con_embalaje && diasPrevios === 0 && filaEmbalaje}
             <tr className="d-total">
               <td className="c" />
-              <td>TOTAL</td>
+              <td data-edit=",tabla_total" data-edit-label="Etiqueta del total">{txt(doc, cfg, 'tabla_total', vars)}</td>
               <td className="v">{formatCLP(precio)}</td>
             </tr>
           </tbody>

@@ -34,3 +34,29 @@ describe('plan por día', () => {
     for (const k of ['dia_0', 'dia_1', 'saludo_cuerpo', 'pago_saldo', 'fila_chofer']) expect(html).toContain(k);
   });
 });
+
+describe('tabla de la hoja 2 editable', () => {
+  const html = (textos: Record<string, string>) =>
+    renderToStaticMarkup(createElement(DocMarco, { doc: base({ dias_embalaje: '2', ...textos }), cfg: DEFAULT_CONFIG }));
+
+  it('por defecto muestra los textos de siempre, cada uno con su enganche para editar', () => {
+    const h = html({});
+    expect(h).toContain('Personas operativas para EMBALAR en departamento origen');
+    expect(h).toContain('data-edit=",banda_1"');
+    expect(h).toContain('data-edit=",fila_embalar_0"');
+    expect(h).toContain('data-edit=",fila_camion"');
+    expect(h).toContain('data-edit=",tabla_total"');
+  });
+  it('cambiar el segundo día no toca los otros', () => {
+    const h = html({ banda_1: 'DÍA DE COCINA', fila_embalar_1: 'Equipo especial para la cocina' });
+    expect(h).toContain('Equipo especial para la cocina');
+    expect(h.match(/Personas operativas para EMBALAR/g)).toHaveLength(1);
+    expect(h.replace(/<[^>]+>/g, '').replace(/\s/g, '')).toContain('DÍADECOCINA');
+    expect(h.replace(/<[^>]+>/g, '').replace(/\s/g, '')).toContain('PRIMERDÍA');
+  });
+  it('camión y total se pueden reescribir', () => {
+    const h = html({ fila_camion: 'Camión de 3/4 con baranda', tabla_total: 'TOTAL NETO' });
+    expect(h).toContain('Camión de 3/4 con baranda');
+    expect(h).toContain('TOTAL NETO');
+  });
+});
