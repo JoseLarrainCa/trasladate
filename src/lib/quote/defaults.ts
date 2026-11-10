@@ -413,6 +413,8 @@ export const ACCIONES_EXTRA = ['accion_cocina', 'accion_adornos', 'accion_libros
 
 export const TITULO_OPTIONS = [
   'TRASLADO + EMBALAJE',
+  'TRASLADO',
+  'TRASLADO + DESEMBALAJE',
   'SOLO TRASLADO',
   'TRASLADO + EMBALAJE + BODEGAJE',
 ];

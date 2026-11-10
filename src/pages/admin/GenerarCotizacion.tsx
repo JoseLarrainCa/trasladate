@@ -578,6 +578,22 @@ const GenerarCotizacion = () => {
                   <datalist id="titulos">
                     {TITULO_OPTIONS.map((t) => <option key={t} value={t} />)}
                   </datalist>
+                  {/* El desplegable del navegador solo muestra lo que calza con lo escrito: estos botones
+                      dejan ver y elegir todas las opciones siempre. */}
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {TITULO_OPTIONS.map((t) => (
+                      <Button
+                        key={t}
+                        type="button"
+                        size="sm"
+                        variant={doc.titulo_servicio === t ? 'default' : 'outline'}
+                        className="h-7 px-2 text-xs"
+                        onClick={() => set('titulo_servicio', t)}
+                      >
+                        {t}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
 
                 <div>
