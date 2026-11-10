@@ -157,7 +157,7 @@ const QuoteForm = () => {
   const validateStep1 = (): boolean => {
     const required = [
       formData.clienteNombre,
-      formData.telefono,
+      formData.celular,
       formData.email,
       formData.origenDireccion,
       formData.origenComuna,
@@ -223,8 +223,10 @@ const QuoteForm = () => {
           id: quoteId,
           cliente_nombre: formData.clienteNombre,
           cliente_apellido: formData.clienteApellido || null,
-          telefono: formData.telefono,
-          celular: formData.celular || null,
+          // El celular es el dato obligatorio; si no hay teléfono fijo, el celular ocupa su lugar
+          // (la base, los enlaces de WhatsApp y el aviso leen `telefono` como contacto principal).
+          telefono: formData.telefono.trim() || formData.celular.trim(),
+          celular: formData.celular.trim() || null,
           email: formData.email || null,
           origen_direccion: formData.origenDireccion,
           origen_comuna: formData.origenComuna,
@@ -297,7 +299,7 @@ const QuoteForm = () => {
       const mensajeLegacy = `DATOS DEL CLIENTE:
 __________________
 Cliente: ${formData.clienteNombre} ${formData.clienteApellido}
-Telefono: ${formData.telefono}
+Telefono: ${formData.telefono || '---'}
 Celular: ${formData.celular || '---'}
 Correo: ${formData.email || '---'}
 
@@ -537,7 +539,7 @@ ${inventarioFormateado}`;
                         />
                       </div>
                       <div>
-                        <Label htmlFor="telefono">Teléfono *</Label>
+                        <Label htmlFor="telefono">Teléfono</Label>
                         <Input
                           id="telefono"
                           type="tel"
@@ -548,7 +550,7 @@ ${inventarioFormateado}`;
                         />
                       </div>
                       <div>
-                        <Label htmlFor="celular">Celular</Label>
+                        <Label htmlFor="celular">Celular *</Label>
                         <Input
                           id="celular"
                           type="tel"

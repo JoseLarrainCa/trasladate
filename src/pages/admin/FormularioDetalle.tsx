@@ -313,7 +313,7 @@ const FormularioDetalle = () => {
               <p className="font-medium flex items-center gap-2">
                 <Phone className="w-4 h-4" />
                 {quote.telefono}
-                {quote.celular && ` / ${quote.celular}`}
+                {quote.celular && quote.celular !== quote.telefono && ` / ${quote.celular}`}
               </p>
             </div>
             {quote.email && (
