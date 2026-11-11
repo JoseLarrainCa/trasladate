@@ -319,6 +319,7 @@
 }
 .m-tbl .m-detail-list li { margin: 0 0 0.6mm; }
 .m-tbl .m-detail-list li:last-child { margin-bottom: 0; }
+.m-tbl .m-detail-list li.crew { list-style: none; margin-left: -5mm; font-weight: 700; color: #1e46c8; }
 
 .m-total {
   background: #1e3a6a;

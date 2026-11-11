@@ -2,7 +2,9 @@ import {
   accionesVisibles,
   buildVars,
   formatFechaCL,
+  planPorDia,
   precioFinal,
+  textoBanda,
   tipoCorto,
   txt,
   verSeccion,
@@ -51,7 +53,27 @@ const DocModerno = ({ doc, cfg }: Props) => {
         {t('personal_calificado') && <div className="d">{t('personal_calificado')}</div>}
       </td>
     );
-  if (ver('item_equipo'))
+  // Mudanza de varios días: una fila por día (embalaje de los días previos + mudanza), igual que
+  // el formato de Marco. Los textos a mano (`dia_N`, `banda_N`) se editan con las mismas claves.
+  const plan = planPorDia(doc, cfg, vars);
+  if (plan.length > 0 && ver('item_equipo'))
+    plan.forEach((dia, i) =>
+      filas.push(
+        <td key={`dia${i}`} data-edit={`item_equipo,banda_${i},dia_${i}`} data-edit-label={`${dia.nombre} — ${dia.final ? 'mudanza' : 'embalaje'}`}>
+          <div className="t">
+            {textoBanda(doc, i)} · {dia.final ? 'MUDANZA' : 'EMBALAJE'}
+          </div>
+          <ul className="m-detail-list">
+            {dia.lineas.map((l, j) => (
+              <li key={j} className={l.equipo ? 'crew' : ''}>
+                {l.texto}
+              </li>
+            ))}
+          </ul>
+        </td>
+      )
+    );
+  else if (ver('item_equipo'))
     filas.push(
       <td key="e" data-edit="item_equipo,mod_item_equipo,mod_equipo_camion,mod_equipo_choferes,mod_equipo_personas" data-edit-label="Equipo y personal">
         {t('mod_item_equipo') && <div className="t">{t('mod_item_equipo')}</div>}

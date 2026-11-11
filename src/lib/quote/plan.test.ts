@@ -4,6 +4,7 @@ import { createElement } from 'react';
 import { DEFAULT_CONFIG, buildVars, planPorDia, planAuto, type DocState } from './document';
 import { ACCION_KEYS, MATERIALES_DOMICILIO, OBSERVACION_KEYS } from './defaults';
 import DocMarco from '@/components/admin/pdf/DocMarco';
+import DocModerno from '@/components/admin/pdf/DocModerno';
 
 const base = (textos: Record<string, string>): DocState => ({
   folio: 1, formato: 'marco', fecha_servicio: '', hora_inicio: '', hora_fin: '', titulo_servicio: 'TRASLADO + EMBALAJE',
@@ -58,5 +59,31 @@ describe('tabla de la hoja 2 editable', () => {
     const h = html({ fila_camion: 'Camión de 3/4 con baranda', tabla_total: 'TOTAL NETO' });
     expect(h).toContain('Camión de 3/4 con baranda');
     expect(h).toContain('TOTAL NETO');
+  });
+});
+
+describe('formato Moderno con varios días', () => {
+  const mod = (textos: Record<string, string>) =>
+    renderToStaticMarkup(createElement(DocModerno, { doc: { ...base({ dias_embalaje: '1', personas_embalaje: '4', ...textos }), formato: 'moderno' }, cfg: DEFAULT_CONFIG }));
+  const plano = (h: string) => h.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+
+  it('muestra una fila por día: las 4 personas que embalan el primer día y la mudanza del segundo', () => {
+    const h = plano(mod({}));
+    expect(h).toContain('PRIMER DÍA · EMBALAJE');
+    expect(h).toContain('SEGUNDO DÍA · MUDANZA');
+    expect(h).toContain('04 personas operativas');
+    expect(h).toContain('03 personas operativas');
+  });
+  it('cada día se puede editar con las mismas claves que en Marco', () => {
+    const h = mod({});
+    for (const k of ['dia_0', 'dia_1', 'banda_0', 'banda_1']) expect(h).toContain(k);
+  });
+  it('un texto escrito a mano para un día aparece en el Moderno', () => {
+    expect(plano(mod({ dia_0: 'Cocina y loza\nDormitorios', banda_1: 'DÍA DE MUDANZA' }))).toContain('Cocina y loza');
+  });
+  it('un solo día sigue mostrando «Equipo y personal»', () => {
+    const h = plano(renderToStaticMarkup(createElement(DocModerno, { doc: { ...base({}), formato: 'moderno' }, cfg: DEFAULT_CONFIG })));
+    expect(h).toContain('Equipo y personal');
+    expect(h).not.toContain('EMBALAJE');
   });
 });
